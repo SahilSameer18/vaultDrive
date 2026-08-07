@@ -28,6 +28,7 @@ model File {
   name        String
   size        Int
   mimeType    String
+  resourceType String     @default("image") // Cloudinary asset resource_type ("image" | "video" | "raw")
   url         String       // Cloudinary secure URL
   publicId    String       // Cloudinary public_id — vaultDrive/<userId>/<fileId>-<filename>
   isPublic    Boolean      @default(false)
