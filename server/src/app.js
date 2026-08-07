@@ -1,22 +1,42 @@
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import { generalLimiter } from "./middlewares/rateLimit.middleware.js";
+import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security HTTP headers
+app.use(helmet());
 
-// test route
-app.get('/', (req, res) => {
-    console.log('first');
-    res.send('Hii from the vaultDrive');
+// CORS configuration
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+// General rate limiter applied globally
+app.use(generalLimiter);
+
+// Body parsers & Cookie parser
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(cookieParser());
+
+// Health check route
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "VaultDrive API is running smoothly." });
 });
 
-// import all the routes here
+// Route imports will be mounted here in future phases
+// app.use("/api/v1/auth", authRouter);
+// app.use("/api/v1/files", fileRouter);
+// app.use("/api/v1/folders", folderRouter);
 
-
-// use all the routes here
-
+// Global Error Handler
+app.use(errorMiddleware);
 
 export default app;

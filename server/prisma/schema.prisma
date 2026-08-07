@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,3 +9,74 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  username      String         @unique
+  passwordHash  String
+  avatarUrl     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  files         File[]
+  folders       Folder[]
+  sharedWithMe  SharedFile[]
+  refreshTokens RefreshToken[]
+}
+
+model File {
+  id          String       @id @default(cuid())
+  name        String
+  size        Int
+  mimeType    String
+  url         String       // Cloudinary secure URL
+  publicId    String       // Cloudinary public_id — vaultDrive/<userId>/<fileId>-<filename>
+  isPublic    Boolean      @default(false)
+  shareToken  String?      @unique // random hex token — active until owner revokes
+  folderId    String?
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folder      Folder?      @relation(fields: [folderId], references: [id], onDelete: SetNull) // SetNull so deleting a folder moves files to root
+  sharedWith  SharedFile[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])        // fast queries by owner
+  @@index([folderId])      // fast queries by folder
+}
+
+model Folder {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  parentId  String?
+  parent    Folder?  @relation("FolderTree", fields: [parentId], references: [id])
+  children  Folder[] @relation("FolderTree")
+  files     File[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])        // fast queries by owner
+  @@index([parentId])      // fast tree traversal
+}
+
+model SharedFile {
+  id        String   @id @default(cuid())
+  fileId    String
+  userId    String   // user it is shared WITH
+  file      File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([fileId, userId]) // prevents duplicate shares; composite index (fileId, userId)
+  @@index([userId])          // needed for GET /files/shared-with-me — filter by userId alone
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique // bcrypt hash of the actual token — never store plain text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
