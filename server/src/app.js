@@ -28,6 +28,7 @@ app.use(cookieParser());
 
 import authRouter from "./routes/auth.routes.js";
 import fileRouter from "./routes/file.routes.js";
+import folderRouter from "./routes/folder.routes.js";
 
 // Health check route
 app.get("/", (req, res) => {
@@ -37,11 +38,10 @@ app.get("/", (req, res) => {
 // API Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/files", fileRouter);
-// app.use("/api/v1/folders", folderRouter);
+app.use("/api/v1/folders", folderRouter);
 
 // Global Error Handler
 app.use(errorMiddleware);
 
 export default app;
-
 
