@@ -1,10 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
 import { filesApi } from "../../api/files.api";
+import { foldersApi } from "../../api/folders.api";
 import { formatBytes } from "../../utils/formatters";
 import { getFileCategory } from "../../utils/fileIcons";
+import FolderSidebar from "../folder/FolderSidebar";
+import RenameFolderModal from "../folder/RenameFolderModal";
+import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 
 export default function Sidebar({ onCloseMobileMenu }) {
+  const [allFolders, setAllFolders] = useState([]);
+  const [renameTarget, setRenameTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
   const [stats, setStats] = useState({
     totalBytes: 0,
     categories: {
@@ -15,9 +22,14 @@ export default function Sidebar({ onCloseMobileMenu }) {
     },
   });
 
-  const loadStats = useCallback(async () => {
+  const loadStatsAndFolders = useCallback(async () => {
     try {
-      const res = await filesApi.list(null); // Fetch all user files
+      // 1. Fetch all user folders (no parentId filter) for directory tree
+      const folderRes = await foldersApi.list(null);
+      setAllFolders(folderRes.data.data.folders || []);
+
+      // 2. Fetch all user files for storage breakdown
+      const res = await filesApi.list(null);
       const files = res.data.data.files || [];
 
       let total = 0;
@@ -49,17 +61,28 @@ export default function Sidebar({ onCloseMobileMenu }) {
   }, []);
 
   useEffect(() => {
-    loadStats();
+    loadStatsAndFolders();
 
-    // Listen for file changes (upload or delete) to refresh storage breakdown
-    window.addEventListener("vault:files-changed", loadStats);
-    window.addEventListener("vault:file-uploaded", loadStats);
+    // Listen for file and folder changes to refresh directory tree and storage breakdown
+    window.addEventListener("vault:files-changed", loadStatsAndFolders);
+    window.addEventListener("vault:file-uploaded", loadStatsAndFolders);
 
     return () => {
-      window.removeEventListener("vault:files-changed", loadStats);
-      window.removeEventListener("vault:file-uploaded", loadStats);
+      window.removeEventListener("vault:files-changed", loadStatsAndFolders);
+      window.removeEventListener("vault:file-uploaded", loadStatsAndFolders);
     };
-  }, [loadStats]);
+  }, [loadStatsAndFolders]);
+
+  const handleRenameSubmit = async (folderId, newName) => {
+    await foldersApi.update(folderId, { name: newName });
+    window.dispatchEvent(new CustomEvent("vault:files-changed"));
+  };
+
+  const handleDeleteSubmit = async () => {
+    if (!deleteTarget) return;
+    await foldersApi.delete(deleteTarget.id);
+    window.dispatchEvent(new CustomEvent("vault:files-changed"));
+  };
 
   // Compute category percentages proportional to current totalBytes
   const total = stats.totalBytes || 1;
@@ -69,10 +92,10 @@ export default function Sidebar({ onCloseMobileMenu }) {
   const archivePct = (stats.categories.archive / total) * 100;
 
   return (
-    <aside className="w-64 border-r border-vault-border bg-vault-bg flex flex-col justify-between h-full select-none">
+    <aside className="w-64 border-r border-vault-border bg-vault-bg flex flex-col justify-between h-full select-none overflow-y-auto">
       
-      {/* ── Top Section: Primary Navigation ────────────────────────────── */}
-      <div className="p-4 space-y-6">
+      {/* ── Top Section: Primary Navigation & Folder Directories ──────── */}
+      <div className="p-4 space-y-5">
         
         {/* Repository Header Tag */}
         <div className="px-3 pt-2">
@@ -139,10 +162,22 @@ export default function Sidebar({ onCloseMobileMenu }) {
           </NavLink>
         </nav>
 
+        {/* Dynamic Interactive Directory Folder Tree */}
+        {allFolders.length > 0 && (
+          <div className="pt-2 border-t border-vault-border/60">
+            <FolderSidebar
+              folders={allFolders}
+              onSelectFolder={onCloseMobileMenu}
+              onRenameFolder={(folder) => setRenameTarget(folder)}
+              onDeleteFolder={(folder) => setDeleteTarget(folder)}
+            />
+          </div>
+        )}
+
       </div>
 
       {/* ── Bottom Section: Proportional Storage Breakdown Bar ─────────── */}
-      <div className="p-4 border-t border-vault-border bg-vault-panel/40">
+      <div className="p-4 border-t border-vault-border bg-vault-panel/40 shrink-0">
         <div className="flex items-center justify-between mb-2.5">
           <span className="text-[9px] font-mono tracking-widest text-vault-muted">STORAGE USED</span>
           <span className="text-[10px] font-mono text-vault-accent font-semibold">
@@ -204,6 +239,22 @@ export default function Sidebar({ onCloseMobileMenu }) {
           </span>
         </div>
       </div>
+
+      <RenameFolderModal
+        isOpen={!!renameTarget}
+        onClose={() => setRenameTarget(null)}
+        folder={renameTarget}
+        onRenameFolder={handleRenameSubmit}
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete Directory"
+        description="Are you sure you want to delete this folder? Files inside will be safely moved to root."
+        itemName={deleteTarget?.name || ""}
+        onConfirm={handleDeleteSubmit}
+      />
 
     </aside>
   );

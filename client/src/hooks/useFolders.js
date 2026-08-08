@@ -40,6 +40,22 @@ export function useFolders(currentFolderId = null) {
     return newFolder;
   };
 
+  // Rename folder
+  const renameFolder = async (folderId, name) => {
+    const res = await foldersApi.update(folderId, { name });
+    const updated = res.data.data.folder;
+    setFolders((prev) =>
+      prev.map((f) => (f.id === folderId ? { ...f, name: updated.name } : f))
+    );
+    return updated;
+  };
+
+  // Delete folder
+  const deleteFolder = async (folderId) => {
+    await foldersApi.delete(folderId);
+    setFolders((prev) => prev.filter((f) => f.id !== folderId));
+  };
+
   // Filtered subfolders by global search query
   const filteredFolders = folders.filter((f) =>
     f.name?.toLowerCase().includes((searchQuery || "").toLowerCase())
@@ -53,5 +69,7 @@ export function useFolders(currentFolderId = null) {
     error,
     fetchFolders,
     createFolder,
+    renameFolder,
+    deleteFolder,
   };
 }

@@ -10,6 +10,8 @@ import FileSkeleton from "../components/ui/FileSkeleton";
 import UploadModal from "../components/file/UploadModal";
 import ShareModal from "../components/file/ShareModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
+import RenameFolderModal from "../components/folder/RenameFolderModal";
+import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 
 export default function FolderPage() {
   const { folderId } = useParams();
@@ -19,8 +21,10 @@ export default function FolderPage() {
   const [isUploadOpen, setIsUploadOpen]       = useState(false);
   const [isFolderOpen, setIsFolderOpen]       = useState(false);
   const [shareFile, setShareFile]             = useState(null);
+  const [renameFolderTarget, setRenameFolderTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget]       = useState(null); // { type: 'file'|'folder', item: obj }
 
-  const { folders, breadcrumbs, loading: foldersLoading, fetchFolders, createFolder } = useFolders(folderId);
+  const { folders, breadcrumbs, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
   const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
 
   useEffect(() => {
@@ -32,8 +36,12 @@ export default function FolderPage() {
       fetchFolders(folderId);
     };
 
+    window.addEventListener("vault:files-changed", handleUploadEvent);
     window.addEventListener("vault:file-uploaded", handleUploadEvent);
-    return () => window.removeEventListener("vault:file-uploaded", handleUploadEvent);
+    return () => {
+      window.removeEventListener("vault:files-changed", handleUploadEvent);
+      window.removeEventListener("vault:file-uploaded", handleUploadEvent);
+    };
   }, [folderId, fetchFolders, fetchFiles]);
 
   // Handlers
@@ -41,8 +49,41 @@ export default function FolderPage() {
     try {
       await createFolder(name, folderId);
       addToast(`Subfolder "${name}" created`, "success");
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch {
       addToast("Failed to create subfolder", "error");
+    }
+  };
+
+  const handleRenameFolder = async (targetFolderId, newName) => {
+    try {
+      await renameFolder(targetFolderId, newName);
+      addToast(`Folder renamed to "${newName}"`, "success");
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
+    } catch {
+      addToast("Failed to rename folder", "error");
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === "file") {
+      try {
+        await deleteFile(deleteTarget.item.id);
+        addToast("File deleted from vault", "info");
+        window.dispatchEvent(new CustomEvent("vault:files-changed"));
+      } catch {
+        addToast("Failed to delete file", "error");
+      }
+    } else if (deleteTarget.type === "folder") {
+      try {
+        await deleteFolder(deleteTarget.item.id);
+        addToast(`Folder "${deleteTarget.item.name}" deleted`, "info");
+        window.dispatchEvent(new CustomEvent("vault:files-changed"));
+      } catch {
+        addToast("Failed to delete folder", "error");
+      }
     }
   };
 
@@ -67,17 +108,6 @@ export default function FolderPage() {
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch {
       addToast("Failed to update privacy status", "error");
-    }
-  };
-
-  const handleDeleteFile = async (fileId) => {
-    if (!window.confirm("Are you sure you want to delete this file?")) return;
-    try {
-      await deleteFile(fileId);
-      addToast("File deleted from vault", "info");
-      window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("Failed to delete file", "error");
     }
   };
 
@@ -170,7 +200,12 @@ export default function FolderPage() {
           viewMode={viewMode}
           onTogglePrivacy={handleTogglePrivacy}
           onOpenShare={(file) => setShareFile(file)}
-          onDeleteFile={handleDeleteFile}
+          onDeleteFile={(fileId) => {
+            const f = files.find((item) => item.id === fileId);
+            setDeleteTarget({ type: "file", item: f || { id: fileId, name: "File" } });
+          }}
+          onRenameFolder={(folder) => setRenameFolderTarget(folder)}
+          onDeleteFolder={(folder) => setDeleteTarget({ type: "folder", item: folder })}
         />
       ) : (
         <div className="min-h-[300px] rounded-2xl border border-dashed border-vault-border bg-vault-panel/20 flex flex-col items-center justify-center p-8 text-center">
@@ -197,6 +232,26 @@ export default function FolderPage() {
         isOpen={isFolderOpen}
         onClose={() => setIsFolderOpen(false)}
         onCreateFolder={handleCreateFolder}
+      />
+
+      <RenameFolderModal
+        isOpen={!!renameFolderTarget}
+        onClose={() => setRenameFolderTarget(null)}
+        folder={renameFolderTarget}
+        onRenameFolder={handleRenameFolder}
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        title={deleteTarget?.type === "folder" ? "Delete Directory" : "Delete Asset"}
+        description={
+          deleteTarget?.type === "folder"
+            ? "Are you sure you want to delete this folder? Files inside will be safely moved to root."
+            : "Are you sure you want to permanently delete this asset from your vault?"
+        }
+        itemName={deleteTarget?.item?.name || ""}
+        onConfirm={handleConfirmDelete}
       />
 
       <UploadModal
