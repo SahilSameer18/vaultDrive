@@ -7,6 +7,9 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import FolderPage from "./pages/FolderPage";
+import SharedWithMePage from "./pages/SharedWithMePage";
+import RecentActivityPage from "./pages/RecentActivityPage";
+import PublicSharePage from "./pages/PublicSharePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function AppRoutes() {
@@ -16,14 +19,15 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/share/:shareToken" element={<PublicSharePage />} />
 
       {/* ── Protected Vault Routes (AppLayout Shell) ────────────────────── */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/folder/:folderId" element={<FolderPage />} />
-          <Route path="/shared" element={<DashboardPage />} />
-          <Route path="/recent" element={<DashboardPage />} />
+          <Route path="/shared" element={<SharedWithMePage />} />
+          <Route path="/recent" element={<RecentActivityPage />} />
         </Route>
       </Route>
 

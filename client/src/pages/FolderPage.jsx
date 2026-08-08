@@ -25,6 +25,14 @@ export default function FolderPage() {
   useEffect(() => {
     fetchFolders(folderId);
     fetchFiles(folderId);
+
+    const handleUploadEvent = () => {
+      fetchFiles(folderId);
+      fetchFolders(folderId);
+    };
+
+    window.addEventListener("vault:file-uploaded", handleUploadEvent);
+    return () => window.removeEventListener("vault:file-uploaded", handleUploadEvent);
   }, [folderId, fetchFolders, fetchFiles]);
 
   // Handlers
@@ -41,6 +49,7 @@ export default function FolderPage() {
     try {
       await uploadFile(file, folderId, onProgress);
       addToast(`File "${file.name}" uploaded to folder`, "success");
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch {
       addToast("File upload failed", "error");
       throw new Error("Upload failed");
@@ -54,6 +63,7 @@ export default function FolderPage() {
         `File is now ${updated.isPublic ? "PUBLIC (Share link active)" : "PRIVATE"}`,
         updated.isPublic ? "success" : "info"
       );
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch {
       addToast("Failed to update privacy status", "error");
     }
@@ -64,6 +74,7 @@ export default function FolderPage() {
     try {
       await deleteFile(fileId);
       addToast("File deleted from vault", "info");
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch {
       addToast("Failed to delete file", "error");
     }

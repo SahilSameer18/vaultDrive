@@ -1,14 +1,39 @@
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Topbar from "./components/layout/Topbar";
 import Sidebar from "./components/layout/Sidebar";
+import DropzoneOverlay from "./components/file/DropzoneOverlay";
+import { useFiles } from "./hooks/useFiles";
+import { useToast } from "./components/ui/Toast";
 
 export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const { uploadFile } = useFiles(null);
+  const { addToast } = useToast();
+
+  // Extract folderId from URL if user is inside /folder/:folderId
+  const folderMatch = location.pathname.match(/\/folder\/([^/]+)/);
+  const currentFolderId = folderMatch ? folderMatch[1] : null;
+
+  const handleDroppedFile = async (file) => {
+    try {
+      await uploadFile(file, currentFolderId);
+      addToast(`File "${file.name}" uploaded successfully`, "success");
+      // Broadcast custom event so Sidebar and Active Page refresh state
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
+      window.dispatchEvent(new CustomEvent("vault:file-uploaded"));
+    } catch {
+      addToast("File upload failed", "error");
+    }
+  };
 
   return (
     <div className="h-screen w-screen bg-vault-bg text-vault-text flex flex-col overflow-hidden font-sans selection:bg-vault-accent/30">
       
+      {/* Whole-page Drag & Drop Overlay */}
+      <DropzoneOverlay onFileDropped={handleDroppedFile} />
+
       {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
       <Topbar onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)} />
 

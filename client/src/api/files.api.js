@@ -6,8 +6,11 @@ export const filesApi = {
       headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress,
     }),
-  list: (folderId = "root") =>
-    api.get("/files", { params: { folderId } }),
+  list: (folderId = "root") => {
+    const params = {};
+    if (folderId) params.folderId = folderId;
+    return api.get("/files", { params });
+  },
   getById: (id) => api.get(`/files/${id}`),
   update: (id, data) => api.patch(`/files/${id}`, data),
   delete: (id) => api.delete(`/files/${id}`),

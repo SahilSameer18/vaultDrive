@@ -1,29 +1,88 @@
+import { useState, useEffect, useCallback } from "react";
 import { NavLink } from "react-router-dom";
+import { filesApi } from "../../api/files.api";
+import { formatBytes } from "../../utils/formatters";
+import { getFileCategory } from "../../utils/fileIcons";
 
 export default function Sidebar({ onCloseMobileMenu }) {
+  const [stats, setStats] = useState({
+    totalBytes: 0,
+    categories: {
+      image: 0,
+      media: 0,
+      doc: 0,
+      archive: 0,
+    },
+  });
+
+  const loadStats = useCallback(async () => {
+    try {
+      const res = await filesApi.list(null); // Fetch all user files
+      const files = res.data.data.files || [];
+
+      let total = 0;
+      const cats = { image: 0, media: 0, doc: 0, archive: 0 };
+
+      files.forEach((f) => {
+        const size = f.size || 0;
+        total += size;
+
+        const category = getFileCategory(f.mimeType);
+        if (category === "image") {
+          cats.image += size;
+        } else if (category === "video" || category === "audio") {
+          cats.media += size;
+        } else if (category === "pdf" || category === "document") {
+          cats.doc += size;
+        } else {
+          cats.archive += size;
+        }
+      });
+
+      setStats({
+        totalBytes: total,
+        categories: cats,
+      });
+    } catch {
+      // Fallback
+    }
+  }, []);
+
+  useEffect(() => {
+    loadStats();
+
+    // Listen for file changes (upload or delete) to refresh storage breakdown
+    window.addEventListener("vault:files-changed", loadStats);
+    window.addEventListener("vault:file-uploaded", loadStats);
+
+    return () => {
+      window.removeEventListener("vault:files-changed", loadStats);
+      window.removeEventListener("vault:file-uploaded", loadStats);
+    };
+  }, [loadStats]);
+
+  // Compute category percentages proportional to current totalBytes
+  const total = stats.totalBytes || 1;
+  const imagePct   = (stats.categories.image / total) * 100;
+  const mediaPct   = (stats.categories.media / total) * 100;
+  const docPct     = (stats.categories.doc / total) * 100;
+  const archivePct = (stats.categories.archive / total) * 100;
+
   return (
     <aside className="w-64 border-r border-vault-border bg-vault-bg flex flex-col justify-between h-full select-none">
       
-      {/* ── Top Section: Actions & Primary Nav ───────────────────────────── */}
+      {/* ── Top Section: Primary Navigation ────────────────────────────── */}
       <div className="p-4 space-y-6">
         
-        {/* Quick Action Button */}
-        <button
-          type="button"
-          className="w-full py-3 px-4 rounded-xl text-xs font-semibold font-mono text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-lg shadow-vault-accent/10 transition-all flex items-center justify-center gap-2"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-            <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          UPLOAD FILE
-        </button>
+        {/* Repository Header Tag */}
+        <div className="px-3 pt-2">
+          <p className="text-[10px] font-mono tracking-widest text-vault-muted">
+            VAULT REPOSITORY
+          </p>
+        </div>
 
         {/* Core Navigation Links */}
         <nav className="space-y-1">
-          <p className="px-3 text-[10px] font-mono tracking-widest text-vault-muted mb-2">
-            REPOSITORY
-          </p>
-
           <NavLink
             to="/dashboard"
             onClick={onCloseMobileMenu}
@@ -82,34 +141,66 @@ export default function Sidebar({ onCloseMobileMenu }) {
 
       </div>
 
-      {/* ── Bottom Section: Storage Allocation Visualizer ───────────────── */}
-      <div className="p-4 border-t border-vault-border bg-vault-panel/30">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[10px] font-mono tracking-wider text-vault-muted">STORAGE ALLOCATION</span>
-          <span className="text-[10px] font-mono text-vault-accent">12.4 MB / 100 MB</span>
+      {/* ── Bottom Section: Proportional Storage Breakdown Bar ─────────── */}
+      <div className="p-4 border-t border-vault-border bg-vault-panel/40">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-[9px] font-mono tracking-widest text-vault-muted">STORAGE USED</span>
+          <span className="text-[10px] font-mono text-vault-accent font-semibold">
+            {formatBytes(stats.totalBytes)} used
+          </span>
         </div>
 
-        {/* Multi-category Progress Bar */}
-        <div className="h-2 rounded-full bg-vault-surface border border-vault-border overflow-hidden flex mb-3">
-          <div className="h-full bg-vault-success" style={{ width: "20%" }} title="Images" />
-          <div className="h-full bg-vault-accent" style={{ width: "15%" }} title="Videos" />
-          <div className="h-full bg-vault-sky" style={{ width: "10%" }} title="Documents" />
-          <div className="h-full bg-vault-muted" style={{ width: "5%" }} title="Archives" />
+        {/* Proportional 6px Multi-Category Metallic Bar */}
+        <div className="h-[6px] rounded-full bg-vault-surface border border-vault-border overflow-hidden flex mb-3.5 shadow-inner">
+          {stats.totalBytes > 0 ? (
+            <>
+              {imagePct > 0 && (
+                <div
+                  className="h-full bg-[#6FA88A] transition-all duration-300"
+                  style={{ width: `${imagePct}%` }}
+                  title={`Images: ${formatBytes(stats.categories.image)}`}
+                />
+              )}
+              {mediaPct > 0 && (
+                <div
+                  className="h-full bg-[#B8935A] transition-all duration-300"
+                  style={{ width: `${mediaPct}%` }}
+                  title={`Media: ${formatBytes(stats.categories.media)}`}
+                />
+              )}
+              {docPct > 0 && (
+                <div
+                  className="h-full bg-[#38BDF8] transition-all duration-300"
+                  style={{ width: `${docPct}%` }}
+                  title={`Docs: ${formatBytes(stats.categories.doc)}`}
+                />
+              )}
+              {archivePct > 0 && (
+                <div
+                  className="h-full bg-[#8B8F99] transition-all duration-300"
+                  style={{ width: `${archivePct}%` }}
+                  title={`Archives: ${formatBytes(stats.categories.archive)}`}
+                />
+              )}
+            </>
+          ) : (
+            <div className="h-full w-full bg-vault-surface" />
+          )}
         </div>
 
         {/* Category Legend */}
-        <div className="grid grid-cols-2 gap-y-1 text-[9px] font-mono text-vault-muted">
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-vault-success" /> Images
+        <div className="grid grid-cols-2 gap-y-2 text-[9px] font-mono text-vault-muted">
+          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.image)}>
+            <span className="w-2 h-2 rounded-full bg-[#6FA88A]" /> Images
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" /> Video & Audio
+          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.media)}>
+            <span className="w-2 h-2 rounded-full bg-[#B8935A]" /> Video & Audio
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-vault-sky" /> Documents
+          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.doc)}>
+            <span className="w-2 h-2 rounded-full bg-[#38BDF8]" /> Docs & PDFs
           </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-vault-muted" /> Archives
+          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.archive)}>
+            <span className="w-2 h-2 rounded-full bg-[#8B8F99]" /> Archives & Other
           </span>
         </div>
       </div>
