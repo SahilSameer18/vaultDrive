@@ -7,12 +7,12 @@ export function useFiles(folderId = null) {
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
 
-  // Fetch files inside current folder
+  // Fetch files inside current folder (defaults to 'root' for root-level files)
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await filesApi.list(targetFolderId);
+      const res = await filesApi.list(targetFolderId || "root");
       setFiles(res.data.data.files || []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load files");
@@ -39,18 +39,41 @@ export function useFiles(folderId = null) {
     return newFile;
   };
 
-  // Toggle privacy status using filesApi.update (PATCH /files/:id)
-  const togglePrivacy = async (fileId, isPublic) => {
-    const res = await filesApi.update(fileId, { isPublic });
-    const updated = res.data.data.file;
-    setFiles((prev) => prev.map((f) => (f.id === fileId ? updated : f)));
-    return updated;
+  // Toggle privacy status via share-link generate/revoke endpoints so isPublic and shareToken stay 100% in sync!
+  const togglePrivacy = async (fileId, currentIsPublic) => {
+    if (!currentIsPublic) {
+      // Make Public: generate share link (backend sets isPublic=true & creates shareToken)
+      const res = await filesApi.generateShareLink(fileId);
+      const { shareToken } = res.data.data;
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId ? { ...f, isPublic: true, shareToken } : f
+        )
+      );
+      return { id: fileId, isPublic: true, shareToken };
+    } else {
+      // Make Private: revoke share link (backend sets isPublic=false & clears shareToken)
+      await filesApi.revokeShareLink(fileId);
+      setFiles((prev) =>
+        prev.map((f) =>
+          f.id === fileId ? { ...f, isPublic: false, shareToken: null } : f
+        )
+      );
+      return { id: fileId, isPublic: false, shareToken: null };
+    }
   };
 
   // Delete file
   const deleteFile = async (fileId) => {
     await filesApi.delete(fileId);
     setFiles((prev) => prev.filter((f) => f.id !== fileId));
+  };
+
+  // Update single file in state (e.g. after ShareModal update)
+  const updateFileInState = (updatedFile) => {
+    setFiles((prev) =>
+      prev.map((f) => (f.id === updatedFile.id ? { ...f, ...updatedFile } : f))
+    );
   };
 
   // Filtered files by search query
@@ -69,5 +92,6 @@ export function useFiles(folderId = null) {
     uploadFile,
     togglePrivacy,
     deleteFile,
+    updateFileInState,
   };
 }
