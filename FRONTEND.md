@@ -278,6 +278,8 @@ NotFoundPage.jsx custom 404 view.
 
 ### ✨ Extras & Standout UX Features (The 2027 Trademark Polish)
 
+we will do this if time will be left and all the web app features are working, it is for last.
+
 1. **`⌘ + K` Command Palette (`CommandPalette.jsx`)**:
    - Raycast/Linear style command overlay allowing instant searching, uploading, folder creation, navigation, and view toggling via keyboard shortcut.
 2. **Instant QR Code Generator (`ShareModal.jsx`)**:

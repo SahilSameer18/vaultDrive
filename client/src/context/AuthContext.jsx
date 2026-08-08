@@ -12,7 +12,9 @@ export function AuthProvider({ children }) {
     (async () => {
       try {
         const res = await authApi.getMe();
-        setUser(res.data.data);
+        // Backend returns: new ApiResponse(200, { user: req.user }, "...")
+        // res.data.data is { user: { id, email, username } }
+        setUser(res.data.data.user);
       } catch {
         setUser(null);
       } finally {
