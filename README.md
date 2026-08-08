@@ -1,6 +1,6 @@
 # 🛡️ VaultDrive — Enterprise Cloud Asset Repository
 
-> A high-performance, secure cloud storage web application designed for modern asset management. Featuring JWT refresh token rotation, unlimited nested folder trees, 64-character public share tokens, real-time drag-and-drop uploads, and inline media previews.
+> A high-performance, secure cloud storage web application designed for modern asset management. Featuring JWT refresh token rotation, unlimited nested folder trees, interactive sidebar directory tree navigation, 64-character public share tokens, real-time drag-and-drop uploads, and inline media previews.
 
 ![Author](https://img.shields.io/badge/Author-Sahil%20Sameer-gold?style=for-the-badge&logo=github)
 ![Security](https://img.shields.io/badge/Security-JWT%20Refresh%20Rotation-emerald?style=for-the-badge)
@@ -24,9 +24,11 @@ flowchart TD
     subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS)"]
         UI["React SPA Components"]
         AXIOS["Axios Interceptor\n(Auto Access Token Refresh)"]
-        STORE["Auth Context & State"]
+        STORE["Auth Context & Search Context"]
+        PORTAL["React Portals\n(File Preview & Custom Modals)"]
         UI --> AXIOS
         AXIOS --> STORE
+        UI --> PORTAL
     end
 
     subgraph Server ["Backend (Node.js + Express REST API)"]
@@ -60,11 +62,13 @@ flowchart TD
 ## ✨ Key Features
 
 ### 🔐 Authentication & Session Security
-- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as bcrypt hashes in Neon PostgreSQL, sent via `httpOnly` secure cookies.
+- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as bcrypt hashes in Neon PostgreSQL, sent via `httpOnly` secure cookies (`ACCESS_TOKEN_SECRET` & `REFRESH_TOKEN_SECRET`).
 - **Silent Token Rotation**: Axios interceptor automatically catches `401 Unauthorized` responses and refreshes access tokens without user interruption.
 - **OWASP Rate Limiting**: Express rate limiters protect authentication and upload endpoints from brute-force attacks.
 
-### 📁 Advanced Nested Folder Engine
+### 📁 Advanced Nested Folder & Directory Engine
+- **Interactive Sidebar Directory Tree**: Dynamic expandable tree (`FolderSidebar.jsx`) in the sidebar with active directory highlighting and auto-expanding hierarchy branches.
+- **Directory Renaming & Management**: Custom dark glassmorphism modal (`RenameFolderModal.jsx`) for renaming directories (`PATCH /folders/:id`).
 - **Unlimited Nesting**: Create subfolders inside subfolders with full breadcrumb navigation up to root (`Home / Projects / 2027`).
 - **Server-Side Ancestry Verification**: Dynamic SQL recursive parent retrieval constructs full breadcrumb chains.
 - **Folder Cycle Guard**: Algorithmic cycle check prevents setting a folder's child or descendent as its parent.
@@ -74,14 +78,18 @@ flowchart TD
 - **Whole-Page Drag & Drop Overlay**: Counter-tracked drag listener detects when files enter the window and opens a glowing illuminated dropzone overlay.
 - **Physical Metallic Vault Switch**: Toggle file security between `PRIVATE` and `PUBLIC` with an animated metallic brass latch (`VaultToggle.jsx`).
 - **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar tracking Images, Video & Audio, Docs & PDFs, and Archives & Code.
+- **Global Live Search Input**: Real-time search bar in the topbar (`SearchContext.jsx`) filtering files and directories instantly across all pages.
 
 ### 🔗 Granular Share Management
 - **Public Share Links**: Generate and revoke 64-character hex share tokens (`/share/:shareToken`).
 - **User-to-User Sharing**: Grant access to specific registered users by email or username with composite unique constraint guards (`fileId_userId`).
 - **Public Share Access Page**: Dedicated public access page (`/share/:shareToken`) allowing unauthenticated visitors to view and download shared files.
 
-### 👁️ Inline Media Preview Modal
-- Fullscreen preview modal supporting:
+### 👁️ React Portal Inline Media Preview & Custom Modals
+- **React Portal Overlay**: Rendered directly in `document.body` via `createPortal` for perfect centering and screen overlay (`z-[99999]`).
+- **Keyboard `Esc` Shortcut**: Instant keyboard dismissal from anywhere on the page.
+- **Custom Hazard Confirmation Modal**: `DeleteConfirmModal.jsx` replaces ugly native browser alert popups with a styled dark hazard modal.
+- Multi-format preview support:
   - 🖼️ **Images**: Responsive image inspector (`<img />`)
   - 🎥 **Videos**: HTML5 video player (`<video controls />`)
   - 🎵 **Audio**: HTML5 audio player (`<audio controls />`)
@@ -126,7 +134,7 @@ We implemented **Multer Memory Buffering (Server Streaming)**:
 ### Backend Stack
 - **Node.js** & **Express v5**
 - **Prisma 7 ORM** + `@prisma/adapter-pg`
-- **Neon PostgreSQL** (Cloud Database)
+- **Neon PostgreSQL** (Cloud Database - Pooled `DATABASE_URL` & Direct `DIRECT_URL`)
 - **Cloudinary SDK** (Media Storage)
 - **JSONWebToken** & **BcryptJS**
 - **Zod v3** (Schema Validation)
@@ -145,8 +153,8 @@ We implemented **Multer Memory Buffering (Server Streaming)**:
 
 ### Prerequisites
 - Node.js (v18+ recommended)
-- Cloudinary Account (`cloud_name`, `api_key`, `api_secret`)
-- PostgreSQL Database URL (Pooled and Direct for Neon)
+- Cloudinary Account (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`)
+- PostgreSQL Database URL (Pooled `DATABASE_URL` and Direct `DIRECT_URL` for Neon)
 
 ### 1. Clone Repository & Install Dependencies
 ```bash
@@ -163,20 +171,33 @@ npm install
 ```
 
 ### 2. Environment Variables Configuration
+
 Create a `.env` file in `server/`:
 ```env
-PORT=5000
+PORT=3000
 NODE_ENV=development
-DATABASE_URL=postgresql://user:password@neon.tech/vaultdrive?sslmode=require
-DIRECT_URL=postgresql://user:password@neon.tech/vaultdrive?sslmode=require
-ACCESS_TOKEN_SECRET=your_super_secret_access_key
-REFRESH_TOKEN_SECRET=your_super_secret_refresh_key
-ACCESS_TOKEN_EXPIRY=15m
-REFRESH_TOKEN_EXPIRY=7d
-CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
-CLOUDINARY_API_KEY=your_cloudinary_api_key
-CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-CLIENT_URL=http://localhost:5173
+
+# Database Connections (Neon PostgreSQL)
+DATABASE_URL="postgresql://user:pass@ep-cool-name-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+DIRECT_URL="postgresql://user:pass@ep-cool-name.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+# JWT Secrets (Dual-Token Rotation)
+ACCESS_TOKEN_SECRET="your-super-secret-access-token-key-min-32-chars"
+REFRESH_TOKEN_SECRET="your-super-secret-refresh-token-key-min-32-chars"
+ACCESS_TOKEN_EXPIRY="15m"
+REFRESH_TOKEN_EXPIRY="7d"
+
+# Cloudinary Credentials
+CLOUDINARY_CLOUD_NAME="your_cloudinary_cloud_name"
+CLOUDINARY_API_KEY="your_cloudinary_api_key"
+CLOUDINARY_API_SECRET="your_cloudinary_api_secret"
+
+CLIENT_URL="http://localhost:5173"
+```
+
+Create a `.env` file in `client/`:
+```env
+VITE_API_URL="http://localhost:3000/api/v1"
 ```
 
 ### 3. Database Migration & Prisma Setup
@@ -187,13 +208,14 @@ npx prisma generate
 ```
 
 ### 4. Run Development Servers
-In terminal 1 (Server):
+
+In Terminal 1 (Server):
 ```bash
 cd server
 npm run dev
 ```
 
-In terminal 2 (Client):
+In Terminal 2 (Client):
 ```bash
 cd client
 npm run dev
@@ -203,29 +225,33 @@ Access the application at `http://localhost:5173`.
 
 ---
 
-## 📋 API Endpoints Reference
+## 🛠️ API Reference Table
 
-| Endpoint | Method | Access | Description |
+| Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `/api/v1/auth/register` | `POST` | Public | Register new user account |
-| `/api/v1/auth/login` | `POST` | Public | Login & receive access token + refresh cookie |
-| `/api/v1/auth/refresh` | `POST` | Public | Refresh expired access token via cookie |
-| `/api/v1/auth/logout` | `POST` | Private | Revoke refresh token & clear cookie |
-| `/api/v1/files/upload` | `POST` | Private | Upload file to Cloudinary & database |
-| `/api/v1/files` | `GET` | Private | List user files (supports `folderId=root`) |
-| `/api/v1/files/shared-with-me` | `GET` | Private | List files shared with current user |
-| `/api/v1/files/:id` | `PATCH` | Private | Update file metadata (rename, public) |
-| `/api/v1/files/:id` | `DELETE` | Private | Delete file from Cloudinary & DB |
-| `/api/v1/files/:id/share-link` | `POST` | Private | Generate 64-char public share link token |
-| `/api/v1/files/:id/share-link` | `DELETE` | Private | Revoke public share link token |
-| `/api/v1/files/:id/share-user` | `POST` | Private | Grant file access to user by email/username |
-| `/api/v1/files/share/:shareToken` | `GET` | Public | View public file by share token |
-| `/api/v1/folders` | `POST` | Private | Create new folder/subfolder |
-| `/api/v1/folders/:id` | `GET` | Private | Get folder contents & ancestor breadcrumbs |
+| `POST` | `/api/v1/auth/register` | Public | Register new account & set HTTP-only refresh cookie |
+| `POST` | `/api/v1/auth/login` | Public | Authenticate user & issue dual tokens |
+| `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token & issue new access token |
+| `POST` | `/api/v1/auth/logout` | Protected | Clear authentication cookies & revoke refresh token |
+| `GET` | `/api/v1/auth/me` | Protected | Fetch current authenticated user identity |
+| `GET` | `/api/v1/folders` | Protected | List root or nested folders (`?parentId=root`) |
+| `POST` | `/api/v1/folders` | Protected | Create new folder/subfolder |
+| `PATCH` | `/api/v1/folders/:id` | Protected | Rename folder (`{ name }`) |
+| `DELETE` | `/api/v1/folders/:id` | Protected | Safe folder deletion (moves child files to root) |
+| `GET` | `/api/v1/files` | Protected | List files (`?folderId=root` for root files) |
+| `POST` | `/api/v1/files/upload` | Protected | Upload file (multipart/form-data) |
+| `DELETE` | `/api/v1/files/:id` | Protected | Delete file permanently from Cloudinary & DB |
+| `POST` | `/api/v1/files/:id/share-link` | Protected | Generate 64-char public share token |
+| `DELETE` | `/api/v1/files/:id/share-link` | Protected | Revoke public share token |
+| `POST` | `/api/v1/files/:id/share-user` | Protected | Share file with user (`{ targetIdentifier }`) |
+| `GET` | `/api/v1/files/shared-with-me` | Protected | List files shared directly with user |
+| `GET` | `/api/v1/files/share/:shareToken` | Public | Access public file details via token |
 
 ---
 
-## 📄 License & Credits
-Developed with ❤️ by **[Sahil Sameer](https://github.com/SahilSameer18)** under the [MIT License](LICENSE).
+## 📜 License & Copyright
+
+Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
+
 
 
