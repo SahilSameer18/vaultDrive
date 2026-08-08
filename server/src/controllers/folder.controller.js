@@ -51,14 +51,21 @@ export const createFolder = async (req, res, next) => {
   }
 };
 
-// List all folders owned by the user (with subfolder tree hierarchy)
+// List folders owned by the user (supports parentId query filter)
 export const getFolders = async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const { parentId } = req.query;
 
-    // Fetch all folders for current user
-    const allFolders = await prisma.folder.findMany({
-      where: { userId },
+    const whereClause = { userId };
+    if (parentId === "root" || parentId === "null") {
+      whereClause.parentId = null;
+    } else if (parentId) {
+      whereClause.parentId = parentId;
+    }
+
+    const folders = await prisma.folder.findMany({
+      where: whereClause,
       orderBy: { name: "asc" },
       include: {
         _count: {
@@ -70,14 +77,14 @@ export const getFolders = async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, { folders: allFolders }, "Folders retrieved successfully")
+        new ApiResponse(200, { folders }, "Folders retrieved successfully")
       );
   } catch (error) {
     next(error);
   }
 };
 
-// Fetch folder details including contained files, subfolders, and parent breadcrumb
+// Fetch folder details including contained files, subfolders, and parent breadcrumbs
 export const getFolderById = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -108,9 +115,25 @@ export const getFolderById = async (req, res, next) => {
       throw new ApiError(404, "Folder not found");
     }
 
+    // Build full ancestor breadcrumb chain
+    const breadcrumbs = [];
+    let currentParent = folder.parent;
+    while (currentParent) {
+      breadcrumbs.unshift({ id: currentParent.id, name: currentParent.name });
+      if (currentParent.parentId) {
+        currentParent = await prisma.folder.findUnique({
+          where: { id: currentParent.parentId },
+          select: { id: true, name: true, parentId: true },
+        });
+      } else {
+        currentParent = null;
+      }
+    }
+    breadcrumbs.push({ id: folder.id, name: folder.name });
+
     return res
       .status(200)
-      .json(new ApiResponse(200, { folder }, "Folder details retrieved successfully"));
+      .json(new ApiResponse(200, { folder: { ...folder, breadcrumbs } }, "Folder details retrieved successfully"));
   } catch (error) {
     next(error);
   }
@@ -128,27 +151,24 @@ export const updateFolder = async (req, res, next) => {
       throw new ApiError(404, "Folder not found");
     }
 
-    // Move folder validation logic
+    // If moving to a new parent folder, validate parent and check for circular dependency
     if (parentId !== undefined && parentId !== folder.parentId) {
       if (parentId === id) {
-        throw new ApiError(400, "Folder cannot be set as its own parent");
+        throw new ApiError(400, "A folder cannot be its own parent");
       }
-
       if (parentId !== null) {
-        // Validate target parent folder ownership
         const targetParent = await prisma.folder.findUnique({
           where: { id: parentId },
         });
         if (!targetParent || targetParent.userId !== userId) {
           throw new ApiError(404, "Target parent folder not found");
         }
-
-        // Folder cycle guard: prevent moving a folder into its own child/descendant
-        const isCircular = await checkCircularDependency(id, parentId);
-        if (isCircular) {
+        // Check if targetParent is a descendant of folder (cycle prevention)
+        const isCycle = await checkCircularDependency(id, parentId);
+        if (isCycle) {
           throw new ApiError(
             400,
-            "Cannot move folder into one of its own subfolders (circular structure)"
+            "Cannot move a folder into one of its own subfolders (circular dependency)"
           );
         }
       }
@@ -158,48 +178,35 @@ export const updateFolder = async (req, res, next) => {
       where: { id },
       data: {
         ...(name !== undefined && { name }),
-        ...(parentId !== undefined && { parentId }),
+        ...(parentId !== undefined && { parentId: parentId || null }),
       },
     });
 
     return res
       .status(200)
       .json(
-        new ApiResponse(200, { folder: updatedFolder }, "Folder updated successfully")
+        new ApiResponse(
+          200,
+          { folder: updatedFolder },
+          "Folder updated successfully"
+        )
       );
   } catch (error) {
     next(error);
   }
 };
 
-// Delete folder (returns 400 if subfolders exist; files inside automatically move to root via SetNull)
+// Delete a folder (safe cascading deletion: files inside deleted folder have folderId set to NULL)
 export const deleteFolder = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const folder = await prisma.folder.findUnique({
-      where: { id },
-      include: {
-        _count: {
-          select: { children: true },
-        },
-      },
-    });
-
+    const folder = await prisma.folder.findUnique({ where: { id } });
     if (!folder || folder.userId !== userId) {
       throw new ApiError(404, "Folder not found");
     }
 
-    // Check if subfolders exist — return 400 error instead of leaking DB constraint error
-    if (folder._count.children > 0) {
-      throw new ApiError(
-        400,
-        "Folder is not empty — please delete or move all subfolders first"
-      );
-    }
-
-    // Delete folder from DB (files inside have onDelete: SetNull so their folderId becomes null/root)
     await prisma.folder.delete({ where: { id } });
 
     return res

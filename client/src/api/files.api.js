@@ -1,13 +1,13 @@
 import api from "./axios";
 
 export const filesApi = {
-  // Core CRUD
   upload: (formData, onUploadProgress) =>
     api.post("/files/upload", formData, {
       headers: { "Content-Type": "multipart/form-data" },
       onUploadProgress,
     }),
-  list: (params) => api.get("/files", { params }),
+  list: (folderId = null) =>
+    api.get("/files", { params: folderId ? { folderId } : {} }),
   getById: (id) => api.get(`/files/${id}`),
   update: (id, data) => api.patch(`/files/${id}`, data),
   delete: (id) => api.delete(`/files/${id}`),
@@ -28,4 +28,3 @@ export const filesApi = {
   // Storage stats
   getStorageStats: () => api.get("/files/storage-stats"),
 };
-

@@ -1,46 +1,36 @@
-import { Routes, Route } from "react-router-dom";
-import LandingPage    from "./pages/LandingPage";
-import LoginPage      from "./pages/LoginPage";
-import RegisterPage   from "./pages/RegisterPage";
-import NotFoundPage   from "./pages/NotFoundPage";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ui/ProtectedRoute";
+import AppLayout from "./app.layout";
 
-// ── Lazy-loaded protected pages (Phase 2 & 3) ────────────────────────────────
-// Uncomment as each phase is built:
-// import { lazy, Suspense } from "react";
-// const DashboardPage = lazy(() => import("../pages/DashboardPage"));
-// const FolderPage    = lazy(() => import("../pages/FolderPage"));
-// const SharePage     = lazy(() => import("../pages/SharePage"));
-
-// Temporary placeholder for protected pages during Phase 1
-function PlaceholderDashboard() {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "var(--color-bg)" }}>
-      <p style={{ color: "var(--color-muted)", fontFamily: "var(--font-mono)", fontSize: "0.75rem" }}>
-        [ Dashboard — Phase 2 ]
-      </p>
-    </div>
-  );
-}
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import FolderPage from "./pages/FolderPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ── Public ──────────────────────────────────────────────────────── */}
-      <Route path="/"         element={<LandingPage />} />
-      <Route path="/login"    element={<LoginPage />} />
+      {/* ── Public Routes ────────────────────────────────────────────────── */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* ── Protected (nested under ProtectedRoute <Outlet />) ──────────── */}
+      {/* ── Protected Vault Routes (AppLayout Shell) ────────────────────── */}
       <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard"                element={<PlaceholderDashboard />} />
-        <Route path="/dashboard/folder/:id"     element={<PlaceholderDashboard />} />
+        <Route element={<AppLayout />}>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/folder/:folderId" element={<FolderPage />} />
+          <Route path="/shared" element={<DashboardPage />} />
+          <Route path="/recent" element={<DashboardPage />} />
+        </Route>
       </Route>
 
-      {/* ── Public share page (Phase 3) ─────────────────────────────────── */}
-      {/* <Route path="/share/:shareToken" element={<SharePage />} /> */}
+      {/* Legacy Fallback Redirect */}
+      <Route path="/app" element={<Navigate to="/dashboard" replace />} />
 
-      {/* ── 404 ─────────────────────────────────────────────────────────── */}
+      {/* ── 404 Not Found ───────────────────────────────────────────────── */}
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

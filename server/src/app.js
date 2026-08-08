@@ -1,14 +1,13 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import helmet from "helmet";
 import { generalLimiter } from "./middlewares/rateLimit.middleware.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();
 
 // Security HTTP headers
-app.use(helmet());
+// app.use(helmet());
 
 // CORS configuration
 app.use(
