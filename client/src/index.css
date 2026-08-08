@@ -1,1 +1,101 @@
 @import "tailwindcss";
+
+/* ─── Bank Vault Design System (Tailwind v4 Theme Tokens) ─────────────────── */
+@theme {
+  /* Colors -> produces bg-vault-bg, text-vault-accent, border-vault-border, etc. */
+  --color-vault-bg: #14161A;
+  --color-vault-surface: #181B21;
+  --color-vault-panel: #1C1F26;
+  --color-vault-border: #2A2E37;
+  --color-vault-accent: #B8935A;
+  --color-vault-accent-hover: #C8A66B;
+  --color-vault-text: #E8E6E0;
+  --color-vault-muted: #8B8F99;
+  --color-vault-success: #6FA88A;
+  --color-vault-danger: #C0654F;
+  --color-vault-sky: #38BDF8;
+
+  /* Typography */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* ─── Base Reset & Globals ──────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-vault-bg);
+  color: var(--color-vault-text);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* ─── Custom Scrollbar ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-vault-surface); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-vault-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-vault-muted); }
+
+/* ─── Focus Ring ────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-vault-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Selection ─────────────────────────────────────────────────────────────── */
+::selection {
+  background-color: rgba(184, 147, 90, 0.25);
+  color: var(--color-vault-text);
+}
+
+/* ─── Shimmer Keyframe (skeleton loader) ────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-vault-surface) 25%,
+    var(--color-vault-panel)   50%,
+    var(--color-vault-surface) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* ─── Fade-in animation ─────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.2s ease-out forwards; }
+
+/* ─── Vault Toggle Keyframes ────────────────────────────────────────────────── */
+@keyframes latchUnlock {
+  0%   { transform: rotate(0deg);    }
+  100% { transform: rotate(-40deg);  }
+}
+@keyframes latchLock {
+  0%   { transform: rotate(-40deg);  }
+  100% { transform: rotate(0deg);    }
+}
+
+.vault-latch-unlock { animation: latchUnlock 150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.vault-latch-lock   { animation: latchLock   150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+

@@ -460,9 +460,9 @@ npm i react-router-dom axios react-dropzone
 |-------|------|-----------|
 | **1** | Prisma schema + migrate + generate ✅ | 1 |
 | **2** | Server utils, config, middleware infrastructure ✅ | 9 |
-| **3** | Auth API (register, login, refresh, logout, me) | ~2 |
-| **4** | File upload + management API | ~3 |
-| **5** | Folder API | ~2 |
+| **3** | Auth API (register, login, refresh, logout, me) ✅ | 3 |
+| **4** | File upload + management API ✅ | 4 |
+| **5** | Folder API ✅ | 3 |
 | **6** | Client: Auth context, Axios, routing, Login/Register pages | ~6 |
 | **7** | Client: Dashboard, FileCard, UploadModal, FolderSidebar, SharePage | ~7 |
 | **8** | Polish + README tradeoffs | – |
@@ -487,5 +487,15 @@ This keeps the implementation simple, the code readable, and is sufficient for t
 - Client calls `POST /files/confirm` — server saves metadata to DB
 
 This approach is infinitely scalable, provides real upload progress tracking, and handles flaky connections via resumable chunked uploads. It is what production apps use.
+
+---
+
+## 🛡️ README Documentation Plan (Final Phase)
+
+When we complete all feature development, `README.md` will contain:
+
+1. **Mermaid.js System Architecture Diagram**: Visualizing data flow between React 19 Client $\rightarrow$ Express REST API $\rightarrow$ Prisma 7 $\rightarrow$ Neon PostgreSQL & Cloudinary.
+2. **OWASP Security Compliance Checklist**: Documenting JWT Refresh Token Rotation, bcrypt token hashing, filename sanitization (`sanitizeFilename`), OWASP rate-limiting, and folder cycle guard.
+3. **Architecture Tradeoffs Section**: Explaining Multer memory buffering (Option 1) vs scalable direct signed uploads (Option 3).
 
 
