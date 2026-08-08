@@ -1,11 +1,12 @@
 import { useState, useCallback } from "react";
 import { filesApi } from "../api/files.api";
+import { useSearch } from "../context/SearchContext";
 
 export function useFiles(folderId = null) {
   const [files, setFiles]     = useState([]);
-  const [search, setSearch]   = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
+  const { searchQuery }       = useSearch();
 
   // Fetch files inside current folder (defaults to 'root' for root-level files)
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {
@@ -76,16 +77,14 @@ export function useFiles(folderId = null) {
     );
   };
 
-  // Filtered files by search query
+  // Filtered files by global search query
   const filteredFiles = files.filter((f) =>
-    f.name?.toLowerCase().includes(search.toLowerCase())
+    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase())
   );
 
   return {
     files: filteredFiles,
     allFiles: files,
-    search,
-    setSearch,
     loading,
     error,
     fetchFiles,

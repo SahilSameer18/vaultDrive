@@ -6,6 +6,7 @@ import { useToast } from "../components/ui/Toast";
 
 import FolderBreadcrumb from "../components/folder/FolderBreadcrumb";
 import FileGrid from "../components/file/FileGrid";
+import FileSkeleton from "../components/ui/FileSkeleton";
 import UploadModal from "../components/file/UploadModal";
 import ShareModal from "../components/file/ShareModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
@@ -161,10 +162,7 @@ export default function FolderPage() {
 
       {/* ── Directory Content List ───────────────────────────────────────── */}
       {isLoading ? (
-        <div className="py-12 flex items-center justify-center text-xs font-mono text-vault-muted">
-          <span className="w-2 h-2 rounded-full bg-vault-accent animate-ping mr-2" />
-          Loading directory contents...
-        </div>
+        <FileSkeleton count={8} viewMode={viewMode} />
       ) : hasItems ? (
         <FileGrid
           folders={folders}

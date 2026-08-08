@@ -1,29 +1,29 @@
 import { useState, useCallback } from "react";
 import { foldersApi } from "../api/folders.api";
+import { useSearch } from "../context/SearchContext";
 
-export function useFolders(initialFolderId = null) {
-  const [currentFolderId, setCurrentFolderId] = useState(initialFolderId);
-  const [folders, setFolders]                 = useState([]);
-  const [breadcrumbs, setBreadcrumbs]         = useState([]);
-  const [loading, setLoading]                 = useState(false);
-  const [error, setError]                     = useState(null);
+export function useFolders(currentFolderId = null) {
+  const [folders, setFolders]         = useState([]);
+  const [breadcrumbs, setBreadcrumbs] = useState([]);
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState(null);
+  const { searchQuery }               = useSearch();
 
-  // Fetch folders for current parent folder & breadcrumb chain
-  const fetchFolders = useCallback(async (targetParentId = currentFolderId) => {
+  // Fetch subfolders and ancestor breadcrumbs for current directory
+  const fetchFolders = useCallback(async (targetFolderId = currentFolderId) => {
     setLoading(true);
     setError(null);
     try {
-      if (targetParentId) {
-        // Fetch detailed folder info including children and breadcrumbs
-        const res = await foldersApi.getById(targetParentId);
-        const folder = res.data.data.folder;
-        setFolders(folder.children || []);
-        setBreadcrumbs(folder.breadcrumbs || []);
+      if (targetFolderId) {
+        // Fetch subfolder details + breadcrumb path
+        const res = await foldersApi.getById(targetFolderId);
+        setFolders(res.data.data.subfolders || []);
+        setBreadcrumbs(res.data.data.breadcrumbs || []);
       } else {
-        // Fetch root-level folders
+        // Fetch root-level folders via list("root")
         const res = await foldersApi.list("root");
         setFolders(res.data.data.folders || []);
-        setBreadcrumbs([]);
+        setBreadcrumbs([{ id: null, name: "Home" }]);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load folders");
@@ -32,39 +32,26 @@ export function useFolders(initialFolderId = null) {
     }
   }, [currentFolderId]);
 
-  // Create folder (sends { name, parentId })
+  // Create new subfolder
   const createFolder = async (name, parentId = currentFolderId) => {
-    const res = await foldersApi.create({ name, parentId: parentId || null });
+    const res = await foldersApi.create({ name, parentId });
     const newFolder = res.data.data.folder;
     setFolders((prev) => [newFolder, ...prev]);
     return newFolder;
   };
 
-  // Rename folder (uses PATCH)
-  const renameFolder = async (folderId, newName) => {
-    const res = await foldersApi.update(folderId, { name: newName });
-    const updated = res.data.data.folder;
-    setFolders((prev) => prev.map((f) => (f.id === folderId ? updated : f)));
-    return updated;
-  };
-
-  // Delete folder
-  const deleteFolder = async (folderId) => {
-    await foldersApi.delete(folderId);
-    setFolders((prev) => prev.filter((f) => f.id !== folderId));
-  };
+  // Filtered subfolders by global search query
+  const filteredFolders = folders.filter((f) =>
+    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase())
+  );
 
   return {
-    currentFolderId,
-    setCurrentFolderId,
-    folders,
+    folders: filteredFolders,
+    allFolders: folders,
     breadcrumbs,
-    setBreadcrumbs,
     loading,
     error,
     fetchFolders,
     createFolder,
-    renameFolder,
-    deleteFolder,
   };
 }

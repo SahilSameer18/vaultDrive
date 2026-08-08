@@ -5,6 +5,7 @@ import { useFiles } from "../hooks/useFiles";
 import { useToast } from "../components/ui/Toast";
 
 import FileGrid from "../components/file/FileGrid";
+import FileSkeleton from "../components/ui/FileSkeleton";
 import UploadModal from "../components/file/UploadModal";
 import ShareModal from "../components/file/ShareModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
@@ -18,8 +19,8 @@ export default function DashboardPage() {
   const [isFolderOpen, setIsFolderOpen] = useState(false);
   const [shareFile, setShareFile]       = useState(null);
 
-  const { folders, fetchFolders, createFolder } = useFolders(null);
-  const { files, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(null);
+  const { folders, loading: foldersLoading, fetchFolders, createFolder } = useFolders(null);
+  const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(null);
 
   useEffect(() => {
     fetchFolders(null);
@@ -30,8 +31,12 @@ export default function DashboardPage() {
       fetchFolders(null);
     };
 
+    window.addEventListener("vault:files-changed", handleUploadEvent);
     window.addEventListener("vault:file-uploaded", handleUploadEvent);
-    return () => window.removeEventListener("vault:file-uploaded", handleUploadEvent);
+    return () => {
+      window.removeEventListener("vault:files-changed", handleUploadEvent);
+      window.removeEventListener("vault:file-uploaded", handleUploadEvent);
+    };
   }, [fetchFolders, fetchFiles]);
 
   // Handlers
@@ -84,7 +89,8 @@ export default function DashboardPage() {
     updateFileInState(updatedFile);
   };
 
-  const hasItems = folders.length > 0 || files.length > 0;
+  const isLoading = foldersLoading || filesLoading;
+  const hasItems  = folders.length > 0 || files.length > 0;
 
   return (
     <div className="space-y-6 fade-in select-none">
@@ -162,7 +168,9 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Content Viewport ─────────────────────────────────────────────── */}
-      {hasItems ? (
+      {isLoading ? (
+        <FileSkeleton count={8} viewMode={viewMode} />
+      ) : hasItems ? (
         <FileGrid
           folders={folders}
           files={files}

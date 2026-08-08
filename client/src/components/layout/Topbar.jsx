@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useSearch } from "../../context/SearchContext";
 
 export default function Topbar({ onToggleMobileMenu }) {
   const { user, logout } = useAuth();
+  const { searchQuery, setSearchQuery } = useSearch();
   const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -58,12 +60,24 @@ export default function Topbar({ onToggleMobileMenu }) {
         </span>
         <input
           type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search files and folders..."
           className="w-full pl-10 pr-12 py-2 rounded-xl bg-vault-panel border border-vault-border text-vault-text text-xs placeholder:text-vault-muted/40 focus:border-vault-accent focus:outline-none transition-colors"
         />
-        <kbd className="absolute right-3 px-1.5 py-0.5 rounded border border-vault-border bg-vault-surface text-[10px] font-mono text-vault-muted pointer-events-none">
-          ⌘K
-        </kbd>
+        {searchQuery ? (
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="absolute right-3 text-vault-muted hover:text-vault-text text-xs"
+          >
+            ✕
+          </button>
+        ) : (
+          <kbd className="absolute right-3 px-1.5 py-0.5 rounded border border-vault-border bg-vault-surface text-[10px] font-mono text-vault-muted pointer-events-none">
+            ⌘K
+          </kbd>
+        )}
       </div>
 
       {/* ── Right: User Identity & Profile Dropdown ──────────────────────── */}

@@ -3,6 +3,7 @@ import { filesApi } from "../api/files.api";
 import { FileCategoryIcon } from "../utils/fileIcons";
 import { formatBytes, formatDate } from "../utils/formatters";
 import FilePreviewModal from "../components/file/FilePreviewModal";
+import FileSkeleton from "../components/ui/FileSkeleton";
 
 export default function RecentActivityPage() {
   const [recentFiles, setRecentFiles] = useState([]);
@@ -45,10 +46,7 @@ export default function RecentActivityPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="py-12 flex items-center justify-center text-xs font-mono text-vault-muted">
-          <span className="w-2 h-2 rounded-full bg-vault-accent animate-ping mr-2" />
-          Loading recent vault activity...
-        </div>
+        <FileSkeleton count={5} viewMode="list" />
       ) : error ? (
         <div className="p-4 rounded-xl bg-vault-danger/10 border border-vault-danger/30 text-vault-danger text-xs font-mono">
           [ERROR] {error}
