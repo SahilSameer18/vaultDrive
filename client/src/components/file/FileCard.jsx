@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { FileCategoryIcon } from "../../utils/fileIcons";
 import { formatBytes, formatDate } from "../../utils/formatters";
+import { handleFileDownload } from "../../utils/download";
 import VaultToggle from "./VaultToggle";
 
 export default function FileCard({
@@ -23,6 +24,12 @@ export default function FileCard({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const onDownloadClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleFileDownload(file.url, file.name);
+  };
 
   if (viewMode === "list") {
     return (
@@ -67,18 +74,16 @@ export default function FileCard({
           </button>
 
           {/* Download Button */}
-          <a
-            href={file.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            download
-            className="p-1.5 rounded-lg text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors"
+          <button
+            type="button"
+            onClick={onDownloadClick}
+            className="p-1.5 rounded-lg text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
             title="Download File"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </a>
+          </button>
 
           {/* 3-Dots Options Menu */}
           <div className="relative" ref={menuRef}>
@@ -102,9 +107,19 @@ export default function FileCard({
                     setMenuOpen(false);
                     onPreview && onPreview(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   Preview Asset
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    onDownloadClick(e);
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  Download File
                 </button>
                 <button
                   type="button"
@@ -112,7 +127,7 @@ export default function FileCard({
                     setMenuOpen(false);
                     onOpenShare && onOpenShare(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   Share Options
                 </button>
@@ -122,7 +137,7 @@ export default function FileCard({
                     setMenuOpen(false);
                     onDelete && onDelete(file.id);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors flex items-center gap-2"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors flex items-center gap-2 cursor-pointer"
                 >
                   Delete File
                 </button>
@@ -186,9 +201,19 @@ export default function FileCard({
                     setMenuOpen(false);
                     onPreview && onPreview(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
                 >
                   Preview Asset
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    onDownloadClick(e);
+                  }}
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                >
+                  Download File
                 </button>
                 <button
                   type="button"
@@ -196,7 +221,7 @@ export default function FileCard({
                     setMenuOpen(false);
                     onOpenShare && onOpenShare(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
                 >
                   Share Options
                 </button>
@@ -206,7 +231,7 @@ export default function FileCard({
                     setMenuOpen(false);
                     onDelete && onDelete(file.id);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors"
+                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors cursor-pointer"
                 >
                   Delete File
                 </button>
@@ -236,18 +261,16 @@ export default function FileCard({
           isPublic={file.isPublic}
           onToggle={() => onTogglePrivacy && onTogglePrivacy(file)}
         />
-        <a
-          href={file.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          download
-          className="p-1 text-vault-muted hover:text-vault-accent transition-colors"
+        <button
+          type="button"
+          onClick={onDownloadClick}
+          className="p-1 text-vault-muted hover:text-vault-accent transition-colors cursor-pointer"
           title="Download"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
             <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-        </a>
+        </button>
       </div>
 
     </div>

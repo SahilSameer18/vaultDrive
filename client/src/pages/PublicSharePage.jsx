@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { filesApi } from "../api/files.api";
 import { FileCategoryIcon } from "../utils/fileIcons";
 import { formatBytes, formatDate } from "../utils/formatters";
+import { handleFileDownload } from "../utils/download";
 import FilePreviewModal from "../components/file/FilePreviewModal";
 
 export default function PublicSharePage() {
@@ -117,15 +118,13 @@ export default function PublicSharePage() {
                 >
                   Preview File
                 </button>
-                <a
-                  href={file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all text-center flex items-center justify-center gap-2"
+                <button
+                  type="button"
+                  onClick={() => handleFileDownload(file.url, file.name)}
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Download
-                </a>
+                </button>
               </div>
             </div>
           ) : null}

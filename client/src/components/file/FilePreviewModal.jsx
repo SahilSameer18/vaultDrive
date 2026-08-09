@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { formatBytes, formatDate } from "../../utils/formatters";
 import { getFileCategory } from "../../utils/fileIcons";
+import { handleFileDownload } from "../../utils/download";
 
 // Helper to infer category from filename extension as fallback
 function inferCategory(filename, mimeType) {
@@ -84,18 +85,16 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
 
           {/* Action buttons: Download & Sharp Close Button */}
           <div className="flex items-center gap-3 shrink-0">
-            <a
-              href={file.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="px-3 py-1.5 rounded-lg border border-vault-accent/40 bg-vault-accent/10 text-vault-accent text-xs font-semibold hover:bg-vault-accent/20 transition-colors flex items-center gap-1.5"
+            <button
+              type="button"
+              onClick={() => handleFileDownload(file.url, file.name)}
+              className="px-3 py-1.5 rounded-lg border border-vault-accent/40 bg-vault-accent/10 text-vault-accent text-xs font-semibold hover:bg-vault-accent/20 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                 <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Download
-            </a>
+            </button>
 
             <button
               type="button"
