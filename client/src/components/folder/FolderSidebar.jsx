@@ -144,7 +144,11 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
             </div>
 
             {/* Subfolders Tree */}
-            {isExpanded && hasChildren && renderNodes(folder.children, depth + 1)}
+            {isExpanded && hasChildren && (
+              <div className="animate-accordion-down overflow-hidden">
+                {renderNodes(folder.children, depth + 1)}
+              </div>
+            )}
           </div>
         );
       })}

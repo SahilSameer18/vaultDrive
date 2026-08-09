@@ -30,7 +30,7 @@ export default function DeleteConfirmModal({
       <div className="fixed inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal Card */}
-      <div className="relative w-full max-w-md rounded-2xl border border-vault-border bg-vault-panel p-6 shadow-2xl z-10 fade-in">
+      <div className="relative w-full max-w-md rounded-2xl border border-vault-border bg-vault-panel p-6 shadow-2xl z-10 animate-scale-up">
         
         <div className="flex items-center gap-3 border-b border-vault-border pb-4 mb-4">
           <div className="w-10 h-10 rounded-xl bg-vault-danger/15 border border-vault-danger/40 flex items-center justify-center text-vault-danger shrink-0">

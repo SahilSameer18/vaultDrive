@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Topbar from "./components/layout/Topbar";
 import Sidebar from "./components/layout/Sidebar";
@@ -46,20 +46,26 @@ export default function AppLayout() {
         </div>
 
         {/* Mobile Drawer Overlay (Slide in on mobile toggle) */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm"
-              onClick={() => setMobileMenuOpen(false)}
-            />
+        <div
+          className={`lg:hidden fixed inset-0 z-50 transition-opacity duration-300 ${
+            mobileMenuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-            {/* Sliding Drawer */}
-            <div className="relative w-64 max-w-[80vw] h-full bg-vault-bg shadow-2xl z-10">
-              <Sidebar onCloseMobileMenu={() => setMobileMenuOpen(false)} />
-            </div>
+          {/* Sliding Drawer */}
+          <div
+            className={`relative w-64 max-w-[80vw] h-full bg-vault-bg shadow-2xl z-10 transition-transform duration-300 ease-out ${
+              mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+          >
+            <Sidebar onCloseMobileMenu={() => setMobileMenuOpen(false)} />
           </div>
-        )}
+        </div>
 
         {/* Main Content Area */}
         <main className="flex-1 h-full overflow-y-auto bg-vault-bg p-4 sm:p-6 lg:p-8">

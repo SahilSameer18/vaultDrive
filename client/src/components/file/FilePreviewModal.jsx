@@ -63,7 +63,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
       />
 
       {/* ── Modal Card Container (Centered in viewport) ───────────────────── */}
-      <div className="relative z-[100000] w-full max-w-4xl h-[85vh] rounded-2xl border border-vault-border bg-vault-panel flex flex-col shadow-2xl overflow-hidden fade-in">
+      <div className="relative z-[100000] w-full max-w-4xl h-[85vh] rounded-2xl border border-vault-border bg-vault-panel flex flex-col shadow-2xl overflow-hidden animate-scale-up">
         
         {/* ── Clean Header Bar ────────────────────────────────────────────── */}
         <div className="px-5 py-3.5 border-b border-vault-border flex items-center justify-between bg-vault-surface shrink-0">

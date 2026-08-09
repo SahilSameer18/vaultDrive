@@ -31,7 +31,7 @@ export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFol
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="relative w-full max-w-sm rounded-2xl border border-vault-border bg-vault-panel p-6 shadow-2xl z-10 fade-in select-none">
+      <div className="relative w-full max-w-sm rounded-2xl border border-vault-border bg-vault-panel p-6 shadow-2xl z-10 animate-scale-up select-none">
         <div className="flex items-center justify-between border-b border-vault-border pb-4 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-accent/40 flex items-center justify-center text-vault-accent">

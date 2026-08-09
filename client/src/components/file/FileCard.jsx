@@ -25,7 +25,7 @@ export default function FileCard({
 
   if (viewMode === "list") {
     return (
-      <div className="group flex items-center justify-between gap-4 p-3 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-all select-none">
+      <div className="group flex items-center justify-between gap-4 p-3 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 hover:bg-vault-panel/80 transition-all duration-200 select-none animate-fade-in-up">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 shrink-0" />
           <div className="min-w-0 flex-1">
@@ -69,7 +69,7 @@ export default function FileCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-20 font-mono text-xs">
+              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-20 font-mono text-xs animate-scale-up">
                 <button
                   type="button"
                   onClick={() => {
@@ -100,11 +100,11 @@ export default function FileCard({
 
   // Grid View
   return (
-    <div className="group relative p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-all flex flex-col justify-between select-none">
+    <div className="group relative p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/50 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 flex flex-col justify-between select-none animate-fade-in-up">
       
       {/* Top Bar: Category Icon + Menu */}
       <div className="flex items-start justify-between gap-2 mb-3">
-        <div className="w-10 h-10 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center group-hover:border-vault-accent/30 transition-colors">
           <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5" />
         </div>
 
@@ -122,7 +122,7 @@ export default function FileCard({
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-20 font-mono text-xs">
+            <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-20 font-mono text-xs animate-scale-up">
               <button
                 type="button"
                 onClick={() => {
@@ -150,7 +150,7 @@ export default function FileCard({
 
       {/* Center: File Info */}
       <div className="mb-4">
-        <p className="text-xs font-semibold text-vault-text truncate mb-1" title={file.name}>
+        <p className="text-xs font-semibold text-vault-text truncate mb-1 group-hover:text-vault-accent transition-colors" title={file.name}>
           {file.name}
         </p>
         <p className="text-[10px] font-mono text-vault-muted">
