@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { filesApi } from "../api/files.api";
 import { useSearch } from "../context/SearchContext";
 
@@ -8,19 +8,26 @@ export function useFiles(folderId = null) {
   const [error, setError]     = useState(null);
   const { searchQuery }       = useSearch();
 
-  // Fetch files inside current folder (defaults to 'root' for root-level files)
+  // Fetch files inside current folder (or all files if global search is active)
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await filesApi.list(targetFolderId || "root");
+      // If searchQuery is present, fetch ALL files (null folderId) so global search queries the whole vault!
+      const param = searchQuery ? null : (targetFolderId || "root");
+      const res = await filesApi.list(param);
       setFiles(res.data.data.files || []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load files");
     } finally {
       setLoading(false);
     }
-  }, [folderId]);
+  }, [folderId, searchQuery]);
+
+  // Re-fetch whenever searchQuery changes
+  useEffect(() => {
+    fetchFiles(folderId);
+  }, [searchQuery, fetchFiles, folderId]);
 
   // Upload file with progress
   const uploadFile = async (file, currentFolderId = folderId, onProgress) => {
@@ -79,7 +86,7 @@ export function useFiles(folderId = null) {
 
   // Filtered files by global search query
   const filteredFiles = files.filter((f) =>
-    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase())
+    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase().trim())
   );
 
   return {

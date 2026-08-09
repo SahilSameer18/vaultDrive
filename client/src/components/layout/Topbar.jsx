@@ -8,6 +8,7 @@ export default function Topbar({ onToggleMobileMenu }) {
   const { searchQuery, setSearchQuery } = useSearch();
   const [profileOpen, setProfileOpen] = useState(false);
   const menuRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -18,6 +19,18 @@ export default function Topbar({ onToggleMobileMenu }) {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Keyboard shortcut (⌘K or Ctrl+K) to focus search bar
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   return (
@@ -59,6 +72,7 @@ export default function Topbar({ onToggleMobileMenu }) {
           </svg>
         </span>
         <input
+          ref={searchInputRef}
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -113,7 +127,7 @@ export default function Topbar({ onToggleMobileMenu }) {
 
           {/* Profile Dropdown Menu */}
           {profileOpen && (
-            <div className="absolute right-0 mt-2 w-56 rounded-xl border border-vault-border bg-vault-panel shadow-2xl p-1.5 z-50 fade-in">
+            <div className="absolute right-0 mt-2 w-56 rounded-xl border border-vault-border bg-vault-panel shadow-2xl p-1.5 z-50 animate-scale-up">
               <div className="px-3 py-2 border-b border-vault-border mb-1">
                 <p className="text-xs font-semibold text-vault-text">{user?.username}</p>
                 <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>

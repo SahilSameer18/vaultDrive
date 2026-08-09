@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useFolders } from "../hooks/useFolders";
 import { useFiles } from "../hooks/useFiles";
 import { useToast } from "../components/ui/Toast";
+import { useSearch } from "../context/SearchContext";
 
 import FileGrid from "../components/file/FileGrid";
 import FileSkeleton from "../components/ui/FileSkeleton";
@@ -15,13 +16,14 @@ import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 export default function DashboardPage() {
   const { user } = useAuth();
   const { addToast } = useToast();
+  const { searchQuery, setSearchQuery } = useSearch();
 
   const [viewMode, setViewMode]               = useState("grid");
   const [isUploadOpen, setIsUploadOpen]       = useState(false);
   const [isFolderOpen, setIsFolderOpen]       = useState(false);
   const [shareFile, setShareFile]             = useState(null);
   const [renameFolderTarget, setRenameFolderTarget] = useState(null);
-  const [deleteTarget, setDeleteTarget]       = useState(null); // { type: 'file'|'folder', item: obj }
+  const [deleteTarget, setDeleteTarget]       = useState(null);
 
   const { folders, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(null);
   const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(null);
@@ -127,10 +129,12 @@ export default function DashboardPage() {
           <nav className="flex items-center gap-2 text-xs font-mono text-vault-muted mb-1">
             <span className="text-vault-accent font-semibold">Home</span>
             <span>/</span>
-            <span className="text-vault-text">My Vault</span>
+            <span className="text-vault-text">
+              {searchQuery ? `Search results for "${searchQuery}"` : "My Vault"}
+            </span>
           </nav>
           <h1 className="text-2xl font-bold tracking-tight text-vault-text">
-            Welcome, {user?.username || "Vault User"}
+            {searchQuery ? `Searching "${searchQuery}"` : `Welcome, ${user?.username || "Vault User"}`}
           </h1>
         </div>
 
@@ -210,6 +214,27 @@ export default function DashboardPage() {
           onRenameFolder={(folder) => setRenameFolderTarget(folder)}
           onDeleteFolder={(folder) => setDeleteTarget({ type: "folder", item: folder })}
         />
+      ) : searchQuery ? (
+        <div className="min-h-[350px] rounded-2xl border border-dashed border-vault-border bg-vault-panel/20 flex flex-col items-center justify-center p-8 text-center animate-fade-in-up">
+          <div className="w-14 h-14 rounded-2xl bg-vault-panel border border-vault-accent/30 flex items-center justify-center mb-4 shadow-xl text-vault-accent">
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none">
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.75" />
+              <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            </svg>
+          </div>
+          <h3 className="text-base font-bold text-vault-text mb-1">No matches found for "{searchQuery}"</h3>
+          <p className="text-xs text-vault-muted max-w-sm mb-6">
+            Check your spelling or search for another file or folder name across your repository.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="px-4 py-2.5 rounded-xl text-xs font-semibold text-vault-accent border border-vault-accent/40 hover:bg-vault-accent/10 transition-colors cursor-pointer"
+          >
+            Clear Search Filter
+          </button>
+        </div>
       ) : (
         <div className="min-h-[400px] rounded-2xl border border-dashed border-vault-border bg-vault-panel/20 flex flex-col items-center justify-center p-8 text-center">
           <div className="w-16 h-16 rounded-2xl bg-vault-panel border border-vault-accent/30 flex items-center justify-center mb-4 shadow-xl">

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { foldersApi } from "../api/folders.api";
 import { useSearch } from "../context/SearchContext";
 
@@ -14,7 +14,11 @@ export function useFolders(currentFolderId = null) {
     setLoading(true);
     setError(null);
     try {
-      if (targetFolderId) {
+      if (searchQuery) {
+        // Fetch ALL user folders for global search across directories
+        const res = await foldersApi.list(null);
+        setFolders(res.data.data.folders || []);
+      } else if (targetFolderId) {
         // Fetch subfolder details + breadcrumb path
         const res = await foldersApi.getById(targetFolderId);
         setFolders(res.data.data.subfolders || []);
@@ -30,7 +34,12 @@ export function useFolders(currentFolderId = null) {
     } finally {
       setLoading(false);
     }
-  }, [currentFolderId]);
+  }, [currentFolderId, searchQuery]);
+
+  // Re-fetch whenever searchQuery changes
+  useEffect(() => {
+    fetchFolders(currentFolderId);
+  }, [searchQuery, fetchFolders, currentFolderId]);
 
   // Create new subfolder
   const createFolder = async (name, parentId = currentFolderId) => {
@@ -58,7 +67,7 @@ export function useFolders(currentFolderId = null) {
 
   // Filtered subfolders by global search query
   const filteredFolders = folders.filter((f) =>
-    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase())
+    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase().trim())
   );
 
   return {

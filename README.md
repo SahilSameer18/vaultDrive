@@ -2,18 +2,20 @@
 
 > A high-performance, secure cloud storage web application designed for modern asset management. Featuring JWT refresh token rotation, unlimited nested folder trees, interactive sidebar directory tree navigation, 64-character public share tokens, real-time drag-and-drop uploads, and inline media previews.
 
-![Author](https://img.shields.io/badge/Author-Sahil%20Sameer-gold?style=for-the-badge&logo=github)
-![Security](https://img.shields.io/badge/Security-JWT%20Refresh%20Rotation-emerald?style=for-the-badge)
-![Tech Stack](https://img.shields.io/badge/Stack-React%2019%20%7C%20Node%20%7C%20Express%20%7C%20Prisma%207-blue?style=for-the-badge)
-![Database](https://img.shields.io/badge/Database-Neon%20PostgreSQL-indigo?style=for-the-badge)
-![Storage](https://img.shields.io/badge/Cloud-Cloudinary-orange?style=for-the-badge)
+[![Live Application](https://img.shields.io/badge/Live--Demo-Vercel--App-B8935A?style=for-the-badge&logo=vercel&logoColor=14161A)](https://vaultdrive-s.vercel.app)
+[![API Backend](https://img.shields.io/badge/API--Backend-Render--Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=14161A)](https://vaultdrive-pjca.onrender.com/api/v1)
+![Author](https://img.shields.io/badge/Author-Sahil--Sameer-181717?style=for-the-badge&logo=github)
+![Security](https://img.shields.io/badge/Security-JWT--Refresh--Rotation-00C853?style=for-the-badge)
+![Tech Stack](https://img.shields.io/badge/Stack-React--19--|--Node--|--Prisma--7-61DAFB?style=for-the-badge&logo=react&logoColor=14161A)
+![Database](https://img.shields.io/badge/Database-Neon--PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)
+![Storage](https://img.shields.io/badge/Cloud-Cloudinary-3448C5?style=for-the-badge&logo=cloudinary)
 
 ---
 
-## 👨‍💻 Developer Information
+## 👨‍💻 Developer & Live Links
 
 - **Developer**: **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18))
-- **Repository**: [https://github.com/SahilSameer18/vaultDrive](https://github.com/SahilSameer18/vaultDrive)
+- **🌐 Live Application (Frontend)**: [https://vaultdrive-s.vercel.app](https://vaultdrive-s.vercel.app)
 
 ---
 
@@ -21,7 +23,7 @@
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS)"]
+    subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS - Vercel)"]
         UI["React SPA Components"]
         AXIOS["Axios Interceptor\n(Auto Access Token Refresh)"]
         STORE["Auth Context & Search Context"]
@@ -31,7 +33,7 @@ flowchart TD
         UI --> PORTAL
     end
 
-    subgraph Server ["Backend (Node.js + Express REST API)"]
+    subgraph Server ["Backend (Node.js + Express REST API - Render)"]
         AUTH_MW["Authentication & Rate Limiter"]
         VALIDATOR["Zod Payload Validator"]
         CONTROLLER["File & Folder Controllers"]
@@ -72,6 +74,12 @@ flowchart TD
 - **Unlimited Nesting**: Create subfolders inside subfolders with full breadcrumb navigation up to root (`Home / Projects / 2027`).
 - **Server-Side Ancestry Verification**: Dynamic SQL recursive parent retrieval constructs full breadcrumb chains.
 - **Folder Cycle Guard**: Algorithmic cycle check prevents setting a folder's child or descendent as its parent.
+
+### 🎨 Micro-Animations & Fluid Motion System
+- **Mobile Sidebar Drawer Slide-In**: Smooth 300ms cubic-bezier slide transition (`-translate-x-full` $\rightarrow$ `translate-x-0`) with backdrop blur opacity fade.
+- **Directory Tree Accordion Expansion**: Expandable subfolder tree with `.animate-accordion-down` CSS keyframe transitions.
+- **Card Staggered Entrance & Elevation**: Grid card entry animations (`.animate-fade-in-up`) with interactive hover elevation (`hover:-translate-y-1 hover:shadow-xl`).
+- **Modal Scale Pop Dialogs**: Smooth scale-up zoom (`.animate-scale-up`) across all modals (`UploadModal`, `RenameFolderModal`, `DeleteConfirmModal`, `FilePreviewModal`).
 
 ### ⚡ Cloud File Management & Storage
 - **100MB File Uploads**: Upload images, videos, audio, PDFs, archives, and code files with real-time percentage progress bar (`Axios onUploadProgress`).
@@ -252,6 +260,3 @@ Access the application at `http://localhost:5173`.
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
-
-
-
