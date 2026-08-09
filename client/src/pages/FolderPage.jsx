@@ -9,6 +9,7 @@ import FileGrid from "../components/file/FileGrid";
 import FileSkeleton from "../components/ui/FileSkeleton";
 import UploadModal from "../components/file/UploadModal";
 import ShareModal from "../components/file/ShareModal";
+import FilePreviewModal from "../components/file/FilePreviewModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
 import RenameFolderModal from "../components/folder/RenameFolderModal";
 import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
@@ -21,8 +22,9 @@ export default function FolderPage() {
   const [isUploadOpen, setIsUploadOpen]       = useState(false);
   const [isFolderOpen, setIsFolderOpen]       = useState(false);
   const [shareFile, setShareFile]             = useState(null);
+  const [previewFile, setPreviewFile]         = useState(null);
   const [renameFolderTarget, setRenameFolderTarget] = useState(null);
-  const [deleteTarget, setDeleteTarget]       = useState(null); // { type: 'file'|'folder', item: obj }
+  const [deleteTarget, setDeleteTarget]       = useState(null);
 
   const { folders, breadcrumbs, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
   const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
@@ -200,6 +202,7 @@ export default function FolderPage() {
           viewMode={viewMode}
           onTogglePrivacy={handleTogglePrivacy}
           onOpenShare={(file) => setShareFile(file)}
+          onPreviewFile={(file) => setPreviewFile(file)}
           onDeleteFile={(fileId) => {
             const f = files.find((item) => item.id === fileId);
             setDeleteTarget({ type: "file", item: f || { id: fileId, name: "File" } });
@@ -265,6 +268,12 @@ export default function FolderPage() {
         onClose={() => setShareFile(null)}
         file={shareFile}
         onShareUpdate={handleShareUpdate}
+      />
+
+      <FilePreviewModal
+        isOpen={!!previewFile}
+        onClose={() => setPreviewFile(null)}
+        file={previewFile}
       />
 
     </div>

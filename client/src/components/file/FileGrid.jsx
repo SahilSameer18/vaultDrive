@@ -10,6 +10,7 @@ export default function FileGrid({
   onDeleteFile,
   onRenameFolder,
   onDeleteFolder,
+  onPreviewFile,
 }) {
   return (
     <div className="space-y-6">
@@ -117,6 +118,7 @@ export default function FileGrid({
                 onTogglePrivacy={onTogglePrivacy}
                 onOpenShare={onOpenShare}
                 onDelete={onDeleteFile}
+                onPreview={onPreviewFile}
               />
             ))}
           </div>
