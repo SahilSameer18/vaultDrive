@@ -122,3 +122,32 @@ body {
 
 .vault-latch-unlock { animation: latchUnlock 150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
 .vault-latch-lock   { animation: latchLock   150ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+
+/* ─── Zero-Lag Clean Utilities ───────────────────────────────────────────── */
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(rgba(42, 46, 55, 0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 46, 55, 0.15) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px;
+}
+
+/* ─── Hide Browser Native Password Reveal Icons (Edge/Chrome/Safari) ────── */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* ─── Override Browser Autofill Background Hijacking (Dark Mode Inputs) ───── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #14161A inset !important;
+  -webkit-text-fill-color: #E8E6E0 !important;
+  caret-color: #E8E6E0 !important;
+  transition: background-color 50000s ease-in-out 0s !important;
+}
