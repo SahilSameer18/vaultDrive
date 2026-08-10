@@ -1,13 +1,32 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 import { generalLimiter } from "./middlewares/rateLimit.middleware.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();
 
-// Security HTTP headers
-// app.use(helmet());
+// Security HTTP headers via Helmet
+// Cross-origin resource policies are relaxed to allow Cloudinary media delivery
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com"],
+        mediaSrc: ["'self'", "https://res.cloudinary.com"],
+        frameSrc: ["'self'", "https://res.cloudinary.com"],
+        connectSrc: ["'self'", "https://res.cloudinary.com"],
+        upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
+      },
+    },
+  })
+);
 
 // CORS configuration
 app.use(
@@ -43,4 +62,3 @@ app.use("/api/v1/folders", folderRouter);
 app.use(errorMiddleware);
 
 export default app;
-

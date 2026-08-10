@@ -30,7 +30,8 @@ router.get("/:id", getFolderById);
 // Rename or move a folder (includes cycle guard against circular folder structures)
 router.patch("/:id", validate(updateFolderSchema), updateFolder);
 
-// Delete folder (returns 400 if subfolders exist)
+// Delete folder — subfolders are cascade-deleted; files inside are moved to root (folderId → null)
 router.delete("/:id", deleteFolder);
 
 export default router;
+
