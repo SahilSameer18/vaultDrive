@@ -265,7 +265,8 @@ export const generateShareLink = async (req, res, next) => {
       data: { shareToken, isPublic: true },
     });
 
-    const shareUrl = `${req.protocol}://${req.get("host")}/api/v1/files/share/${shareToken}`;
+    const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+    const shareUrl = `${clientUrl}/share/${updatedFile.shareToken}`;
 
     return res
       .status(200)

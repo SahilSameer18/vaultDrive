@@ -27,7 +27,4 @@ export const filesApi = {
   // Views
   getSharedWithMe: () => api.get("/files/shared-with-me"),
   getByShareToken: (shareToken) => api.get(`/files/share/${shareToken}`),
-
-  // Storage stats
-  getStorageStats: () => api.get("/files/storage-stats"),
 };

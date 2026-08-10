@@ -16,14 +16,15 @@
 
 - **Developer**: **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18))
 - **🌐 Live Application (Frontend)**: [https://vaultdrive-s.vercel.app](https://vaultdrive-s.vercel.app)
+- **⚙️ API Health Check**: [https://vaultdrive-pjca.onrender.com](https://vaultdrive-pjca.onrender.com)
 
 ---
 
-## 📐 System Architecture Diagram
+## 📐 System Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS - Vercel)"]
+    subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS v4 — Vercel)"]
         UI["React SPA Components"]
         AXIOS["Axios Interceptor\n(Auto Access Token Refresh)"]
         STORE["Auth Context & Search Context"]
@@ -33,13 +34,15 @@ flowchart TD
         UI --> PORTAL
     end
 
-    subgraph Server ["Backend (Node.js + Express REST API - Render)"]
+    subgraph Server ["Backend (Node.js + Express REST API — Render)"]
+        HELMET["Helmet (HTTP Security Headers)"]
         AUTH_MW["Authentication & Rate Limiter"]
         VALIDATOR["Zod Payload Validator"]
         CONTROLLER["File & Folder Controllers"]
         CYCLE_GUARD["Folder Cycle Guard"]
         MULTER["Multer Memory Buffer"]
 
+        HELMET --> AUTH_MW
         AUTH_MW --> VALIDATOR
         VALIDATOR --> CONTROLLER
         CONTROLLER --> CYCLE_GUARD
@@ -56,7 +59,7 @@ flowchart TD
         CONTROLLER --> PRISMA
     end
 
-    AXIOS <-->|HTTPS + JWT / HttpOnly Cookie| AUTH_MW
+    AXIOS <-->|HTTPS + JWT / HttpOnly Cookie| HELMET
 ```
 
 ---
@@ -64,199 +67,285 @@ flowchart TD
 ## ✨ Key Features
 
 ### 🔐 Authentication & Session Security
-- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as bcrypt hashes in Neon PostgreSQL, sent via `httpOnly` secure cookies (`ACCESS_TOKEN_SECRET` & `REFRESH_TOKEN_SECRET`).
-- **Silent Token Rotation**: Axios interceptor automatically catches `401 Unauthorized` responses and refreshes access tokens without user interruption.
-- **OWASP Rate Limiting**: Express rate limiters protect authentication and upload endpoints from brute-force attacks.
+- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as **bcrypt hashes** (not plaintext) in Neon PostgreSQL, sent via `httpOnly` secure cookies.
+- **Silent Token Rotation**: Axios interceptor automatically catches `401 Unauthorized` responses and queues concurrent requests while refreshing — preventing refresh token race conditions.
+- **HTTP Security Headers**: [Helmet.js](https://helmetjs.github.io/) enforces `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, and `Strict-Transport-Security` in production.
+- **OWASP Rate Limiting**: Auth endpoints limited to 5 req/15min; global API limited to 100 req/15min.
 
 ### 📁 Advanced Nested Folder & Directory Engine
-- **Interactive Sidebar Directory Tree**: Dynamic expandable tree (`FolderSidebar.jsx`) in the sidebar with active directory highlighting and auto-expanding hierarchy branches.
-- **Directory Renaming & Management**: Custom dark glassmorphism modal (`RenameFolderModal.jsx`) for renaming directories (`PATCH /folders/:id`).
-- **Unlimited Nesting**: Create subfolders inside subfolders with full breadcrumb navigation up to root (`Home / Projects / 2027`).
-- **Server-Side Ancestry Verification**: Dynamic SQL recursive parent retrieval constructs full breadcrumb chains.
-- **Folder Cycle Guard**: Algorithmic cycle check prevents setting a folder's child or descendent as its parent.
-
-### 🎨 Micro-Animations & Fluid Motion System
-- **Mobile Sidebar Drawer Slide-In**: Smooth 300ms cubic-bezier slide transition (`-translate-x-full` $\rightarrow$ `translate-x-0`) with backdrop blur opacity fade.
-- **Directory Tree Accordion Expansion**: Expandable subfolder tree with `.animate-accordion-down` CSS keyframe transitions.
-- **Card Staggered Entrance & Elevation**: Grid card entry animations (`.animate-fade-in-up`) with interactive hover elevation (`hover:-translate-y-1 hover:shadow-xl`).
-- **Modal Scale Pop Dialogs**: Smooth scale-up zoom (`.animate-scale-up`) across all modals (`UploadModal`, `RenameFolderModal`, `DeleteConfirmModal`, `FilePreviewModal`).
+- **Interactive Sidebar Directory Tree**: Dynamic expandable tree (`FolderSidebar.jsx`) with active directory highlighting and auto-expanding hierarchy branches.
+- **Unlimited Nesting**: Create subfolders inside subfolders with full breadcrumb navigation (`Home / Projects / 2027`).
+- **Folder Cycle Guard**: Algorithmic ancestry traversal prevents setting a folder's descendant as its parent.
+- **Safe Deletion Cascade**: Deleting a folder moves all its files to root (`folderId → null`) rather than deleting them — intentional data integrity decision.
 
 ### ⚡ Cloud File Management & Storage
-- **100MB File Uploads**: Upload images, videos, audio, PDFs, archives, and code files with real-time percentage progress bar (`Axios onUploadProgress`).
-- **Whole-Page Drag & Drop Overlay**: Counter-tracked drag listener detects when files enter the window and opens a glowing illuminated dropzone overlay.
-- **Physical Metallic Vault Switch**: Toggle file security between `PRIVATE` and `PUBLIC` with an animated metallic brass latch (`VaultToggle.jsx`).
-- **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar tracking Images, Video & Audio, Docs & PDFs, and Archives & Code.
-- **Global Live Search Input**: Real-time search bar in the topbar (`SearchContext.jsx`) filtering files and directories instantly across all pages.
+- **100MB File Uploads**: Upload images, videos, audio, PDFs, archives, and code files with real-time percentage progress bar.
+- **Whole-Page Drag & Drop Overlay**: Counter-tracked drag listener detects file drags and shows an illuminated full-screen dropzone.
+- **Public / Private Toggle**: `VaultToggle.jsx` switches each file between `PRIVATE` and `PUBLIC` with instant visual feedback.
+- **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar (Images / Video & Audio / Docs & PDFs / Archives).
+- **Global Live Search**: Real-time search bar in the topbar filtering files and folders instantly.
 
 ### 🔗 Granular Share Management
-- **Public Share Links**: Generate and revoke 64-character hex share tokens (`/share/:shareToken`).
-- **User-to-User Sharing**: Grant access to specific registered users by email or username with composite unique constraint guards (`fileId_userId`).
-- **Public Share Access Page**: Dedicated public access page (`/share/:shareToken`) allowing unauthenticated visitors to view and download shared files.
+- **Public Share Links**: Generate and revoke 64-character hex share tokens. Public page (`/share/:shareToken`) is accessible without authentication.
+- **User-to-User Sharing**: Grant file access to specific registered users by email or username.
+- **Composite Unique Guard**: `fileId + userId` constraint prevents duplicate share entries.
 
-### 👁️ React Portal Inline Media Preview & Custom Modals
-- **React Portal Overlay**: Rendered directly in `document.body` via `createPortal` for perfect centering and screen overlay (`z-[99999]`).
-- **Keyboard `Esc` Shortcut**: Instant keyboard dismissal from anywhere on the page.
-- **Custom Hazard Confirmation Modal**: `DeleteConfirmModal.jsx` replaces ugly native browser alert popups with a styled dark hazard modal.
-- Multi-format preview support:
-  - 🖼️ **Images**: Responsive image inspector (`<img />`)
-  - 🎥 **Videos**: HTML5 video player (`<video controls />`)
-  - 🎵 **Audio**: HTML5 audio player (`<audio controls />`)
-  - 📄 **PDFs**: Embedded document inspector (`<iframe />`)
-  - 💻 **Code & Text**: Code viewer with 10KB safe streaming (`<pre><code>`)
+### 👁️ Inline Media Previews
+- **React Portal Overlay** (`createPortal → document.body`) for correct z-index stacking.
+- **Keyboard `Esc` Shortcut** for instant dismissal.
+- Multi-format support: 🖼️ Images · 🎥 Videos · 🎵 Audio · 📄 PDFs · 💻 Code & Text files
 
 ---
 
-## 🛡️ OWASP Security Compliance Checklist
+## 🛡️ Security Implementation
 
-| OWASP Security Rule | Implementation in VaultDrive |
+| Security Layer | How VaultDrive Implements It |
 | :--- | :--- |
-| **Authentication & Session** | Dual-Token JWT architecture; refresh tokens stored as bcrypt hashes; `SameSite=Lax` in dev, `SameSite=None; Secure` in production for cross-domain cookie delivery. |
-| **Input Sanitization** | `sanitizeFilename()` strips path traversal sequences (`../`, `..\`) and illegal characters (`< > : " / \ \| ? *`). |
-| **Payload Validation** | Strict Zod validation schemas on all request bodies, query params, and route params. |
-| **Cross-Site Scripting (XSS)** | Text file previews capped at 10KB with standard HTML entity escaping inside `<pre>` containers. |
-| **Access Control (IDOR)** | Owner validation checks (`file.userId === req.user.id`) enforced on all mutating routes (`PATCH`, `DELETE`). |
-| **Folder Cycle Prevention** | Ancestral traversal algorithm verifies no folder can become a subfolder of its own descendent. |
+| **HTTP Security Headers** | `helmet()` with custom CSP: whitelists only `self` + `https://res.cloudinary.com` for media, scripts, frames. HSTS enforced in production. |
+| **Authentication** | Dual-token JWT; refresh tokens stored as bcrypt hashes (cost 12) — a DB breach does not expose valid tokens. |
+| **Input Sanitization** | `sanitizeFilename()` strips path traversal sequences and illegal characters before Cloudinary upload. |
+| **Payload Validation** | Zod schemas on all request bodies, query params, and route params via a shared `validate()` middleware. |
+| **Access Control (IDOR)** | `file.userId === req.user.id` ownership check on every mutating route. |
+| **Shared File Access** | Three-tier check: owner → public (`isPublic`) → shared (`SharedFile` record) before allowing file access. |
+| **Self-Share Prevention** | Controller rejects share requests where `targetUser.id === req.user.id`. |
+| **Folder Cycle Prevention** | Iterative ancestor traversal blocks any folder from becoming its own descendant. |
+| **Rate Limiting** | Auth routes: 5 req/15min · Global API: 100 req/15min (via `express-rate-limit`). |
+| **XSS** | React escapes JSX by default; text file previews capped at 10KB inside `<pre>` — no `dangerouslySetInnerHTML`. |
+| **Cookie Security** | `httpOnly: true`, `secure: true`, `sameSite: none` in production for cross-domain cookie delivery. |
+
+---
+
+## 🏗️ Key Engineering Decisions
+
+| Decision | What Was Chosen | Why |
+| :--- | :--- | :--- |
+| **Refresh token storage** | bcrypt hash in DB (never plaintext) | A database breach doesn't expose usable refresh tokens |
+| **Concurrent 401 handling** | Queue-based Axios interceptor | Prevents multiple simultaneous refresh storms in SPAs |
+| **Folder deletion** | `SetNull` cascade (files → root) | Deleting a folder should not destroy user files |
+| **Upload pipeline** | Multer memory buffer → Cloudinary stream | Zero disk I/O; clean DX; progress tracking via Axios |
+| **File preview** | `createPortal(document.body)` | Correct z-index stacking regardless of parent stacking context |
+| **Drag-and-drop** | `dragCounter` pattern on `window` | Prevents flickering when cursor moves over child elements |
+| **Share URL construction** | Uses `CLIENT_URL` env variable | Ensures share links point to the frontend page, not the backend API |
+| **Tree building** | Client-side `buildFolderTree()` from flat array | Single API call; O(n) build; no recursive DB queries needed |
 
 ---
 
 ## ⚖️ Architecture Tradeoffs
 
-### File Upload Strategy
+### File Upload Strategy — Multer Memory Buffering
 
-We implemented **Multer Memory Buffering (Server Streaming)**:
+**How it works**: Client sends multipart form data → Multer buffers file bytes in server RAM → bytes streamed directly to Cloudinary.
 
-- **How it works**: Client sends multipart form data to Express server $\rightarrow$ Multer buffers file bytes in RAM $\rightarrow$ Server streams bytes directly to Cloudinary using `cloudinary.uploader.upload_stream`.
-- **Why selected**: Extremely clean developer experience, zero setup friction for evaluators, and direct progress tracking via Axios.
-- **Known Tradeoff**: Under heavy concurrent load or with multiple simultaneous 100MB uploads, server RAM usage spikes temporarily.
+**Why chosen**: Zero disk setup, clean DX for evaluators, direct upload progress via Axios `onUploadProgress`.
 
-#### Production Scale Alternative (Direct Signed Uploads)
-1. **Client Signature Request**: Client requests an upload signature (`POST /api/v1/files/sign`).
-2. **Server Validation**: Server validates auth & file size limit $\rightarrow$ returns signed timestamp & signature.
-3. **Direct Cloudinary Upload**: Client uploads directly from browser to Cloudinary via 6MB chunked resumable upload (`upload_large`). **Zero file bytes touch the application server.**
-4. **Metadata Confirmation**: Client calls `POST /api/v1/files/confirm` to save metadata to Neon PostgreSQL.
+**Known tradeoff**: Under concurrent heavy load (multiple simultaneous 100MB uploads), server RAM usage spikes temporarily.
+
+**Production alternative — Direct Signed Uploads**:
+1. Client requests a signed upload URL from server (`POST /files/sign`)
+2. Server validates auth and returns a Cloudinary signature
+3. Client uploads **directly from browser to Cloudinary** (zero bytes touch the app server)
+4. Client confirms upload by calling `POST /files/confirm` to persist metadata to PostgreSQL
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Backend Stack
-- **Node.js** & **Express v5**
-- **Prisma 7 ORM** + `@prisma/adapter-pg`
-- **Neon PostgreSQL** (Cloud Database - Pooled `DATABASE_URL` & Direct `DIRECT_URL`)
-- **Cloudinary SDK** (Media Storage)
-- **JSONWebToken** & **BcryptJS**
-- **Zod v3** (Schema Validation)
-- **Multer** (Multipart Upload Parser)
-
-### Frontend Stack
-- **React 19** + **Vite 8**
-- **React Router DOM v7**
-- **Axios** (API Client)
-- **Tailwind CSS v4**
-- **Google Fonts** (Inter & JetBrains Mono)
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 19, Vite 8, React Router DOM v7, Axios, Tailwind CSS v4 |
+| **Backend** | Node.js, Express v5, Helmet, express-rate-limit |
+| **ORM** | Prisma 7 + `@prisma/adapter-pg` (Neon serverless adapter) |
+| **Database** | Neon PostgreSQL (pooled + direct connections) |
+| **File Storage** | Cloudinary SDK (images, video, audio, raw) |
+| **Auth** | JSON Web Token + BcryptJS |
+| **Validation** | Zod v3 |
+| **Upload** | Multer (memory storage) |
+| **Fonts** | Inter (sans) + JetBrains Mono (monospace) via Google Fonts |
 
 ---
 
 ## 🚀 Local Installation & Setup
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- Cloudinary Account (`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`)
-- PostgreSQL Database URL (Pooled `DATABASE_URL` and Direct `DIRECT_URL` for Neon)
+- **Node.js** v18 or higher
+- **Cloudinary** account (free tier is sufficient)
+- **Neon PostgreSQL** database (free tier works — requires both a pooled `DATABASE_URL` and a direct `DIRECT_URL`)
 
-### 1. Clone Repository & Install Dependencies
+### 1. Clone & Install
+
 ```bash
 git clone https://github.com/SahilSameer18/vaultDrive.git
 cd vaultDrive
 
 # Install server dependencies
-cd server
-npm install
+cd server && npm install
 
 # Install client dependencies
-cd ../client
-npm install
+cd ../client && npm install
 ```
 
-### 2. Environment Variables Configuration
+### 2. Configure Environment Variables
 
-Create a `.env` file in `server/`:
+**Server** — create `server/.env`:
+
 ```env
+# Server
 PORT=3000
 NODE_ENV=development
 
-# Database Connections (Neon PostgreSQL)
-DATABASE_URL="postgresql://user:pass@ep-cool-name-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
-DIRECT_URL="postgresql://user:pass@ep-cool-name.us-east-2.aws.neon.tech/neondb?sslmode=require"
+# Neon PostgreSQL (Prisma)
+# Pooled URL — used for all application queries
+DATABASE_URL="postgresql://user:pass@ep-cool-name-pooler.region.aws.neon.tech/neondb?sslmode=require"
+# Direct URL — used for migrations only
+DIRECT_URL="postgresql://user:pass@ep-cool-name.region.aws.neon.tech/neondb?sslmode=require"
 
-# JWT Secrets (Dual-Token Rotation)
+# JWT — use long random strings (min 32 characters)
 ACCESS_TOKEN_SECRET="your-super-secret-access-token-key-min-32-chars"
 REFRESH_TOKEN_SECRET="your-super-secret-refresh-token-key-min-32-chars"
 ACCESS_TOKEN_EXPIRY="15m"
 REFRESH_TOKEN_EXPIRY="7d"
 
-# Cloudinary Credentials
-CLOUDINARY_CLOUD_NAME="your_cloudinary_cloud_name"
-CLOUDINARY_API_KEY="your_cloudinary_api_key"
-CLOUDINARY_API_SECRET="your_cloudinary_api_secret"
+# Cloudinary
+CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
 
+# Frontend URL (used to build public share links)
 CLIENT_URL="http://localhost:5173"
 ```
 
-Create a `.env` file in `client/`:
+**Client** — create `client/.env`:
+
 ```env
 VITE_API_URL="http://localhost:3000/api/v1"
 ```
 
-### 3. Database Migration & Prisma Setup
+> **Where to get credentials:**
+> - Neon: [neon.tech](https://neon.tech) → create project → copy both connection strings from the "Connection Details" panel
+> - Cloudinary: [cloudinary.com](https://cloudinary.com) → Dashboard → copy Cloud Name, API Key, API Secret
+
+### 3. Database Setup
+
 ```bash
 cd server
+
+# Run migrations (creates all tables)
 npx prisma migrate dev --name init
+
+# Generate Prisma client
 npx prisma generate
 ```
 
-### 4. Run Development Servers
+### 4. Start Development Servers
 
-In Terminal 1 (Server):
+**Terminal 1 — Backend:**
 ```bash
 cd server
 npm run dev
+# → http://localhost:3000
 ```
 
-In Terminal 2 (Client):
+**Terminal 2 — Frontend:**
 ```bash
 cd client
 npm run dev
+# → http://localhost:5173
 ```
 
-Access the application at `http://localhost:5173`.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 🛠️ API Reference Table
+## 📡 API Reference
 
-| Method | Endpoint | Access | Description |
+### Authentication
+
+| Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/register` | Public | Register new account & set HTTP-only refresh cookie |
-| `POST` | `/api/v1/auth/login` | Public | Authenticate user & issue dual tokens |
-| `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token & issue new access token |
-| `POST` | `/api/v1/auth/logout` | Protected | Clear authentication cookies & revoke refresh token |
-| `GET` | `/api/v1/auth/me` | Protected | Fetch current authenticated user identity |
-| `GET` | `/api/v1/folders` | Protected | List root or nested folders (`?parentId=root`) |
-| `POST` | `/api/v1/folders` | Protected | Create new folder/subfolder |
-| `PATCH` | `/api/v1/folders/:id` | Protected | Rename folder (`{ name }`) |
-| `DELETE` | `/api/v1/folders/:id` | Protected | Safe folder deletion (moves child files to root) |
-| `GET` | `/api/v1/files` | Protected | List files (`?folderId=root` for root files) |
-| `POST` | `/api/v1/files/upload` | Protected | Upload file (multipart/form-data) |
-| `DELETE` | `/api/v1/files/:id` | Protected | Delete file permanently from Cloudinary & DB |
-| `POST` | `/api/v1/files/:id/share-link` | Protected | Generate 64-char public share token |
-| `DELETE` | `/api/v1/files/:id/share-link` | Protected | Revoke public share token |
-| `POST` | `/api/v1/files/:id/share-user` | Protected | Share file with user (`{ targetIdentifier }`) |
-| `GET` | `/api/v1/files/shared-with-me` | Protected | List files shared directly with user |
-| `GET` | `/api/v1/files/share/:shareToken` | Public | Access public file details via token |
+| `POST` | `/api/v1/auth/register` | Public | Register new account |
+| `POST` | `/api/v1/auth/login` | Public | Login and receive tokens via cookies |
+| `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token, issue new access token |
+| `POST` | `/api/v1/auth/logout` | 🔒 Protected | Revoke refresh token and clear cookies |
+| `GET` | `/api/v1/auth/me` | 🔒 Protected | Get current authenticated user |
+
+### Folders
+
+| Method | Endpoint | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/folders` | 🔒 Protected | List folders (`?parentId=root` for root level) |
+| `GET` | `/api/v1/folders/:id` | 🔒 Protected | Get folder with subfolders + breadcrumb path |
+| `POST` | `/api/v1/folders` | 🔒 Protected | Create folder or subfolder (`{ name, parentId? }`) |
+| `PATCH` | `/api/v1/folders/:id` | 🔒 Protected | Rename or move folder (cycle-guard enforced) |
+| `DELETE` | `/api/v1/folders/:id` | 🔒 Protected | Delete folder — subfolders cascade, files move to root |
+
+### Files
+
+| Method | Endpoint | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/files` | 🔒 Protected | List files (`?folderId`, `?search`, `?sortBy`, `?page`, `?limit`) |
+| `POST` | `/api/v1/files/upload` | 🔒 Protected | Upload file (multipart/form-data, max 100MB) |
+| `GET` | `/api/v1/files/:id` | 🔒 Protected | Get single file by ID (owner/shared/public check) |
+| `DELETE` | `/api/v1/files/:id` | 🔒 Protected | Permanently delete file from Cloudinary + DB |
+| `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared directly with the current user |
+| `GET` | `/api/v1/files/share/:shareToken` | Public | Access public file via share token |
+| `POST` | `/api/v1/files/:id/share-link` | 🔒 Protected | Generate 64-char public share token |
+| `DELETE` | `/api/v1/files/:id/share-link` | 🔒 Protected | Revoke public share token |
+| `POST` | `/api/v1/files/:id/share-user` | 🔒 Protected | Share file with user by email or username |
+
+### Request/Response Format
+
+All responses follow a unified envelope:
+
+```json
+// Success
+{ "success": true, "message": "...", "data": { ... } }
+
+// Error
+{ "success": false, "message": "...", "errors": [ ... ] }
+```
+
+---
+
+## 🗄️ Database Schema
+
+```
+User
+ ├── files[]          (one-to-many)
+ ├── folders[]        (one-to-many)
+ ├── sharedFiles[]    (files shared with this user)
+ └── refreshTokens[]  (bcrypt-hashed, multi-device)
+
+File
+ ├── user             (owner)
+ ├── folder?          (optional parent — null = root)
+ └── sharedWith[]     (SharedFile records)
+
+Folder
+ ├── user             (owner)
+ ├── parent?          (self-referential — null = root)
+ └── children[]       (nested subfolders)
+
+SharedFile
+ ├── file             (what is shared)
+ └── user             (who it's shared with)
+```
+
+---
+
+## ⚠️ Known Limitations
+
+| Limitation | Notes |
+| :--- | :--- |
+| **Single file upload** | UploadModal handles one file at a time |
+| **Client-side search** | Search filters from the full fetched list; server-side `?search=` param is supported on the backend but not yet wired into the frontend search bar |
+| **Memory upload** | 100MB files are buffered in server RAM before streaming to Cloudinary — see Architecture Tradeoffs above |
+| **No file rename UI** | Backend `PATCH /files/:id` supports `{ name }` updates but no rename button exists in the UI yet |
+| **No TypeScript** | Project is JavaScript; TypeScript migration is the next planned step |
+| **No automated tests** | Unit and integration test coverage is a planned addition |
 
 ---
 
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
+

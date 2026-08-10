@@ -21,8 +21,8 @@ export function useFolders(currentFolderId = null) {
       } else if (targetFolderId) {
         // Fetch subfolder details + breadcrumb path
         const res = await foldersApi.getById(targetFolderId);
-        setFolders(res.data.data.subfolders || []);
-        setBreadcrumbs(res.data.data.breadcrumbs || []);
+        setFolders(res.data.data.folder?.children || []);
+        setBreadcrumbs(res.data.data.folder?.breadcrumbs || []);
       } else {
         // Fetch root-level folders via list("root")
         const res = await foldersApi.list("root");
