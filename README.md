@@ -337,10 +337,7 @@ SharedFile
 | Limitation | Notes |
 | :--- | :--- |
 | **Single file upload** | UploadModal handles one file at a time |
-| **Client-side search** | Search filters from the full fetched list; server-side `?search=` param is supported on the backend but not yet wired into the frontend search bar |
 | **Memory upload** | 100MB files are buffered in server RAM before streaming to Cloudinary — see Architecture Tradeoffs above |
-| **No file rename UI** | Backend `PATCH /files/:id` supports `{ name }` updates but no rename button exists in the UI yet |
-| **No TypeScript** | Project is JavaScript; TypeScript migration is the next planned step |
 | **No automated tests** | Unit and integration test coverage is a planned addition |
 
 ---
@@ -348,4 +345,7 @@ SharedFile
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
+
+
+
 
