@@ -7,6 +7,9 @@ import errorMiddleware from "./middlewares/error.middleware.js";
 
 const app = express();
 
+// Trust reverse proxies (Render, Railway, Vercel, Nginx, Cloudflare) for accurate client IP identification
+app.set("trust proxy", 1);
+
 // Security HTTP headers via Helmet
 // Cross-origin resource policies are relaxed to allow Cloudinary media delivery
 app.use(

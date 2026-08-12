@@ -107,7 +107,7 @@ function VaultMechanism() {
 }
 
 export default function LoginPage() {
-  const { login, googleLogin } = useAuth();
+  const { login, googleLogin, demoLogin } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -153,6 +153,23 @@ export default function LoginPage() {
     setError("Google Sign-In was cancelled or failed.");
     addToast("Google Sign-In was cancelled or failed.", "error");
   };
+
+  const handleDemoLogin = async () => {
+    try {
+      setError("");
+      setLoading(true);
+      await demoLogin();
+      addToast("Welcome Reviewer! Signed into Demo Workspace.", "success");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      const msg = err.response?.data?.message || "Demo login failed";
+      setError(msg);
+      addToast(msg, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   return (
@@ -298,7 +315,7 @@ export default function LoginPage() {
             </div>
 
             {/* Google OAuth Login Button */}
-            <div className="flex justify-center w-full mb-6 overflow-hidden rounded-xl">
+            <div className="flex justify-center w-full mb-4 overflow-hidden rounded-xl">
               <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
@@ -308,6 +325,17 @@ export default function LoginPage() {
                 text="continue_with"
               />
             </div>
+
+            {/* 1-Click Demo Login for Reviewers */}
+            <button
+              type="button"
+              onClick={handleDemoLogin}
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-[#B8935A] bg-[#181B21] border border-[#B8935A]/50 hover:bg-[#B8935A]/10 hover:border-[#B8935A] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mb-6"
+            >
+              <span>⚡</span> 1-Click Demo Login (Reviewer Access)
+            </button>
+
 
 
             {/* Footer Link */}

@@ -1,11 +1,13 @@
 import { Router } from "express";
 import {
   register,
+
   login,
   refresh,
   logout,
   getMe,
   googleLogin,
+  demoLogin,
 } from "../controllers/auth.controller.js";
 import {
   registerSchema,
@@ -14,18 +16,26 @@ import {
 } from "../validators/auth.validator.js";
 import validate from "../middlewares/validate.middleware.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
-import { authLimiter } from "../middlewares/rateLimit.middleware.js";
+import {
+  registerLimiter,
+  loginLimiter,
+} from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
 
-// Register new user account (rate limited to 5 req/15m to prevent registration spam)
-router.post("/register", authLimiter, validate(registerSchema), register);
+// Register new user account (rate limited to 10 req/15m)
+router.post("/register", registerLimiter, validate(registerSchema), register);
 
-// Authenticate user with credentials (rate limited to 5 req/15m to block brute force)
-router.post("/login", authLimiter, validate(loginSchema), login);
+// Authenticate user with credentials (rate limited to 10 failed req/15m)
+router.post("/login", loginLimiter, validate(loginSchema), login);
 
-// Authenticate Google OAuth ID token (rate limited)
-router.post("/google", authLimiter, validate(googleLoginSchema), googleLogin);
+// Authenticate Google OAuth ID token (rate limited to 10 failed req/15m)
+router.post("/google", loginLimiter, validate(googleLoginSchema), googleLogin);
+
+// 1-Click Demo Login for Reviewers
+router.post("/demo-login", loginLimiter, demoLogin);
+
+
 
 
 // Rotate refresh token and issue new access token

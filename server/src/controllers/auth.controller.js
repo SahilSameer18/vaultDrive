@@ -405,5 +405,67 @@ export const googleLogin = async (req, res, next) => {
   }
 };
 
+// Authenticate or auto-provision 1-Click Demo account for reviewers
+export const demoLogin = async (req, res, next) => {
+  try {
+    const demoEmail = "demo.reviewer@vaultdrive.com";
+
+    // 1. Find or create demo user
+    let user = await prisma.user.findUnique({
+      where: { email: demoEmail },
+    });
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: demoEmail,
+          username: "demo_reviewer",
+          avatarUrl: "https://res.cloudinary.com/demo/image/upload/v1571218039/sample.jpg",
+          passwordHash: null,
+        },
+      });
+
+      // 2. Seed initial sample folders for demo user workspace
+      await prisma.folder.createMany({
+        data: [
+          { name: "Project Assets", userId: user.id },
+          { name: "Sample Documents", userId: user.id },
+        ],
+      });
+    }
+
+    const { accessToken, refreshToken } = await generateAndStoreTokens(user.id);
+
+    const cookieOptions = getCookieOptions();
+    res.cookie("accessToken", accessToken, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    const userWithoutPassword = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+    };
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { user: userWithoutPassword, accessToken },
+          "Demo login successful"
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
 
 

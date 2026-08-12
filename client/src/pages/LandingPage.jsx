@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/ui/Toast";
+
 
 function LogoMark({ className = "w-5 h-5" }) {
   return (
@@ -93,9 +96,28 @@ function CloudUploadIcon({ className = "w-5 h-5" }) {
 }
 
 export default function LandingPage() {
+  const { demoLogin } = useAuth();
+  const { addToast } = useToast();
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState("all");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [loadingDemo, setLoadingDemo] = useState(false);
+
+  const handleDemoLogin = async () => {
+    try {
+      setLoadingDemo(true);
+      await demoLogin();
+      addToast("Welcome Reviewer! Signed into Demo Workspace.", "success");
+      navigate("/dashboard");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Demo login failed", "error");
+    } finally {
+      setLoadingDemo(false);
+    }
+  };
+
 
   const sampleFiles = [
     { id: "1", name: "Tax_Return_2026.pdf", size: "4.2 MB", folder: "financial", type: "doc", date: "Updated 2h ago", status: "PRIVATE", color: "#6FA88A" },
@@ -178,24 +200,34 @@ export default function LandingPage() {
                 VaultDrive provides private storage, nested folder trees, and passcode-protected public file sharing.
               </p>
 
-              {/* Clean Action Buttons (NO email input field!) */}
+              {/* Clean Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mt-8 w-full sm:w-auto">
-                <Link
-                  to="/register"
-                  className="group relative inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#B8935A] to-[#C8A66B] text-[#0C0D10] text-sm font-semibold tracking-wide shadow-[0_10px_35px_rgba(184,147,90,0.22)] hover:brightness-110 active:scale-[0.99] transition-all overflow-hidden"
+                <button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  disabled={loadingDemo}
+                  className="group relative inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#B8935A] to-[#C8A66B] text-[#0C0D10] text-sm font-semibold tracking-wide shadow-[0_10px_35px_rgba(184,147,90,0.22)] hover:brightness-110 active:scale-[0.99] transition-all cursor-pointer overflow-hidden"
                 >
                   <span className="absolute inset-0 bg-white/20 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out skew-x-12" />
-                  <span>Create Your Vault</span>
+                  <span>⚡ 1-Click Demo Access</span>
                   <ArrowIcon className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Link>
+                </button>
 
                 <Link
                   to="/login"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#181B21] border border-[#2A2E37] text-[#E8E6E0] hover:border-[#B8935A]/50 hover:bg-[#1C1F26] transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#181B21] border border-[#2A2E37] text-[#E8E6E0] hover:border-[#B8935A]/50 hover:bg-[#1C1F26] transition-all"
                 >
                   <span>Sign In</span>
                 </Link>
+
+                <Link
+                  to="/register"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-[#181B21] border border-[#2A2E37] text-[#8B8F99] hover:text-[#E8E6E0] hover:border-[#B8935A]/50 transition-all text-sm font-medium"
+                >
+                  <span>Register</span>
+                </Link>
               </div>
+
 
               {/* Trust Specs */}
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 text-[11px] font-mono text-[#8B8F99]">

@@ -10,14 +10,24 @@ export const generalLimiter = rateLimit({
   },
 });
 
-// Strict rate limiter for sensitive Auth endpoints (5 requests per 15 minutes to block brute force)
-export const authLimiter = rateLimit({
+// Rate limiter for Registration endpoint (10 attempts per 15 minutes)
+export const registerLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 10,
   message: {
     success: false,
-    message: "Too many login/registration attempts. Please try again after 15 minutes.",
+    message: "Too many registration attempts. Please try again after 15 minutes.",
   },
 });
 
+// Rate limiter for Login endpoints (10 failed attempts per 15 minutes; successful logins skip counting)
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  skipSuccessfulRequests: true, // Only failed logins count
+  message: {
+    success: false,
+    message: "Too many login attempts. Please try again after 15 minutes.",
+  },
+});
 
