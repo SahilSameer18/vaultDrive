@@ -106,6 +106,8 @@ export default function Topbar({ onToggleMobileMenu }) {
           )}
         </div>
 
+
+
         {/* ── Right: Mobile Search Toggle & User Identity ─────────────────── */}
         <div className="flex items-center gap-3" ref={menuRef}>
           
@@ -183,44 +185,73 @@ export default function Topbar({ onToggleMobileMenu }) {
 
       </div>
 
-      {/* ── Mobile Expandable Search Bar Drawer ─────────────────────────── */}
+      {/* ── Mobile Expandable Glassmorphic Search Bar Drawer ─────────────── */}
       {mobileSearchOpen && (
-        <div className="md:hidden px-4 pb-3 pt-1 border-t border-vault-border bg-vault-panel animate-fade-in relative flex items-center gap-2">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-2.5 text-vault-muted pointer-events-none">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.5" />
-                <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            </span>
-            <input
-              ref={searchInputRef}
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearchKeyDown}
-              placeholder="Search files & folders..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-vault-bg border border-vault-border text-vault-text text-xs placeholder:text-vault-muted/40 focus:border-vault-accent focus:outline-none"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="absolute right-2.5 top-2.5 text-vault-muted hover:text-vault-text text-xs"
-              >
-                ✕
-              </button>
-            )}
+        <div className="md:hidden px-4 py-3 border-t border-[#B8935A]/30 bg-[#14161A]/95 backdrop-blur-2xl shadow-[0_16px_35px_rgba(0,0,0,0.7)] animate-fade-in relative space-y-2.5">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <span className="absolute left-3.5 top-2.5 text-[#B8935A] pointer-events-none">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.75" />
+                  <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                </svg>
+              </span>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                placeholder="Search files, folders & shared assets..."
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#0C0D10] border border-[#2A2E37] text-[#E8E6E0] text-xs placeholder:text-[#8B8F99]/50 focus:border-[#B8935A] focus:ring-2 focus:ring-[#B8935A]/20 focus:outline-none transition-all shadow-inner"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-2.5 w-4.5 h-4.5 rounded-full bg-[#2A2E37] text-[#8B8F99] hover:text-[#E8E6E0] flex items-center justify-center text-[10px] transition-colors"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setMobileSearchOpen(false);
+              }}
+              className="text-xs font-semibold text-[#8B8F99] hover:text-[#B8935A] transition-colors px-2 py-2"
+            >
+              Cancel
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setMobileSearchOpen(false)}
-            className="text-xs text-vault-muted hover:text-vault-text font-medium px-2 py-1"
-          >
-            Cancel
-          </button>
+
+          {/* Quick Filter Tag Chips for Mobile Search */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none text-[11px]">
+            <span className="text-[10px] font-mono text-[#8B8F99]/60 shrink-0">FILTER:</span>
+            {["All", "Images", "Docs", "Videos", "Folders"].map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => {
+                  if (tag === "All") setSearchQuery("");
+                  else setSearchQuery(tag.toLowerCase());
+                }}
+                className={`px-2.5 py-1 rounded-lg border text-xs font-medium shrink-0 transition-all cursor-pointer ${
+                  searchQuery.toLowerCase() === tag.toLowerCase() || (tag === "All" && !searchQuery)
+                    ? "bg-[#B8935A]/20 border-[#B8935A] text-[#B8935A]"
+                    : "bg-[#181B21] border-[#2A2E37] text-[#8B8F99] hover:border-[#B8935A]/40 hover:text-[#E8E6E0]"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
         </div>
       )}
+
 
     </header>
   );
