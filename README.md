@@ -5,10 +5,20 @@
 [![Live Application](https://img.shields.io/badge/Live--Demo-Vercel--App-B8935A?style=for-the-badge&logo=vercel&logoColor=14161A)](https://vaultdrive-s.vercel.app)
 [![API Backend](https://img.shields.io/badge/API--Backend-Render--Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=14161A)](https://vaultdrive-pjca.onrender.com/api/v1)
 ![Author](https://img.shields.io/badge/Author-Sahil--Sameer-181717?style=for-the-badge&logo=github)
-![Security](https://img.shields.io/badge/Security-JWT--Refresh--Rotation-00C853?style=for-the-badge)
+![Security](https://img.shields.io/badge/Security-Google--OAuth--2.0--%7C--JWT-00C853?style=for-the-badge&logo=google)
 ![Tech Stack](https://img.shields.io/badge/Stack-React--19--|--Node--|--Prisma--7-61DAFB?style=for-the-badge&logo=react&logoColor=14161A)
 ![Database](https://img.shields.io/badge/Database-Neon--PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)
 ![Storage](https://img.shields.io/badge/Cloud-Cloudinary-3448C5?style=for-the-badge&logo=cloudinary)
+
+---
+
+## ⚡ 1-Click Reviewer Quick Start
+
+Testing VaultDrive is instant! No registration or password typing is required:
+1. Open the [Live Application](https://vaultdrive-s.vercel.app).
+2. Click **`⚡ 1-Click Demo Access`** on the Landing, Login, or Register page.
+3. You are instantly logged into a pre-populated workspace with sample folders and file controls.
+
 
 ---
 
@@ -27,23 +37,29 @@ flowchart TD
     subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS v4 — Vercel)"]
         UI["React SPA Components"]
         AXIOS["Axios Interceptor\n(Auto Access Token Refresh)"]
+        GOOGLE_SDK["@react-oauth/google\n(Google Sign-In SDK)"]
         STORE["Auth Context & Search Context"]
         PORTAL["React Portals\n(File Preview & Custom Modals)"]
         UI --> AXIOS
+        UI --> GOOGLE_SDK
         AXIOS --> STORE
         UI --> PORTAL
     end
 
     subgraph Server ["Backend (Node.js + Express REST API — Render)"]
         HELMET["Helmet (HTTP Security Headers)"]
-        AUTH_MW["Authentication & Rate Limiter"]
+        PROXY["Proxy Trust (app.set('trust proxy', 1))"]
+        AUTH_MW["Split Rate Limiters\n(generalLimiter, loginLimiter, registerLimiter)"]
+        GOOGLE_VERIFIER["Google Token Verifier\n(google-auth-library)"]
         VALIDATOR["Zod Payload Validator"]
-        CONTROLLER["File & Folder Controllers"]
+        CONTROLLER["Auth Controllers\n(Google OAuth 2.0 & 1-Click Demo Access)"]
         CYCLE_GUARD["Folder Cycle Guard"]
         MULTER["Multer Memory Buffer"]
 
-        HELMET --> AUTH_MW
-        AUTH_MW --> VALIDATOR
+        HELMET --> PROXY
+        PROXY --> AUTH_MW
+        AUTH_MW --> GOOGLE_VERIFIER
+        GOOGLE_VERIFIER --> VALIDATOR
         VALIDATOR --> CONTROLLER
         CONTROLLER --> CYCLE_GUARD
         CONTROLLER --> MULTER
@@ -51,7 +67,7 @@ flowchart TD
 
     subgraph Infrastructure ["Cloud Infrastructure & Persistence"]
         PRISMA["Prisma 7 ORM"]
-        NEON[("Neon PostgreSQL\n(User, File, Folder, SharedFile)")]
+        NEON[("Neon PostgreSQL\n(User, OAuthAccount, File, Folder, SharedFile)")]
         CLOUDINARY[("Cloudinary Asset Cloud\n(Secure File Storage)")]
 
         PRISMA --> NEON
@@ -59,8 +75,10 @@ flowchart TD
         CONTROLLER --> PRISMA
     end
 
+    GOOGLE_SDK <-->|ID Token Auth| GOOGLE_VERIFIER
     AXIOS <-->|HTTPS + JWT / HttpOnly Cookie| HELMET
 ```
+
 
 ---
 
@@ -263,10 +281,13 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
 | `POST` | `/api/v1/auth/register` | Public | Register new account |
-| `POST` | `/api/v1/auth/login` | Public | Login and receive tokens via cookies |
+| `POST` | `/api/v1/auth/login` | Public | Login with email/username + password |
+| `POST` | `/api/v1/auth/google` | Public | Authenticate Google OAuth 2.0 ID Token |
+| `POST` | `/api/v1/auth/demo-login` | Public | 1-Click Demo Login for instant reviewer testing |
 | `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token, issue new access token |
 | `POST` | `/api/v1/auth/logout` | 🔒 Protected | Revoke refresh token and clear cookies |
 | `GET` | `/api/v1/auth/me` | 🔒 Protected | Get current authenticated user |
+
 
 ### Folders
 
@@ -313,7 +334,11 @@ User
  ├── files[]          (one-to-many)
  ├── folders[]        (one-to-many)
  ├── sharedFiles[]    (files shared with this user)
- └── refreshTokens[]  (bcrypt-hashed, multi-device)
+ ├── refreshTokens[]  (bcrypt-hashed, multi-device)
+ └── oauthAccounts[]  (multi-provider OAuth bindings: Google, GitHub, etc.)
+
+OAuthAccount
+ └── user             (linked user account)
 
 File
  ├── user             (owner)
