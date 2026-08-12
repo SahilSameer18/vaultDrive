@@ -20,3 +20,12 @@ export const loginSchema = z.object({
     password: z.string().min(1, "Password is required"),
   }),
 });
+
+// Validation schema for Google OAuth login requests
+export const googleLoginSchema = z.object({
+  body: z.object({
+    idToken: z.string().min(1, "Google ID token is required"),
+  }),
+});
+
+

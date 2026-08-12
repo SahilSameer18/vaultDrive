@@ -7,6 +7,8 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt.js";
+import { verifyGoogleIdToken } from "../utils/googleAuth.js";
+
 
 // Standard security cookie configurations (lax in dev, none in production for cross-site deployment)
 const getCookieOptions = () => ({
@@ -112,7 +114,15 @@ export const login = async (req, res, next) => {
       throw new ApiError(401, "Invalid credentials");
     }
 
+    if (!user.passwordHash) {
+      throw new ApiError(
+        400,
+        "This account was created with Google OAuth. Please sign in using Google."
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+
     if (!isPasswordValid) {
       throw new ApiError(401, "Invalid credentials");
     }
@@ -274,4 +284,126 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+// Authenticate Google OAuth ID token, provision or link user, and return JWT cookies
+export const googleLogin = async (req, res, next) => {
+  try {
+    const { idToken } = req.body;
+    const { googleId, email, emailVerified, picture } =
+      await verifyGoogleIdToken(idToken);
+
+    if (!emailVerified) {
+      throw new ApiError(400, "Google account email is not verified");
+    }
+
+    // 1. Check if OAuth account already exists
+    let oauthAccount = await prisma.oAuthAccount.findUnique({
+      where: {
+        provider_providerUserId: {
+          provider: "google",
+          providerUserId: googleId,
+        },
+      },
+      include: { user: true },
+    });
+
+    let user;
+
+    if (oauthAccount) {
+      user = oauthAccount.user;
+      if (!user.avatarUrl && picture) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { avatarUrl: picture },
+        });
+      }
+    } else {
+      // 2. Check if a user with this email already exists
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+      });
+
+      if (existingUser) {
+        user = existingUser;
+        await prisma.oAuthAccount.create({
+          data: {
+            provider: "google",
+            providerUserId: googleId,
+            userId: user.id,
+          },
+        });
+
+        if (!user.avatarUrl && picture) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { avatarUrl: picture },
+          });
+        }
+      } else {
+        // 3. Create new user and OAuth account in a Prisma transaction
+        const baseUsername = email
+          .split("@")[0]
+          .replace(/[^a-zA-Z0-9_]/g, "");
+        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+        let username = `${baseUsername}_${randomSuffix}`;
+
+        const usernameCheck = await prisma.user.findUnique({
+          where: { username },
+        });
+        if (usernameCheck) {
+          username = `${baseUsername}_${Date.now().toString().slice(-6)}`;
+        }
+
+        user = await prisma.user.create({
+          data: {
+            email,
+            username,
+            avatarUrl: picture || null,
+            passwordHash: null,
+            oauthAccounts: {
+              create: {
+                provider: "google",
+                providerUserId: googleId,
+              },
+            },
+          },
+        });
+      }
+    }
+
+    const { accessToken, refreshToken } = await generateAndStoreTokens(user.id);
+
+    const cookieOptions = getCookieOptions();
+    res.cookie("accessToken", accessToken, {
+      ...cookieOptions,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      ...cookieOptions,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    const userWithoutPassword = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+    };
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { user: userWithoutPassword, accessToken },
+          "Google login successful"
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
