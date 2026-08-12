@@ -36,6 +36,12 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
+  const googleLogin = async (idToken) => {
+    const res = await authApi.googleLogin(idToken);
+    setUser(res.data.data.user);
+    return res.data;
+  };
+
   const logout = async () => {
     try {
       await authApi.logout();
@@ -45,10 +51,11 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, register, login, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
+
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -57,3 +64,4 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
+

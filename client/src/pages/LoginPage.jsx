@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../components/ui/Toast";
 
 function LogoMark({ className = "w-5 h-5" }) {
+
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
@@ -104,7 +107,8 @@ function VaultMechanism() {
 }
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ identifier: "", password: "" });
@@ -128,6 +132,28 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    try {
+      setError("");
+      setLoading(true);
+      await googleLogin(credentialResponse.credential);
+      addToast("Signed in with Google successfully!", "success");
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      const msg = err.response?.data?.message || "Google authentication failed";
+      setError(msg);
+      addToast(msg, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google Sign-In was cancelled or failed.");
+    addToast("Google Sign-In was cancelled or failed.", "error");
+  };
+
 
   return (
     <div className="min-h-screen bg-[#0C0D10] text-[#E8E6E0] font-sans flex relative selection:bg-[#B8935A]/30">
@@ -265,11 +291,24 @@ export default function LoginPage() {
             </form>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 my-8">
+            <div className="flex items-center gap-3 my-6">
               <div className="flex-1 h-px bg-[#2A2E37]" />
-              <span className="text-xs text-[#8B8F99] font-mono">or</span>
+              <span className="text-xs text-[#8B8F99] font-mono">or continue with</span>
               <div className="flex-1 h-px bg-[#2A2E37]" />
             </div>
+
+            {/* Google OAuth Login Button */}
+            <div className="flex justify-center w-full mb-6 overflow-hidden rounded-xl">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="filled_black"
+                shape="pill"
+                size="large"
+                text="continue_with"
+              />
+            </div>
+
 
             {/* Footer Link */}
             <p className="text-center text-sm text-[#8B8F99]">
@@ -295,3 +334,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
