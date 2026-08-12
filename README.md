@@ -48,7 +48,7 @@ flowchart TD
 
     subgraph Server ["Backend (Node.js + Express REST API — Render)"]
         HELMET["Helmet (HTTP Security Headers)"]
-        PROXY["Proxy Trust (app.set('trust proxy', 1))"]
+        PROXY["Proxy Trust\n(trust proxy = 1)"]
         AUTH_MW["Split Rate Limiters\n(generalLimiter, loginLimiter, registerLimiter)"]
         GOOGLE_VERIFIER["Google Token Verifier\n(google-auth-library)"]
         VALIDATOR["Zod Payload Validator"]
@@ -75,9 +75,10 @@ flowchart TD
         CONTROLLER --> PRISMA
     end
 
-    GOOGLE_SDK <-->|ID Token Auth| GOOGLE_VERIFIER
-    AXIOS <-->|HTTPS + JWT / HttpOnly Cookie| HELMET
+    GOOGLE_SDK -->|ID Token Auth| GOOGLE_VERIFIER
+    AXIOS -->|HTTPS + JWT / HttpOnly Cookie| HELMET
 ```
+
 
 
 ---
