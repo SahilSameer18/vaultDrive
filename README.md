@@ -86,16 +86,18 @@ flowchart TD
 ## ✨ Key Features
 
 ### 🔐 Authentication & Session Security
-- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as **bcrypt hashes** (not plaintext) in Neon PostgreSQL, sent via `httpOnly` secure cookies.
+- **Dual-Token System**: 15-minute access tokens + 7-day refresh tokens stored as **bcrypt hashes** (cost 12 for user passwords, cost 10 for refresh tokens) in Neon PostgreSQL, sent via `httpOnly` secure cookies.
+- **Google OAuth 2.0 & Multi-Provider Relational Schema**: Cryptographically verified Google ID tokens via `google-auth-library` + extensible `OAuthAccount` relational model in Prisma.
 - **Silent Token Rotation**: Axios interceptor automatically catches `401 Unauthorized` responses and queues concurrent requests while refreshing — preventing refresh token race conditions.
-- **HTTP Security Headers**: [Helmet.js](https://helmetjs.github.io/) enforces `Content-Security-Policy`, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, and `Strict-Transport-Security` in production.
-- **OWASP Rate Limiting**: Auth endpoints limited to 5 req/15min; global API limited to 100 req/15min.
+- **HTTP Security Headers & Proxy Trust**: [Helmet.js](https://helmetjs.github.io/) enforces security headers with `app.set("trust proxy", 1)` for accurate client IP resolution behind reverse proxies (Render / Vercel).
+- **OWASP Rate Limiting**: Registration & Login endpoints limited to 10 attempts/15min (`skipSuccessfulRequests: true` for logins); global API limited to 500 req/15min.
 
 ### 📁 Advanced Nested Folder & Directory Engine
 - **Interactive Sidebar Directory Tree**: Dynamic expandable tree (`FolderSidebar.jsx`) with active directory highlighting and auto-expanding hierarchy branches.
 - **Unlimited Nesting**: Create subfolders inside subfolders with full breadcrumb navigation (`Home / Projects / 2027`).
 - **Folder Cycle Guard**: Algorithmic ancestry traversal prevents setting a folder's descendant as its parent.
-- **Safe Deletion Cascade**: Deleting a folder moves all its files to root (`folderId → null`) rather than deleting them — intentional data integrity decision.
+- **Safe Data Integrity Unlinking**: Deleting a folder safely unlinks its contained files (`folderId → null`) and subfolders (`parentId → null`), moving them back to root rather than destroying user assets.
+
 
 ### ⚡ Cloud File Management & Storage
 - **100MB File Uploads**: Upload images, videos, audio, PDFs, archives, and code files with real-time percentage progress bar.
@@ -298,7 +300,8 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | `GET` | `/api/v1/folders/:id` | 🔒 Protected | Get folder with subfolders + breadcrumb path |
 | `POST` | `/api/v1/folders` | 🔒 Protected | Create folder or subfolder (`{ name, parentId? }`) |
 | `PATCH` | `/api/v1/folders/:id` | 🔒 Protected | Rename or move folder (cycle-guard enforced) |
-| `DELETE` | `/api/v1/folders/:id` | 🔒 Protected | Delete folder — subfolders cascade, files move to root |
+| `DELETE` | `/api/v1/folders/:id` | 🔒 Protected | Delete folder — contained subfolders and files move to root |
+
 
 ### Files
 
