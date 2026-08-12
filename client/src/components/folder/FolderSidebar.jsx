@@ -135,11 +135,14 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
                   <button
                     type="button"
                     onClick={(e) => toggleExpand(folder.id, e)}
-                    className="p-1 rounded text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors"
+                    aria-expanded={isExpanded}
+                    aria-label={isExpanded ? `Collapse ${folder.name} directory` : `Expand ${folder.name} directory`}
+                    className="p-1 rounded text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
                   >
                     {isExpanded ? "−" : "+"}
                   </button>
                 )}
+
               </div>
             </div>
 

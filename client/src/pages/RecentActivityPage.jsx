@@ -16,11 +16,12 @@ export default function RecentActivityPage() {
       setLoading(true);
       setError(null);
       try {
-        const res = await filesApi.list(null);
+        const res = await filesApi.list(null, { limit: 12 });
         const allFiles = res.data.data.files || [];
         // Sort chronologically by newest first
         const sorted = [...allFiles].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setRecentFiles(sorted.slice(0, 12));
+
       } catch (err) {
         setError(err.response?.data?.message || "Failed to load recent activity");
       } finally {

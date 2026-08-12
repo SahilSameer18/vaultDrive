@@ -3,13 +3,12 @@ import { Outlet, useLocation } from "react-router-dom";
 import Topbar from "./components/layout/Topbar";
 import Sidebar from "./components/layout/Sidebar";
 import DropzoneOverlay from "./components/file/DropzoneOverlay";
-import { useFiles } from "./hooks/useFiles";
+import { filesApi } from "./api/files.api";
 import { useToast } from "./components/ui/Toast";
 
 export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { uploadFile } = useFiles(null);
   const { addToast } = useToast();
 
   // Extract folderId from URL if user is inside /folder/:folderId
@@ -18,7 +17,11 @@ export default function AppLayout() {
 
   const handleDroppedFile = async (file) => {
     try {
-      await uploadFile(file, currentFolderId);
+      const formData = new FormData();
+      formData.append("file", file);
+      if (currentFolderId) formData.append("folderId", currentFolderId);
+
+      await filesApi.upload(formData);
       addToast(`File "${file.name}" uploaded successfully`, "success");
       // Broadcast custom event so Sidebar and Active Page refresh state
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
@@ -27,6 +30,7 @@ export default function AppLayout() {
       addToast("File upload failed", "error");
     }
   };
+
 
   return (
     <div className="h-screen w-screen bg-vault-bg text-vault-text flex flex-col overflow-hidden font-sans selection:bg-vault-accent/30">
