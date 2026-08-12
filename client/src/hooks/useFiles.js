@@ -6,15 +6,15 @@ export function useFiles(folderId = null) {
   const [files, setFiles]     = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState(null);
-  const { searchQuery }       = useSearch();
+  const { searchQuery, debouncedSearchQuery } = useSearch();
 
   // Fetch files inside current folder (or all files if global search is active)
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {
     setLoading(true);
     setError(null);
     try {
-      // If searchQuery is present, fetch ALL files (null folderId) so global search queries the whole vault!
-      const param = searchQuery ? null : (targetFolderId || "root");
+      // If debouncedSearchQuery is present, fetch ALL files (null folderId) so global search queries the whole vault!
+      const param = debouncedSearchQuery ? null : (targetFolderId || "root");
       const res = await filesApi.list(param);
       setFiles(res.data.data.files || []);
     } catch (err) {
@@ -22,12 +22,14 @@ export function useFiles(folderId = null) {
     } finally {
       setLoading(false);
     }
-  }, [folderId, searchQuery]);
+  }, [folderId, debouncedSearchQuery]);
 
-  // Re-fetch whenever searchQuery changes
+  // Re-fetch whenever debouncedSearchQuery changes
   useEffect(() => {
     fetchFiles(folderId);
-  }, [searchQuery, fetchFiles, folderId]);
+  }, [debouncedSearchQuery, fetchFiles, folderId]);
+
+
 
   // Upload file with progress
   const uploadFile = async (file, currentFolderId = folderId, onProgress) => {

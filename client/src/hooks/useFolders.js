@@ -7,14 +7,14 @@ export function useFolders(currentFolderId = null) {
   const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState(null);
-  const { searchQuery }               = useSearch();
+  const { searchQuery, debouncedSearchQuery } = useSearch();
 
   // Fetch subfolders and ancestor breadcrumbs for current directory
   const fetchFolders = useCallback(async (targetFolderId = currentFolderId) => {
     setLoading(true);
     setError(null);
     try {
-      if (searchQuery) {
+      if (debouncedSearchQuery) {
         // Fetch ALL user folders for global search across directories
         const res = await foldersApi.list(null);
         setFolders(res.data.data.folders || []);
@@ -34,12 +34,13 @@ export function useFolders(currentFolderId = null) {
     } finally {
       setLoading(false);
     }
-  }, [currentFolderId, searchQuery]);
+  }, [currentFolderId, debouncedSearchQuery]);
 
-  // Re-fetch whenever searchQuery changes
+  // Re-fetch whenever debouncedSearchQuery changes
   useEffect(() => {
     fetchFolders(currentFolderId);
-  }, [searchQuery, fetchFolders, currentFolderId]);
+  }, [debouncedSearchQuery, fetchFolders, currentFolderId]);
+
 
   // Create new subfolder
   const createFolder = async (name, parentId = currentFolderId) => {

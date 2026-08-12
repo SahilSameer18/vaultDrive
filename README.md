@@ -104,7 +104,8 @@ flowchart TD
 - **Whole-Page Drag & Drop Overlay**: Counter-tracked drag listener detects file drags and shows an illuminated full-screen dropzone.
 - **Public / Private Toggle**: `VaultToggle.jsx` switches each file between `PRIVATE` and `PUBLIC` with instant visual feedback.
 - **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar (Images / Video & Audio / Docs & PDFs / Archives).
-- **Global Live Search**: Real-time search bar in the topbar filtering files and folders instantly.
+- **400ms Debounced Global Search**: High-performance vault search engine with custom `useDebounce` hook, `⌘K` / `Ctrl+K` keyboard shortcut, `Escape` key clear, and mobile expandable search drawer.
+
 
 ### 🔗 Granular Share Management
 - **Public Share Links**: Generate and revoke 64-character hex share tokens. Public page (`/share/:shareToken`) is accessible without authentication.
