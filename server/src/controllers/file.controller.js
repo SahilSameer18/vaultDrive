@@ -7,11 +7,29 @@ import {
   deleteFromCloudinary,
 } from "../utils/cloudinary.upload.js";
 
+const TOTAL_STORAGE_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB (1,073,741,824 bytes)
+
 // Generate Cloudinary presigned upload parameters & HMAC signature for direct client uploads
 export const getSignUpload = async (req, res, next) => {
   try {
-    const { filename, mimeType, folderId } = req.body;
+    const { filename, mimeType, size, folderId } = req.body;
     const userId = req.user.id;
+
+    // Validate 1 GB storage quota before issuing signature
+    const storageSum = await prisma.file.aggregate({
+      where: { userId },
+      _sum: { size: true },
+    });
+    const currentUsedBytes = storageSum._sum.size || 0;
+    const uploadSize = size || 0;
+
+    if (currentUsedBytes + uploadSize > TOTAL_STORAGE_QUOTA_BYTES) {
+      const usedMB = (currentUsedBytes / (1024 * 1024)).toFixed(1);
+      throw new ApiError(
+        400,
+        `Storage quota exceeded! Your 1 GB vault storage limit is full (${usedMB} MB / 1024 MB used).`
+      );
+    }
 
     // Validate target folder ownership if folderId is provided
     if (folderId) {
@@ -49,6 +67,21 @@ export const confirmUpload = async (req, res, next) => {
   try {
     const { name, size, mimeType, resourceType, url, publicId, folderId } = req.body;
     const userId = req.user.id;
+
+    // Enforce 1 GB storage quota check on confirm
+    const storageSum = await prisma.file.aggregate({
+      where: { userId },
+      _sum: { size: true },
+    });
+    const currentUsedBytes = storageSum._sum.size || 0;
+
+    if (currentUsedBytes + (size || 0) > TOTAL_STORAGE_QUOTA_BYTES) {
+      const usedMB = (currentUsedBytes / (1024 * 1024)).toFixed(1);
+      throw new ApiError(
+        400,
+        `Storage quota exceeded! Your 1 GB vault storage limit is full (${usedMB} MB / 1024 MB used).`
+      );
+    }
 
     // Validate target folder ownership if folderId is provided
     if (folderId) {

@@ -14,6 +14,7 @@ export const filesApi = {
     const signRes = await filesApi.getSignUpload({
       filename: file.name,
       mimeType: file.type || "application/octet-stream",
+      size: file.size,
       folderId: folderId || null,
     });
 

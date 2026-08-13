@@ -5,6 +5,7 @@ export const signUploadSchema = z.object({
   body: z.object({
     filename: z.string().min(1, "Filename is required"),
     mimeType: z.string().min(1, "Mime type is required"),
+    size: z.number().positive("File size must be positive").optional(),
     folderId: z.string().nullable().optional(),
   }),
 });

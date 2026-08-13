@@ -118,12 +118,12 @@ export default function Sidebar({ onCloseMobileMenu }) {
     }
   };
 
-  // Compute category percentages proportional to current totalBytes
-  const total = stats.totalBytes || 1;
-  const imagePct   = (stats.categories.image / total) * 100;
-  const mediaPct   = (stats.categories.media / total) * 100;
-  const docPct     = (stats.categories.doc / total) * 100;
-  const archivePct = (stats.categories.archive / total) * 100;
+  // Compute category percentages proportional to 1 GB total quota (1,073,741,824 bytes)
+  const TOTAL_QUOTA_BYTES = 1 * 1024 * 1024 * 1024;
+  const imagePct   = (stats.categories.image / TOTAL_QUOTA_BYTES) * 100;
+  const mediaPct   = (stats.categories.media / TOTAL_QUOTA_BYTES) * 100;
+  const docPct     = (stats.categories.doc / TOTAL_QUOTA_BYTES) * 100;
+  const archivePct = (stats.categories.archive / TOTAL_QUOTA_BYTES) * 100;
 
   return (
     <aside className="w-64 border-r border-vault-border bg-vault-bg flex flex-col justify-between h-full select-none overflow-y-auto">
@@ -215,7 +215,7 @@ export default function Sidebar({ onCloseMobileMenu }) {
         <div className="flex items-center justify-between mb-2.5">
           <span className="text-[9px] font-mono tracking-widest text-vault-muted">STORAGE USED</span>
           <span className="text-[10px] font-mono text-vault-accent font-semibold">
-            {formatBytes(stats.totalBytes)} used
+            {formatBytes(stats.totalBytes)} / 1 GB
           </span>
         </div>
 

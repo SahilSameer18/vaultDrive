@@ -231,7 +231,7 @@ export default function LandingPage() {
 
               {/* Trust Specs */}
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 mt-6 text-[11px] font-mono text-[#8B8F99]">
-                <span>✓ 100GB Free Storage</span>
+                <span>✓ 1GB Free Storage</span>
                 <span className="hidden sm:inline">•</span>
                 <span>✓ Password Protection</span>
               </div>
