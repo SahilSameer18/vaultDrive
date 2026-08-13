@@ -52,27 +52,27 @@ flowchart TD
         AUTH_MW["Split Rate Limiters\n(generalLimiter, loginLimiter, registerLimiter)"]
         GOOGLE_VERIFIER["Google Token Verifier\n(google-auth-library)"]
         VALIDATOR["Zod Payload Validator"]
-        CONTROLLER["Auth Controllers\n(Google OAuth 2.0 & 1-Click Demo Access)"]
+        CONTROLLER["Auth & File Controllers\n(Google OAuth, Direct Cloudinary HMAC, 1GB Quota)"]
+        NOTIF_SVC["Notification Engine\n(Share, Revoke & Quota Alerts)"]
         CYCLE_GUARD["Folder Cycle Guard"]
-        MULTER["Multer Memory Buffer"]
 
         HELMET --> PROXY
         PROXY --> AUTH_MW
         AUTH_MW --> GOOGLE_VERIFIER
         GOOGLE_VERIFIER --> VALIDATOR
         VALIDATOR --> CONTROLLER
+        CONTROLLER --> NOTIF_SVC
         CONTROLLER --> CYCLE_GUARD
-        CONTROLLER --> MULTER
     end
 
     subgraph Infrastructure ["Cloud Infrastructure & Persistence"]
         PRISMA["Prisma 7 ORM"]
-        NEON[("Neon PostgreSQL\n(User, OAuthAccount, File, Folder, SharedFile)")]
-        CLOUDINARY[("Cloudinary Asset Cloud\n(Secure File Storage)")]
+        NEON[("Neon PostgreSQL\n(User, OAuthAccount, File, Folder, SharedFile, Notification)")]
+        CLOUDINARY[("Cloudinary Asset Cloud\n(Direct Signed File Storage)")]
 
         PRISMA --> NEON
-        MULTER --> CLOUDINARY
         CONTROLLER --> PRISMA
+        CONTROLLER --> CLOUDINARY
     end
 
     GOOGLE_SDK -->|ID Token Auth| GOOGLE_VERIFIER
@@ -99,18 +99,21 @@ flowchart TD
 - **Safe Data Integrity Unlinking**: Deleting a folder safely unlinks its contained files (`folderId → null`) and subfolders (`parentId → null`), moving them back to root rather than destroying user assets.
 
 
-### ⚡ Cloud File Management & Storage
-- **100MB File Uploads**: Upload images, videos, audio, PDFs, archives, and code files with real-time percentage progress bar.
+### ⚡ Direct Cloud Storage & 1GB Quota Limit
+- **Direct Presigned HMAC Uploads**: Signature-verified direct browser-to-Cloudinary upload pipeline (`sign-upload` → Cloudinary → `confirm-upload`) with chunked uploading for large files.
+- **1GB Vault Storage Quota**: Strict **1 GB total storage quota** enforced on the backend. Uploads exceeding quota are blocked before signing.
 - **Whole-Page Drag & Drop Overlay**: Counter-tracked drag listener detects file drags and shows an illuminated full-screen dropzone.
 - **Public / Private Toggle**: `VaultToggle.jsx` switches each file between `PRIVATE` and `PUBLIC` with instant visual feedback.
-- **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar (Images / Video & Audio / Docs & PDFs / Archives).
+- **Multi-Category Storage Breakdown**: Live color-coded storage distribution bar in the sidebar (Images / Video & Audio / Docs & PDFs / Archives) measured against the 1GB quota.
 - **400ms Debounced Global Search**: High-performance vault search engine with custom `useDebounce` hook, `⌘K` / `Ctrl+K` keyboard shortcut, `Escape` key clear, and mobile expandable search drawer.
 
 
-### 🔗 Granular Share Management
+### 🔔 Real-Time Notification System & Share Management
+- **Notification Bell Dropdown**: Topbar glassmorphic dropdown with animated red unread badge counter, notification type icons, relative timestamps, and one-tap "Mark all as read" / dismissal.
+- **Automated Triggers**: Sends `FILE_SHARED` alerts when access is granted, `ACCESS_REVOKED` alerts when access is removed, and `STORAGE_WARNING` alerts when storage usage crosses 800 MB (80% of quota).
+- **Interactive Click-to-Preview**: Clicking a file notification opens the `FilePreviewModal` overlay or navigates straight to `/shared-with-me`.
 - **Public Share Links**: Generate and revoke 64-character hex share tokens. Public page (`/share/:shareToken`) is accessible without authentication.
-- **User-to-User Sharing**: Grant file access to specific registered users by email or username.
-- **Composite Unique Guard**: `fileId + userId` constraint prevents duplicate share entries.
+- **User-to-User Sharing & Revocation**: Grant and revoke file access to specific registered users by email or username with live access lists inside `ShareModal`.
 
 ### 👁️ Inline Media Previews
 - **React Portal Overlay** (`createPortal → document.body`) for correct z-index stacking.
@@ -152,21 +155,18 @@ flowchart TD
 
 ---
 
-## ⚖️ Architecture Tradeoffs
+## ⚡ Upload Pipeline — Direct Presigned HMAC Uploads
 
-### File Upload Strategy — Multer Memory Buffering
+**How it works**:
+1. Client requests presigned HMAC parameters from server (`POST /files/sign-upload`) — server validates auth and checks user's **1GB storage quota**.
+2. Server returns a signed Cloudinary token and timestamp.
+3. Client uploads file bytes **directly from browser to Cloudinary** (single request for <10MB, chunked for ≥10MB). Zero file bytes touch the application server!
+4. Client confirms completed upload via `POST /files/confirm-upload` to save metadata to Neon PostgreSQL.
 
-**How it works**: Client sends multipart form data → Multer buffers file bytes in server RAM → bytes streamed directly to Cloudinary.
-
-**Why chosen**: Zero disk setup, clean DX for evaluators, direct upload progress via Axios `onUploadProgress`.
-
-**Known tradeoff**: Under concurrent heavy load (multiple simultaneous 100MB uploads), server RAM usage spikes temporarily.
-
-**Production alternative — Direct Signed Uploads**:
-1. Client requests a signed upload URL from server (`POST /files/sign`)
-2. Server validates auth and returns a Cloudinary signature
-3. Client uploads **directly from browser to Cloudinary** (zero bytes touch the app server)
-4. Client confirms upload by calling `POST /files/confirm` to persist metadata to PostgreSQL
+**Benefits**:
+- **Zero Server RAM Load**: Large 100MB files bypass the Node.js server entirely.
+- **Quota Protection**: Storage quota is checked *before* any file upload starts.
+- **Accurate Real-Time Progress**: Axios progress listener tracks live percentage directly to Cloudinary.
 
 ---
 
@@ -309,14 +309,27 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/v1/files` | 🔒 Protected | List files (`?folderId`, `?search`, `?sortBy`, `?page`, `?limit`) |
-| `POST` | `/api/v1/files/upload` | 🔒 Protected | Upload file (multipart/form-data, max 100MB) |
+| `POST` | `/api/v1/files/sign-upload` | 🔒 Protected | Request HMAC signature for direct Cloudinary upload (checks 1GB quota) |
+| `POST` | `/api/v1/files/confirm-upload` | 🔒 Protected | Confirm completed Cloudinary upload and save DB record |
 | `GET` | `/api/v1/files/:id` | 🔒 Protected | Get single file by ID (owner/shared/public check) |
 | `DELETE` | `/api/v1/files/:id` | 🔒 Protected | Permanently delete file from Cloudinary + DB |
-| `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared directly with the current user |
+| `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared directly with current user |
 | `GET` | `/api/v1/files/share/:shareToken` | Public | Access public file via share token |
 | `POST` | `/api/v1/files/:id/share-link` | 🔒 Protected | Generate 64-char public share token |
 | `DELETE` | `/api/v1/files/:id/share-link` | 🔒 Protected | Revoke public share token |
+| `GET` | `/api/v1/files/:id/share-user` | 🔒 Protected | List users with explicit access to file |
 | `POST` | `/api/v1/files/:id/share-user` | 🔒 Protected | Share file with user by email or username |
+| `DELETE` | `/api/v1/files/:id/share-user/:targetUserId` | 🔒 Protected | Revoke file access from specific user |
+
+
+### Notifications
+
+| Method | Endpoint | Auth | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/notifications` | 🔒 Protected | Get user notifications list and unread count |
+| `PATCH` | `/api/v1/notifications/read-all` | 🔒 Protected | Mark all unread notifications as read |
+| `PATCH` | `/api/v1/notifications/:id/read` | 🔒 Protected | Mark single notification as read |
+| `DELETE` | `/api/v1/notifications/:id` | 🔒 Protected | Delete notification record |
 
 ### Request/Response Format
 
@@ -339,8 +352,9 @@ User
  ├── files[]          (one-to-many)
  ├── folders[]        (one-to-many)
  ├── sharedFiles[]    (files shared with this user)
+ ├── notifications[]  (recipient notifications)
  ├── refreshTokens[]  (bcrypt-hashed, multi-device)
- └── oauthAccounts[]  (multi-provider OAuth bindings: Google, GitHub, etc.)
+ └── oauthAccounts[]  (multi-provider OAuth bindings)
 
 OAuthAccount
  └── user             (linked user account)
@@ -358,6 +372,10 @@ Folder
 SharedFile
  ├── file             (what is shared)
  └── user             (who it's shared with)
+
+Notification
+ ├── user             (recipient)
+ └── actor?           (sender/triggering user)
 ```
 
 ---
@@ -367,7 +385,6 @@ SharedFile
 | Limitation | Notes |
 | :--- | :--- |
 | **Single file upload** | UploadModal handles one file at a time |
-| **Memory upload** | 100MB files are buffered in server RAM before streaming to Cloudinary — see Architecture Tradeoffs above |
 | **No automated tests** | Unit and integration test coverage is a planned addition |
 
 ---
@@ -375,7 +392,4 @@ SharedFile
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
-
-
-
 
