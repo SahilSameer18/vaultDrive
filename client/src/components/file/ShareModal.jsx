@@ -6,17 +6,36 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
   const [activeTab, setActiveTab]               = useState("link"); // "link" | "user"
   const [shareToken, setShareToken]             = useState(file?.shareToken || null);
   const [targetIdentifier, setTargetIdentifier] = useState("");
+  const [sharedUsers, setSharedUsers]           = useState([]);
+  const [loadingUsers, setLoadingUsers]         = useState(false);
   const [loading, setLoading]                   = useState(false);
   const [error, setError]                       = useState("");
   const [success, setSuccess]                   = useState("");
+
+  // Fetch list of users this file is shared with
+  const fetchSharedUsers = async () => {
+    if (!file?.id) return;
+    setLoadingUsers(true);
+    try {
+      const res = await filesApi.getSharedUsers(file.id);
+      setSharedUsers(res.data.data.sharedUsers || []);
+    } catch {
+      // Silently handle if unable to fetch shared users list
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   useEffect(() => {
     if (file) {
       setShareToken(file.shareToken || null);
       setError("");
       setSuccess("");
+      if (isOpen) {
+        fetchSharedUsers();
+      }
     }
-  }, [file]);
+  }, [file, isOpen]);
 
   if (!isOpen || !file) return null;
 
@@ -77,10 +96,24 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
       await filesApi.shareWithUser(file.id, { targetIdentifier: targetIdentifier.trim() });
       setSuccess(`File shared with ${targetIdentifier.trim()}!`);
       setTargetIdentifier("");
+      fetchSharedUsers();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to share file with user");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Revoke/unshare access from specific user
+  const handleUnshareUser = async (targetUserId, username) => {
+    setError("");
+    setSuccess("");
+    try {
+      await filesApi.unshareWithUser(file.id, targetUserId);
+      setSuccess(`Access revoked for ${username}`);
+      setSharedUsers((prev) => prev.filter((u) => u.userId !== targetUserId));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to revoke access");
     }
   };
 
@@ -211,31 +244,77 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
 
         {/* Tab 2: Share with Specific User */}
         {activeTab === "user" && (
-          <form onSubmit={handleShareWithUser} className="space-y-4">
-            <div>
-              <label className="block text-xs font-medium text-vault-text mb-2">
-                User Email or Username
-              </label>
-              <input
-                type="text"
-                value={targetIdentifier}
-                onChange={(e) => setTargetIdentifier(e.target.value)}
-                placeholder="e.g. alice@vault.com or alice"
-                required
-                className="w-full px-4 py-3 rounded-xl bg-vault-surface border border-vault-border text-vault-text text-sm placeholder:text-vault-muted/40 focus:border-vault-accent focus:outline-none transition-colors"
-              />
-            </div>
+          <div className="space-y-5">
+            <form onSubmit={handleShareWithUser} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-vault-text mb-2">
+                  Grant Access to User
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={targetIdentifier}
+                    onChange={(e) => setTargetIdentifier(e.target.value)}
+                    placeholder="User email or username..."
+                    required
+                    className="flex-1 px-4 py-2.5 rounded-xl bg-vault-surface border border-vault-border text-vault-text text-xs placeholder:text-vault-muted/40 focus:border-vault-accent focus:outline-none transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !targetIdentifier.trim()}
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md shrink-0"
+                  >
+                    {loading ? "Sharing..." : "Grant Access"}
+                  </button>
+                </div>
+              </div>
+            </form>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
-              <button
-                type="submit"
-                disabled={loading || !targetIdentifier.trim()}
-                className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md"
-              >
-                {loading ? "Sharing..." : "Grant Access"}
-              </button>
+            {/* List of users who currently have access */}
+            <div className="border-t border-vault-border pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-vault-text">
+                  Users With Access ({sharedUsers.length})
+                </span>
+                {loadingUsers && (
+                  <span className="text-[10px] font-mono text-vault-muted">Loading…</span>
+                )}
+              </div>
+
+              {sharedUsers.length === 0 ? (
+                <div className="p-4 rounded-xl border border-dashed border-vault-border bg-vault-surface/40 text-center">
+                  <p className="text-xs text-vault-muted">No individual users have been granted explicit access to this file yet.</p>
+                </div>
+              ) : (
+                <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
+                  {sharedUsers.map((user) => (
+                    <div
+                      key={user.userId}
+                      className="p-2.5 rounded-xl border border-vault-border bg-vault-surface flex items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-lg bg-vault-accent/15 border border-vault-accent/40 flex items-center justify-center text-vault-accent font-mono font-bold text-xs shrink-0">
+                          {user.username?.charAt(0)?.toUpperCase() || "U"}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold text-vault-text truncate">{user.username}</p>
+                          <p className="text-[10px] font-mono text-vault-muted truncate">{user.email}</p>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleUnshareUser(user.userId, user.username)}
+                        className="px-2.5 py-1 rounded-lg border border-vault-danger/40 bg-vault-danger/10 text-vault-danger hover:bg-vault-danger/20 text-[11px] font-mono font-medium transition-colors shrink-0 cursor-pointer"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </form>
+          </div>
         )}
 
       </div>

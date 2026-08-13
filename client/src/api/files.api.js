@@ -114,6 +114,7 @@ export const filesApi = {
   revokeShareLink: (id) => api.delete(`/files/${id}/share-link`),
 
   // Sharing — user-to-user
+  getSharedUsers: (id) => api.get(`/files/${id}/share-user`),
   shareWithUser: (id, data) => api.post(`/files/${id}/share-user`, data),
   unshareWithUser: (id, targetUserId) =>
     api.delete(`/files/${id}/share-user/${targetUserId}`),

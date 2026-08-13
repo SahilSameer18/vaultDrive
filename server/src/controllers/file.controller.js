@@ -414,6 +414,47 @@ export const unshareWithUser = async (req, res, next) => {
   }
 };
 
+// Get list of users a file is shared with (file owner only)
+export const getFileSharedUsers = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    const file = await prisma.file.findUnique({ where: { id } });
+    if (!file) {
+      throw new ApiError(404, "File not found");
+    }
+
+    if (file.userId !== userId) {
+      throw new ApiError(403, "Forbidden: Only file owner can view file shares");
+    }
+
+    const shares = await prisma.sharedFile.findMany({
+      where: { fileId: id },
+      include: {
+        user: {
+          select: { id: true, username: true, email: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const sharedUsers = shares.map((s) => ({
+      shareId: s.id,
+      userId: s.user.id,
+      username: s.user.username,
+      email: s.user.email,
+      sharedAt: s.createdAt,
+    }));
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { sharedUsers }, "Shared users retrieved successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
 // List files shared with current user
 export const getSharedWithMe = async (req, res, next) => {
   try {

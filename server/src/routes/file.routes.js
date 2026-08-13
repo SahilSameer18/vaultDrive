@@ -10,6 +10,7 @@ import {
   revokeShareLink,
   shareWithUser,
   unshareWithUser,
+  getFileSharedUsers,
   getSharedWithMe,
   getByShareToken,
 } from "../controllers/file.controller.js";
@@ -57,6 +58,9 @@ router.post("/:id/share-link", generateShareLink);
 
 // Revoke public share link token
 router.delete("/:id/share-link", revokeShareLink);
+
+// Get list of users a file is shared with
+router.get("/:id/share-user", getFileSharedUsers);
 
 // Share file with specific user by email or username
 router.post("/:id/share-user", validate(shareUserSchema), shareWithUser);
