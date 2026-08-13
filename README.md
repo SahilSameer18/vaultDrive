@@ -134,7 +134,7 @@ flowchart TD
 | **Shared File Access** | Three-tier check: owner → public (`isPublic`) → shared (`SharedFile` record) before allowing file access. |
 | **Self-Share Prevention** | Controller rejects share requests where `targetUser.id === req.user.id`. |
 | **Folder Cycle Prevention** | Iterative ancestor traversal blocks any folder from becoming its own descendant. |
-| **Rate Limiting** | Auth routes: 5 req/15min · Global API: 100 req/15min (via `express-rate-limit`). |
+| **Rate Limiting** | Auth routes: 10 req/15min · Global API: 500 req/15min (via `express-rate-limit`). |
 | **XSS** | React escapes JSX by default; text file previews capped at 10KB inside `<pre>` — no `dangerouslySetInnerHTML`. |
 | **Cookie Security** | `httpOnly: true`, `secure: true`, `sameSite: none` in production for cross-domain cookie delivery. |
 
@@ -147,7 +147,7 @@ flowchart TD
 | **Refresh token storage** | bcrypt hash in DB (never plaintext) | A database breach doesn't expose usable refresh tokens |
 | **Concurrent 401 handling** | Queue-based Axios interceptor | Prevents multiple simultaneous refresh storms in SPAs |
 | **Folder deletion** | `SetNull` cascade (files → root) | Deleting a folder should not destroy user files |
-| **Upload pipeline** | Multer memory buffer → Cloudinary stream | Zero disk I/O; clean DX; progress tracking via Axios |
+| **Upload pipeline** | Direct Presigned HMAC → Cloudinary | Zero server RAM load; quota checked pre-flight; chunked uploads |
 | **File preview** | `createPortal(document.body)` | Correct z-index stacking regardless of parent stacking context |
 | **Drag-and-drop** | `dragCounter` pattern on `window` | Prevents flickering when cursor moves over child elements |
 | **Share URL construction** | Uses `CLIENT_URL` env variable | Ensures share links point to the frontend page, not the backend API |
@@ -181,7 +181,7 @@ flowchart TD
 | **File Storage** | Cloudinary SDK (images, video, audio, raw) |
 | **Auth** | JSON Web Token + BcryptJS |
 | **Validation** | Zod v3 |
-| **Upload** | Multer (memory storage) |
+| **Upload** | Direct Cloudinary Presigned HMAC (browser-to-cloud) |
 | **Fonts** | Inter (sans) + JetBrains Mono (monospace) via Google Fonts |
 
 ---
