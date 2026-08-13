@@ -106,6 +106,36 @@ export const confirmUpload = async (req, res, next) => {
       },
     });
 
+    // Check if total user storage has crossed 800 MB (80% of 1 GB quota)
+    const WARNING_THRESHOLD_BYTES = 800 * 1024 * 1024; // 800 MB
+    const newTotalBytes = currentUsedBytes + (size || 0);
+
+    if (newTotalBytes >= WARNING_THRESHOLD_BYTES) {
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const recentWarning = await prisma.notification.findFirst({
+        where: {
+          userId,
+          type: "STORAGE_WARNING",
+          createdAt: { gte: twentyFourHoursAgo },
+        },
+      });
+
+      if (!recentWarning) {
+        const usedMB = (newTotalBytes / (1024 * 1024)).toFixed(1);
+        const usedPct = Math.min(100, Math.round((newTotalBytes / TOTAL_STORAGE_QUOTA_BYTES) * 100));
+        await prisma.notification.create({
+          data: {
+            userId,
+            actorId: null,
+            type: "STORAGE_WARNING",
+            title: "Vault Storage Alert",
+            message: `You have used ${usedMB} MB (${usedPct}%) of your 1 GB storage quota.`,
+            fileId: file.id,
+          },
+        });
+      }
+    }
+
     return res
       .status(201)
       .json(new ApiResponse(201, { file }, "File upload confirmed successfully"));
@@ -410,6 +440,18 @@ export const shareWithUser = async (req, res, next) => {
       },
     });
 
+    // Create FILE_SHARED notification for target user
+    await prisma.notification.create({
+      data: {
+        userId: targetUser.id,
+        actorId: userId,
+        type: "FILE_SHARED",
+        title: "New File Shared",
+        message: `${req.user.username || "A user"} shared '${file.name}' with you`,
+        fileId: id,
+      },
+    });
+
     return res
       .status(200)
       .json(new ApiResponse(200, { sharedFile }, `File shared with ${targetUser.username}`));
@@ -436,6 +478,18 @@ export const unshareWithUser = async (req, res, next) => {
     await prisma.sharedFile.delete({
       where: {
         fileId_userId: { fileId: id, userId: targetUserId },
+      },
+    });
+
+    // Create ACCESS_REVOKED notification for target user
+    await prisma.notification.create({
+      data: {
+        userId: targetUserId,
+        actorId: userId,
+        type: "ACCESS_REVOKED",
+        title: "Access Revoked",
+        message: `${req.user.username || "A user"} revoked your access to '${file.name}'`,
+        fileId: id,
       },
     });
 

@@ -97,6 +97,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
       setSuccess(`File shared with ${targetIdentifier.trim()}!`);
       setTargetIdentifier("");
       fetchSharedUsers();
+      window.dispatchEvent(new CustomEvent("vault:notifications-changed"));
     } catch (err) {
       setError(err.response?.data?.message || "Failed to share file with user");
     } finally {
@@ -112,6 +113,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
       await filesApi.unshareWithUser(file.id, targetUserId);
       setSuccess(`Access revoked for ${username}`);
       setSharedUsers((prev) => prev.filter((u) => u.userId !== targetUserId));
+      window.dispatchEvent(new CustomEvent("vault:notifications-changed"));
     } catch (err) {
       setError(err.response?.data?.message || "Failed to revoke access");
     }

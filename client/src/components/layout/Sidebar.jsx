@@ -131,8 +131,23 @@ export default function Sidebar({ onCloseMobileMenu }) {
       {/* ── Top Section: Primary Navigation & Folder Directories ──────── */}
       <div className="p-4 space-y-5">
         
-        {/* Repository Header Tag */}
-        <div className="px-3 pt-2">
+        {/* Brand Header — Mobile only (since desktop topbar already shows VaultDrive brand) */}
+        <div className="px-3 pt-2 pb-1 flex items-center gap-2.5 lg:hidden">
+          <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-accent/40 flex items-center justify-center shadow-md shrink-0">
+            <svg className="w-4.5 h-4.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+              <circle cx="12" cy="16" r="1.5" fill="currentColor" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="font-bold text-base tracking-tight text-vault-text">VaultDrive</h2>
+            <p className="text-[9px] font-mono tracking-widest text-vault-muted">VAULT REPOSITORY</p>
+          </div>
+        </div>
+
+        {/* Desktop Repository Tag */}
+        <div className="px-3 pt-2 hidden lg:block">
           <p className="text-[10px] font-mono tracking-widest text-vault-muted">
             VAULT REPOSITORY
           </p>

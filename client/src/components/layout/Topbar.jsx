@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useSearch } from "../../context/SearchContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 export default function Topbar({ onToggleMobileMenu }) {
   const { user, logout } = useAuth();
@@ -104,7 +105,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                 <circle cx="12" cy="16" r="1.5" fill="currentColor" />
               </svg>
             </div>
-            <span className="font-bold text-base tracking-tight text-vault-text">VaultDrive</span>
+            <span className="hidden sm:inline font-bold text-base tracking-tight text-vault-text">VaultDrive</span>
           </Link>
         </div>
 
@@ -157,6 +158,9 @@ export default function Topbar({ onToggleMobileMenu }) {
               <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
+
+          {/* Notification Bell Dropdown */}
+          <NotificationDropdown />
 
           {/* User Identity Pill */}
           <div className="relative">
