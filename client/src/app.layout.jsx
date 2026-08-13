@@ -17,11 +17,7 @@ export default function AppLayout() {
 
   const handleDroppedFile = async (file) => {
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (currentFolderId) formData.append("folderId", currentFolderId);
-
-      await filesApi.upload(formData);
+      await filesApi.uploadDirectToCloudinary(file, currentFolderId);
       addToast(`File "${file.name}" uploaded successfully`, "success");
       // Broadcast custom event so Sidebar and Active Page refresh state
       window.dispatchEvent(new CustomEvent("vault:files-changed"));

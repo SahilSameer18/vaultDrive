@@ -31,18 +31,17 @@ export function useFiles(folderId = null) {
 
 
 
-  // Upload file with progress
+  // Upload file directly to Cloudinary with signature & progress
   const uploadFile = async (file, currentFolderId = folderId, onProgress) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    if (currentFolderId) formData.append("folderId", currentFolderId);
-
-    const res = await filesApi.upload(formData, (evt) => {
-      if (onProgress && evt.total) {
-        const percent = Math.round((evt.loaded * 100) / evt.total);
-        onProgress(percent);
+    const res = await filesApi.uploadDirectToCloudinary(
+      file,
+      currentFolderId,
+      (evt) => {
+        if (onProgress && evt.percent !== undefined) {
+          onProgress(evt.percent);
+        }
       }
-    });
+    );
 
     const newFile = res.data.data.file;
     setFiles((prev) => [newFile, ...prev]);

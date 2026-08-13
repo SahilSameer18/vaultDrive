@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
-  uploadFile,
+  getSignUpload,
+  confirmUpload,
   getFiles,
   getFileById,
   updateFile,
@@ -13,10 +14,11 @@ import {
   getByShareToken,
 } from "../controllers/file.controller.js";
 import {
+  signUploadSchema,
+  confirmUploadSchema,
   updateFileSchema,
   shareUserSchema,
 } from "../validators/file.validator.js";
-import upload from "../config/multer.js";
 import validate from "../middlewares/validate.middleware.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
 
@@ -28,8 +30,12 @@ router.get("/share/:shareToken", getByShareToken);
 // All endpoints below require user authentication
 router.use(authenticate);
 
-// Upload single file (multipart form data)
-router.post("/upload", upload.single("file"), uploadFile);
+// Request Cloudinary direct upload HMAC signature
+router.post("/sign-upload", validate(signUploadSchema), getSignUpload);
+
+// Confirm completed Cloudinary upload and save record to DB
+router.post("/confirm-upload", validate(confirmUploadSchema), confirmUpload);
+
 
 // List user owned files (supports pagination, search, sorting, folder filtering)
 router.get("/", getFiles);

@@ -3,22 +3,17 @@ import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import {
-  uploadToCloudinary,
+  generateUploadSignature,
   deleteFromCloudinary,
 } from "../utils/cloudinary.upload.js";
 
-// Upload file to Cloudinary and record metadata in database
-export const uploadFile = async (req, res, next) => {
+// Generate Cloudinary presigned upload parameters & HMAC signature for direct client uploads
+export const getSignUpload = async (req, res, next) => {
   try {
-    if (!req.file) {
-      throw new ApiError(400, "No file provided for upload");
-    }
-
-    const { originalname, buffer, mimetype, size } = req.file;
+    const { filename, mimeType, folderId } = req.body;
     const userId = req.user.id;
-    const folderId = req.body.folderId || null;
 
-    // Validate folder ownership if folderId is provided
+    // Validate target folder ownership if folderId is provided
     if (folderId) {
       const folder = await prisma.folder.findUnique({
         where: { id: folderId },
@@ -28,39 +23,64 @@ export const uploadFile = async (req, res, next) => {
       }
     }
 
-    // Generate unique file CUID for Cloudinary path scoping
     const tempFileId = crypto.randomUUID();
 
-    // Stream upload to Cloudinary (vaultDrive/<userId>/<fileId>-<sanitizedFilename>)
-    const { url, publicId, resourceType } = await uploadToCloudinary(
-      buffer,
-      mimetype,
+    const signParams = generateUploadSignature(
       userId,
       tempFileId,
-      originalname
+      filename,
+      mimeType
     );
 
-    // Save File record in DB (raw originalname stored for display)
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        signParams,
+        "Direct upload signature generated successfully"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Confirm completed Cloudinary upload and record file metadata in database
+export const confirmUpload = async (req, res, next) => {
+  try {
+    const { name, size, mimeType, resourceType, url, publicId, folderId } = req.body;
+    const userId = req.user.id;
+
+    // Validate target folder ownership if folderId is provided
+    if (folderId) {
+      const folder = await prisma.folder.findUnique({
+        where: { id: folderId },
+      });
+      if (!folder || folder.userId !== userId) {
+        throw new ApiError(404, "Target folder not found");
+      }
+    }
+
     const file = await prisma.file.create({
       data: {
-        name: originalname,
+        name,
         size,
-        mimeType: mimetype,
-        resourceType,
+        mimeType,
+        resourceType: resourceType || "image",
         url,
         publicId,
         userId,
-        folderId,
+        folderId: folderId || null,
       },
     });
 
     return res
       .status(201)
-      .json(new ApiResponse(201, { file }, "File uploaded successfully"));
+      .json(new ApiResponse(201, { file }, "File upload confirmed successfully"));
   } catch (error) {
     next(error);
   }
 };
+
 
 // List user's owned files with pagination, sorting, and folder filtering
 export const getFiles = async (req, res, next) => {

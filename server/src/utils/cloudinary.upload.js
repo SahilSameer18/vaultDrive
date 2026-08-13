@@ -6,6 +6,43 @@ export const sanitizeFilename = (filename) => {
   return filename.replace(/[^a-zA-Z0-9.\-]/g, "-");
 };
 
+// Generate Cloudinary presigned upload parameters & HMAC signature for direct client uploads
+export const generateUploadSignature = (userId, fileId, originalFilename, mimeType) => {
+  const sanitized = sanitizeFilename(originalFilename);
+  const timestamp = Math.floor(Date.now() / 1000);
+
+  const isMedia =
+    mimeType.startsWith("image/") ||
+    mimeType.startsWith("video/") ||
+    mimeType.startsWith("audio/") ||
+    mimeType === "application/pdf";
+
+  const filenameWithoutExt = sanitized.replace(/\.[^/.]+$/, "");
+  const publicId = isMedia ? `${fileId}-${filenameWithoutExt}` : `${fileId}-${sanitized}`;
+  const folder = `vaultDrive/${userId}`;
+
+  const paramsToSign = {
+    folder,
+    public_id: publicId,
+    timestamp,
+  };
+
+  const signature = cloudinary.utils.api_sign_request(
+    paramsToSign,
+    process.env.CLOUDINARY_API_SECRET
+  );
+
+  return {
+    signature,
+    timestamp,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    folder,
+    publicId,
+  };
+};
+
+
 // Stream buffer to Cloudinary with scoped path: vaultDrive/<userId>/<fileId>-<sanitizedFilename>
 export const uploadToCloudinary = (buffer, mimetype, userId, fileId, originalFilename) => {
   return new Promise((resolve, reject) => {

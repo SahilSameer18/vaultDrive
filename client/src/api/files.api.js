@@ -1,11 +1,104 @@
+import axios from "axios";
 import api from "./axios";
 
 export const filesApi = {
-  upload: (formData, onUploadProgress) =>
-    api.post("/files/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress,
-    }),
+  // Request HMAC signature for Cloudinary direct upload
+  getSignUpload: (data) => api.post("/files/sign-upload", data),
+
+  // Confirm completed Cloudinary upload and save record to DB
+  confirmUpload: (data) => api.post("/files/confirm-upload", data),
+
+  // Perform direct Cloudinary upload (single for <10MB, chunked for ≥10MB)
+  uploadDirectToCloudinary: async (file, folderId = null, onUploadProgress) => {
+    // 1. Get presigned HMAC upload parameters from backend
+    const signRes = await filesApi.getSignUpload({
+      filename: file.name,
+      mimeType: file.type || "application/octet-stream",
+      folderId: folderId || null,
+    });
+
+    const { signature, timestamp, apiKey, cloudName, folder, publicId } =
+      signRes.data.data;
+
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+    const CHUNK_SIZE = 10 * 1024 * 1024; // 10MB chunks
+    let cloudinaryData = null;
+
+    if (file.size < 10 * 1024 * 1024) {
+      // ── Single Direct Signed Upload (<10MB) ──────────────────────────────────
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("api_key", apiKey);
+      formData.append("timestamp", timestamp);
+      formData.append("signature", signature);
+      formData.append("folder", folder);
+      formData.append("public_id", publicId);
+
+      const res = await axios.post(uploadUrl, formData, {
+        onUploadProgress: (e) => {
+          if (onUploadProgress && e.total) {
+            const percent = Math.round((e.loaded * 100) / e.total);
+            onUploadProgress({ loaded: e.loaded, total: e.total, percent });
+          }
+        },
+      });
+      cloudinaryData = res.data;
+    } else {
+      // ── Chunked Direct Signed Upload (≥10MB) ─────────────────────────────────
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+      const uniqueUploadId = `uq_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 9)}`;
+      let uploadedBytes = 0;
+
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, file.size);
+        const chunk = file.slice(start, end);
+
+        const formData = new FormData();
+        formData.append("file", chunk);
+        formData.append("api_key", apiKey);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+        formData.append("folder", folder);
+        formData.append("public_id", publicId);
+
+        const chunkRes = await axios.post(uploadUrl, formData, {
+          headers: {
+            "X-Unique-Upload-Id": uniqueUploadId,
+            "Content-Range": `bytes ${start}-${end - 1}/${file.size}`,
+          },
+          onUploadProgress: (e) => {
+            if (onUploadProgress) {
+              const currentLoaded = Math.min(uploadedBytes + e.loaded, file.size);
+              const percent = Math.round((currentLoaded * 100) / file.size);
+              onUploadProgress({ loaded: currentLoaded, total: file.size, percent });
+            }
+          },
+        });
+
+        uploadedBytes += end - start;
+        if (i === totalChunks - 1) {
+          cloudinaryData = chunkRes.data;
+        }
+      }
+    }
+
+    // 2. Confirm upload with backend metadata store
+    const confirmRes = await filesApi.confirmUpload({
+      name: file.name,
+      size: file.size,
+      mimeType: file.type || "application/octet-stream",
+      resourceType: cloudinaryData.resource_type || "image",
+      url: cloudinaryData.secure_url,
+      publicId: cloudinaryData.public_id,
+      folderId: folderId || null,
+    });
+
+    return confirmRes;
+  },
+
   list: (folderId = "root", extraParams = {}) => {
     const params = { ...extraParams };
     if (folderId) params.folderId = folderId;
@@ -29,3 +122,4 @@ export const filesApi = {
   getSharedWithMe: () => api.get("/files/shared-with-me"),
   getByShareToken: (shareToken) => api.get(`/files/share/${shareToken}`),
 };
+
