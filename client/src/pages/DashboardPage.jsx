@@ -53,8 +53,10 @@ export default function DashboardPage() {
       await createFolder(name, null);
       addToast(`Folder "${name}" created`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("Failed to create folder", "error");
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to create folder";
+      addToast(msg, "error");
+      throw err;
     }
   };
 
@@ -63,8 +65,10 @@ export default function DashboardPage() {
       await renameFolder(folderId, newName);
       addToast(`Folder renamed to "${newName}"`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("Failed to rename folder", "error");
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to rename folder";
+      addToast(msg, "error");
+      throw err;
     }
   };
 

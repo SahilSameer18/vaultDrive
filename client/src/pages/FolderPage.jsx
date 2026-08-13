@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFolders } from "../hooks/useFolders";
 import { useFiles } from "../hooks/useFiles";
 import { useToast } from "../components/ui/Toast";
@@ -16,6 +16,7 @@ import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 
 export default function FolderPage() {
   const { folderId } = useParams();
+  const navigate = useNavigate();
   const { addToast } = useToast();
 
   const [viewMode, setViewMode]               = useState("grid");
@@ -26,7 +27,7 @@ export default function FolderPage() {
   const [renameFolderTarget, setRenameFolderTarget] = useState(null);
   const [deleteTarget, setDeleteTarget]       = useState(null);
 
-  const { folders, breadcrumbs, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
+  const { folders, breadcrumbs, loading: foldersLoading, error: foldersError, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
   const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
 
   useEffect(() => {
@@ -52,8 +53,10 @@ export default function FolderPage() {
       await createFolder(name, folderId);
       addToast(`Subfolder "${name}" created`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("Failed to create subfolder", "error");
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to create subfolder";
+      addToast(msg, "error");
+      throw err;
     }
   };
 
@@ -62,8 +65,10 @@ export default function FolderPage() {
       await renameFolder(targetFolderId, newName);
       addToast(`Folder renamed to "${newName}"`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("Failed to rename folder", "error");
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to rename folder";
+      addToast(msg, "error");
+      throw err;
     }
   };
 
@@ -80,9 +85,27 @@ export default function FolderPage() {
       }
     } else if (deleteTarget.type === "folder") {
       try {
-        await deleteFolder(deleteTarget.item.id);
-        addToast(`Folder "${deleteTarget.item.name}" deleted`, "info");
+        const targetFolderId = deleteTarget.item.id;
+        const targetFolderName = deleteTarget.item.name;
+
+        // Determine parent destination BEFORE deleting if current active folder is being deleted
+        const isCurrentFolder = targetFolderId === folderId;
+        let parentDestination = "/dashboard";
+        if (isCurrentFolder && breadcrumbs && breadcrumbs.length >= 2) {
+          const parentItem = breadcrumbs[breadcrumbs.length - 2];
+          if (parentItem && parentItem.id) {
+            parentDestination = `/folder/${parentItem.id}`;
+          }
+        }
+
+        await deleteFolder(targetFolderId);
+        addToast(`Folder "${targetFolderName}" deleted`, "info");
         window.dispatchEvent(new CustomEvent("vault:files-changed"));
+
+        // If the active directory was deleted, navigate immediately to its parent (or /dashboard)
+        if (isCurrentFolder) {
+          navigate(parentDestination, { replace: true });
+        }
       } catch {
         addToast("Failed to delete folder", "error");
       }

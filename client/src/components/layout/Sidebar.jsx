@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { filesApi } from "../../api/files.api";
 import { foldersApi } from "../../api/folders.api";
 import { formatBytes } from "../../utils/formatters";
@@ -12,6 +12,8 @@ export default function Sidebar({ onCloseMobileMenu }) {
   const [allFolders, setAllFolders] = useState([]);
   const [renameTarget, setRenameTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalBytes: 0,
     categories: {
@@ -80,8 +82,40 @@ export default function Sidebar({ onCloseMobileMenu }) {
 
   const handleDeleteSubmit = async () => {
     if (!deleteTarget) return;
-    await foldersApi.delete(deleteTarget.id);
-    window.dispatchEvent(new CustomEvent("vault:files-changed"));
+    try {
+      const deletedId = deleteTarget.id;
+      const targetParentId = deleteTarget.parentId;
+
+      await foldersApi.delete(deletedId);
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
+
+      // Extract current active folder ID from URL /folder/:activeFolderId
+      const folderMatch = location.pathname.match(/\/folder\/([^/]+)/);
+      const activeFolderId = folderMatch ? folderMatch[1] : null;
+
+      if (activeFolderId) {
+        let isCurrentOrDescendant = activeFolderId === deletedId;
+        if (!isCurrentOrDescendant && allFolders.length > 0) {
+          let curr = allFolders.find((f) => f.id === activeFolderId);
+          while (curr && curr.parentId) {
+            if (curr.parentId === deletedId) {
+              isCurrentOrDescendant = true;
+              break;
+            }
+            curr = allFolders.find((f) => f.id === curr.parentId);
+          }
+        }
+
+        if (isCurrentOrDescendant) {
+          const destination = targetParentId ? `/folder/${targetParentId}` : "/dashboard";
+          navigate(destination, { replace: true });
+        }
+      }
+    } catch {
+      // Handled silently or toast
+    } finally {
+      setDeleteTarget(null);
+    }
   };
 
   // Compute category percentages proportional to current totalBytes

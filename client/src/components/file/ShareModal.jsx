@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { filesApi } from "../../api/files.api";
 
 export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
@@ -90,7 +91,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
@@ -238,6 +239,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
         )}
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

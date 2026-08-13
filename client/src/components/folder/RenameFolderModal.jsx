@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFolder }) {
-  const [name, setName]     = useState("");
+  const [name, setName]       = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
 
   useEffect(() => {
     if (folder) {
       setName(folder.name || "");
+      setError("");
     }
   }, [folder]);
 
@@ -16,18 +19,19 @@ export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFol
     e.preventDefault();
     if (!name.trim() || name === folder.name) return;
 
+    setError("");
     setLoading(true);
     try {
       await onRenameFolder(folder.id, name.trim());
       onClose();
-    } catch {
-      // Error handled by parent toast
+    } catch (err) {
+      setError(err.response?.data?.message || err.message || "Failed to rename folder");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
 
@@ -47,6 +51,12 @@ export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFol
             ✕
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-vault-danger/10 border border-vault-danger/30 text-vault-danger text-xs font-mono">
+            [ERROR] {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -82,6 +92,7 @@ export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFol
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

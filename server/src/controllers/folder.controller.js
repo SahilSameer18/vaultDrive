@@ -25,21 +25,51 @@ export const createFolder = async (req, res, next) => {
     const { name, parentId } = req.body;
     const userId = req.user.id;
 
+    const trimmedName = name ? name.trim() : "";
+    if (!trimmedName) {
+      throw new ApiError(400, "Folder name cannot be empty");
+    }
+
+    // Normalize parentId string ("root" or "null" -> null)
+    const normalizedParentId =
+      parentId === "root" || parentId === "null" || !parentId
+        ? null
+        : parentId;
+
     // Validate parent folder ownership if parentId is provided
-    if (parentId) {
+    if (normalizedParentId) {
       const parentFolder = await prisma.folder.findUnique({
-        where: { id: parentId },
+        where: { id: normalizedParentId },
       });
       if (!parentFolder || parentFolder.userId !== userId) {
         throw new ApiError(404, "Parent folder not found");
       }
     }
 
+    // Prevent duplicate folder names under the same parent directory
+    const existingFolder = await prisma.folder.findFirst({
+      where: {
+        userId,
+        parentId: normalizedParentId,
+        name: {
+          equals: trimmedName,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    if (existingFolder) {
+      throw new ApiError(
+        400,
+        `A folder named "${trimmedName}" already exists in this directory`
+      );
+    }
+
     const folder = await prisma.folder.create({
       data: {
-        name,
+        name: trimmedName,
         userId,
-        parentId: parentId || null,
+        parentId: normalizedParentId,
       },
     });
 
@@ -151,20 +181,32 @@ export const updateFolder = async (req, res, next) => {
       throw new ApiError(404, "Folder not found");
     }
 
+    const targetName = name !== undefined ? name.trim() : folder.name;
+    if (!targetName) {
+      throw new ApiError(400, "Folder name cannot be empty");
+    }
+
+    const targetParentId =
+      parentId !== undefined
+        ? parentId === "root" || parentId === "null" || !parentId
+          ? null
+          : parentId
+        : folder.parentId;
+
     // If moving to a new parent folder, validate parent and check for circular dependency
-    if (parentId !== undefined && parentId !== folder.parentId) {
-      if (parentId === id) {
+    if (parentId !== undefined && targetParentId !== folder.parentId) {
+      if (targetParentId === id) {
         throw new ApiError(400, "A folder cannot be its own parent");
       }
-      if (parentId !== null) {
+      if (targetParentId !== null) {
         const targetParent = await prisma.folder.findUnique({
-          where: { id: parentId },
+          where: { id: targetParentId },
         });
         if (!targetParent || targetParent.userId !== userId) {
           throw new ApiError(404, "Target parent folder not found");
         }
         // Check if targetParent is a descendant of folder (cycle prevention)
-        const isCycle = await checkCircularDependency(id, parentId);
+        const isCycle = await checkCircularDependency(id, targetParentId);
         if (isCycle) {
           throw new ApiError(
             400,
@@ -174,11 +216,31 @@ export const updateFolder = async (req, res, next) => {
       }
     }
 
+    // Prevent duplicate folder names under the target parent directory
+    const existingFolder = await prisma.folder.findFirst({
+      where: {
+        userId,
+        parentId: targetParentId,
+        name: {
+          equals: targetName,
+          mode: "insensitive",
+        },
+        id: { not: id }, // Exclude current folder being updated
+      },
+    });
+
+    if (existingFolder) {
+      throw new ApiError(
+        400,
+        `A folder named "${targetName}" already exists in the target directory`
+      );
+    }
+
     const updatedFolder = await prisma.folder.update({
       where: { id },
       data: {
-        ...(name !== undefined && { name }),
-        ...(parentId !== undefined && { parentId: parentId || null }),
+        ...(name !== undefined && { name: targetName }),
+        ...(parentId !== undefined && { parentId: targetParentId }),
       },
     });
 
@@ -216,3 +278,4 @@ export const deleteFolder = async (req, res, next) => {
     next(error);
   }
 };
+

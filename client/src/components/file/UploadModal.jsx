@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { formatBytes } from "../../utils/formatters";
 
 export default function UploadModal({ isOpen, onClose, onUploadFile }) {
@@ -56,7 +57,7 @@ export default function UploadModal({ isOpen, onClose, onUploadFile }) {
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
@@ -153,6 +154,7 @@ export default function UploadModal({ isOpen, onClose, onUploadFile }) {
         </form>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

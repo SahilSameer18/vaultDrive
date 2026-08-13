@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function DeleteConfirmModal({
   isOpen,
@@ -24,7 +25,7 @@ export default function DeleteConfirmModal({
     }
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/75 backdrop-blur-sm" onClick={onClose} />
@@ -73,6 +74,7 @@ export default function DeleteConfirmModal({
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

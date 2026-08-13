@@ -115,7 +115,9 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   // Pre-fill email if passed in URL query param (?email=...)
   useEffect(() => {
@@ -141,7 +143,7 @@ export default function RegisterPage() {
       return;
     }
 
-    setLoading(true);
+    setFormLoading(true);
     try {
       await register(form);
       navigate("/dashboard", { replace: true });
@@ -153,14 +155,14 @@ export default function RegisterPage() {
           : err.response?.data?.message || "Registration failed. Please check input fields."
       );
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       setError("");
-      setLoading(true);
+      setGoogleLoading(true);
       await googleLogin(credentialResponse.credential);
       addToast("Signed up with Google successfully!", "success");
       navigate("/dashboard", { replace: true });
@@ -169,7 +171,7 @@ export default function RegisterPage() {
       setError(msg);
       addToast(msg, "error");
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   };
 
@@ -181,7 +183,7 @@ export default function RegisterPage() {
   const handleDemoLogin = async () => {
     try {
       setError("");
-      setLoading(true);
+      setDemoLoading(true);
       await demoLogin();
       addToast("Welcome Reviewer! Signed into Demo Workspace.", "success");
       navigate("/dashboard", { replace: true });
@@ -190,7 +192,7 @@ export default function RegisterPage() {
       setError(msg);
       addToast(msg, "error");
     } finally {
-      setLoading(false);
+      setDemoLoading(false);
     }
   };
 
@@ -349,10 +351,10 @@ export default function RegisterPage() {
               <button
                 id="register-submit"
                 type="submit"
-                disabled={loading}
+                disabled={formLoading}
                 className="w-full py-3.5 px-4 rounded-xl text-sm font-semibold text-[#0C0D10] bg-gradient-to-r from-[#B8935A] to-[#C8A66B] hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg mt-2 cursor-pointer"
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {formLoading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
 
@@ -375,14 +377,35 @@ export default function RegisterPage() {
               />
             </div>
 
+            {/* Status line shown while backend is processing after Google OAuth */}
+            {googleLoading && (
+              <div className="flex items-center justify-center gap-2 mb-3 text-xs font-mono text-[#B8935A]">
+                <svg className="w-3.5 h-3.5 animate-spin shrink-0" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Verifying with server… (may take a moment)
+              </div>
+            )}
+
             {/* 1-Click Demo Login for Reviewers */}
             <button
               type="button"
               onClick={handleDemoLogin}
-              disabled={loading}
-              className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-[#B8935A] bg-[#181B21] border border-[#B8935A]/50 hover:bg-[#B8935A]/10 hover:border-[#B8935A] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mb-6"
+              disabled={demoLoading}
+              className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-[#B8935A] bg-[#181B21] border border-[#B8935A]/50 hover:bg-[#B8935A]/10 hover:border-[#B8935A] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mb-6 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              <span>⚡</span> 1-Click Demo Login (Reviewer Access)
+              {demoLoading ? (
+                <>
+                  <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  Signing In…
+                </>
+              ) : (
+                <><span>⚡</span> 1-Click Demo Login (Reviewer Access)</>
+              )}
             </button>
 
 
