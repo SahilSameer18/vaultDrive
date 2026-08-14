@@ -212,7 +212,7 @@ export default function LoginPage() {
         </div>
 
         {/* ── RIGHT PANEL: Form Container ───────────────────────────────────── */}
-        <div className="flex flex-col justify-center items-center p-6 sm:p-10 lg:p-12 min-h-screen lg:h-screen lg:overflow-y-auto relative">
+        <div className="flex flex-col items-center justify-start p-6 sm:p-10 lg:p-12 min-h-screen lg:h-screen lg:overflow-y-auto relative">
           <div className="w-full max-w-md my-auto py-4">
             {/* Mobile Header */}
             <div className="lg:hidden flex items-center gap-3 mb-8">

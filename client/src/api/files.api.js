@@ -65,19 +65,33 @@ export const filesApi = {
         formData.append("folder", folder);
         formData.append("public_id", publicId);
 
-        const chunkRes = await axios.post(uploadUrl, formData, {
-          headers: {
-            "X-Unique-Upload-Id": uniqueUploadId,
-            "Content-Range": `bytes ${start}-${end - 1}/${file.size}`,
-          },
-          onUploadProgress: (e) => {
-            if (onUploadProgress) {
-              const currentLoaded = Math.min(uploadedBytes + e.loaded, file.size);
-              const percent = Math.round((currentLoaded * 100) / file.size);
-              onUploadProgress({ loaded: currentLoaded, total: file.size, percent });
-            }
-          },
-        });
+        let chunkRes = null;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        while (attempts < maxAttempts) {
+          try {
+            chunkRes = await axios.post(uploadUrl, formData, {
+              headers: {
+                "X-Unique-Upload-Id": uniqueUploadId,
+                "Content-Range": `bytes ${start}-${end - 1}/${file.size}`,
+              },
+              onUploadProgress: (e) => {
+                if (onUploadProgress) {
+                  const currentLoaded = Math.min(uploadedBytes + e.loaded, file.size);
+                  const percent = Math.round((currentLoaded * 100) / file.size);
+                  onUploadProgress({ loaded: currentLoaded, total: file.size, percent });
+                }
+              },
+            });
+            break; // Success! Exit retry loop
+          } catch (err) {
+            attempts++;
+            if (attempts >= maxAttempts) throw err;
+            // Exponential backoff delay (1s, 2s) before retrying same chunk
+            await new Promise((res) => setTimeout(res, attempts * 1000));
+          }
+        }
 
         uploadedBytes += end - start;
         if (i === totalChunks - 1) {
