@@ -13,6 +13,8 @@ import FilePreviewModal from "../components/file/FilePreviewModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
 import RenameFolderModal from "../components/folder/RenameFolderModal";
 import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
+import FileSortDropdown from "../components/file/FileSortDropdown";
+import PaginationControls from "../components/ui/PaginationControls";
 
 export default function FolderPage() {
   const { folderId } = useParams();
@@ -28,7 +30,7 @@ export default function FolderPage() {
   const [deleteTarget, setDeleteTarget]       = useState(null);
 
   const { folders, breadcrumbs, loading: foldersLoading, error: foldersError, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
-  const { files, loading: filesLoading, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
+  const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
 
   useEffect(() => {
     fetchFolders(folderId);
@@ -145,7 +147,7 @@ export default function FolderPage() {
   const hasItems  = folders.length > 0 || files.length > 0;
 
   return (
-    <div className="space-y-6 fade-in select-none">
+    <div className="min-h-[calc(100vh-7rem)] flex flex-col justify-between fade-in select-none pb-2 space-y-6">
       
       {/* ── Header & Path ────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vault-border">
@@ -188,6 +190,16 @@ export default function FolderPage() {
               </svg>
             </button>
           </div>
+
+          {/* Server-Side Sort Control Dropdown */}
+          <FileSortDropdown
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onChangeSort={(by, order) => {
+              setSortBy(by);
+              setSortOrder(order);
+            }}
+          />
 
           {/* New Subfolder */}
           <button
@@ -252,6 +264,16 @@ export default function FolderPage() {
           </button>
         </div>
       )}
+
+      {/* Pagination Controls */}
+      <PaginationControls
+        page={page}
+        limit={limit}
+        totalCount={pagination.totalCount}
+        totalPages={pagination.totalPages}
+        onPageChange={setPage}
+        onLimitChange={setLimit}
+      />
 
       {/* Modals */}
       <CreateFolderModal

@@ -3,31 +3,56 @@ import { filesApi } from "../api/files.api";
 import { useSearch } from "../context/SearchContext";
 
 export function useFiles(folderId = null) {
-  const [files, setFiles]     = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState(null);
+  const [files, setFiles]         = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState(null);
+  const [sortBy, setSortBy]       = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [page, setPage]           = useState(1);
+  const [limit, setLimit]         = useState(20);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    totalCount: 0,
+    totalPages: 1,
+  });
   const { searchQuery, debouncedSearchQuery } = useSearch();
 
-  // Fetch files inside current folder (or all files if global search is active)
+  // Fetch files inside current folder with server-side search, sorting, and pagination
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {
     setLoading(true);
     setError(null);
     try {
-      // If debouncedSearchQuery is present, fetch ALL files (null folderId) so global search queries the whole vault!
+      // If debouncedSearchQuery is present, query whole vault (null folderId)
       const param = debouncedSearchQuery ? null : (targetFolderId || "root");
-      const res = await filesApi.list(param);
+      const queryParams = {
+        search: debouncedSearchQuery?.trim() || undefined,
+        sortBy,
+        sortOrder,
+        page,
+        limit,
+      };
+      const res = await filesApi.list(param, queryParams);
       setFiles(res.data.data.files || []);
+      if (res.data.data.pagination) {
+        setPagination(res.data.data.pagination);
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load files");
     } finally {
       setLoading(false);
     }
+  }, [folderId, debouncedSearchQuery, sortBy, sortOrder, page, limit]);
+
+  // Reset page to 1 whenever folderId or debouncedSearchQuery changes
+  useEffect(() => {
+    setPage(1);
   }, [folderId, debouncedSearchQuery]);
 
-  // Re-fetch whenever debouncedSearchQuery changes
+  // Re-fetch whenever dependencies change
   useEffect(() => {
     fetchFiles(folderId);
-  }, [debouncedSearchQuery, fetchFiles, folderId]);
+  }, [debouncedSearchQuery, sortBy, sortOrder, page, limit, fetchFiles, folderId]);
 
 
 
@@ -85,16 +110,19 @@ export function useFiles(folderId = null) {
     );
   };
 
-  // Filtered files by global search query
-  const filteredFiles = files.filter((f) =>
-    f.name?.toLowerCase().includes((searchQuery || "").toLowerCase().trim())
-  );
-
   return {
-    files: filteredFiles,
-    allFiles: files,
+    files,
     loading,
     error,
+    sortBy,
+    sortOrder,
+    page,
+    limit,
+    pagination,
+    setSortBy,
+    setSortOrder,
+    setPage,
+    setLimit,
     fetchFiles,
     uploadFile,
     togglePrivacy,
