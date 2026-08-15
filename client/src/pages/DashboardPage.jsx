@@ -104,18 +104,18 @@ export default function DashboardPage() {
     if (deleteTarget.type === "file") {
       try {
         await deleteFile(deleteTarget.item.id);
-        addToast("File deleted from vault", "info");
+        addToast("File moved to Trash", "info");
         window.dispatchEvent(new CustomEvent("vault:files-changed"));
       } catch {
-        addToast("Failed to delete file", "error");
+        addToast("Failed to move file to Trash", "error");
       }
     } else if (deleteTarget.type === "folder") {
       try {
         await deleteFolder(deleteTarget.item.id);
-        addToast(`Folder "${deleteTarget.item.name}" deleted`, "info");
+        addToast(`Folder "${deleteTarget.item.name}" moved to Trash`, "info");
         window.dispatchEvent(new CustomEvent("vault:files-changed"));
       } catch {
-        addToast("Failed to delete folder", "error");
+        addToast("Failed to move folder to Trash", "error");
       }
     }
   };
@@ -305,13 +305,14 @@ export default function DashboardPage() {
       <DeleteConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title={deleteTarget?.type === "folder" ? "Delete Directory" : "Delete Asset"}
+        title={deleteTarget?.type === "folder" ? "Move Folder to Trash" : "Move File to Trash"}
         description={
           deleteTarget?.type === "folder"
-            ? "Are you sure you want to delete this folder? Files inside will be safely moved to root."
-            : "Are you sure you want to permanently delete this asset from your vault?"
+            ? "Are you sure you want to move this folder to Trash? All subfolders and files inside will be moved to Trash together."
+            : "Are you sure you want to move this file to Trash? You can restore it anytime from your Trash Bin."
         }
         itemName={deleteTarget?.item?.name || ""}
+        confirmText="Move to Trash"
         onConfirm={handleConfirmDelete}
       />
 

@@ -4,24 +4,26 @@ import { createPortal } from "react-dom";
 export default function DeleteConfirmModal({
   isOpen,
   onClose,
-  title = "Delete Confirmation",
-  description = "Are you sure you want to delete this item?",
+  title = "Move to Trash",
+  description = "This item will be moved to Trash. You can restore it anytime from your Trash Bin.",
   itemName = "",
+  confirmText = "Move to Trash",
+  isPermanent = false,
   onConfirm,
 }) {
-  const [deleting, setDeleting] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   if (!isOpen) return null;
 
   const handleConfirm = async () => {
-    setDeleting(true);
+    setProcessing(true);
     try {
       await onConfirm();
       onClose();
     } catch {
       // Handled by parent toast
     } finally {
-      setDeleting(false);
+      setProcessing(false);
     }
   };
 
@@ -41,7 +43,9 @@ export default function DeleteConfirmModal({
           </div>
           <div>
             <h3 className="font-bold text-base text-vault-text">{title}</h3>
-            <p className="text-[10px] font-mono text-vault-muted">IRREVERSIBLE ACTION</p>
+            <p className="text-[10px] font-mono text-vault-muted">
+              {isPermanent ? "PERMANENT IRREVERSIBLE ACTION" : "CAN BE RESTORED FROM TRASH"}
+            </p>
           </div>
         </div>
 
@@ -58,18 +62,18 @@ export default function DeleteConfirmModal({
           <button
             type="button"
             onClick={onClose}
-            disabled={deleting}
-            className="px-4 py-2.5 rounded-xl border border-vault-border text-xs font-medium text-vault-muted hover:text-vault-text transition-colors"
+            disabled={processing}
+            className="px-4 py-2.5 rounded-xl border border-vault-border text-xs font-medium text-vault-muted hover:text-vault-text transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={deleting}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold font-mono text-white bg-vault-danger hover:bg-vault-danger/90 disabled:opacity-50 transition-colors shadow-md flex items-center gap-2"
+            disabled={processing}
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold font-mono text-white bg-vault-danger hover:bg-vault-danger/90 disabled:opacity-50 transition-colors shadow-md flex items-center gap-2 cursor-pointer"
           >
-            {deleting ? "Deleting..." : "Confirm Delete"}
+            {processing ? "Processing…" : confirmText}
           </button>
         </div>
 

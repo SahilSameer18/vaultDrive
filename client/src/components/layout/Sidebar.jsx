@@ -227,6 +227,23 @@ export default function Sidebar({ onCloseMobileMenu }) {
             </svg>
             Account Profile
           </NavLink>
+
+          <NavLink
+            to="/trash"
+            onClick={onCloseMobileMenu}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+                isActive
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+              }`
+            }
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Trash Bin
+          </NavLink>
         </nav>
 
         {/* Dynamic Interactive Directory Folder Tree */}
@@ -317,12 +334,14 @@ export default function Sidebar({ onCloseMobileMenu }) {
       <DeleteConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        title="Delete Directory"
-        description="Are you sure you want to delete this folder? Files inside will be safely moved to root."
+        title="Move Folder to Trash"
+        description="Are you sure you want to move this folder to Trash? All subfolders and files inside will be moved to Trash together and can be restored anytime."
         itemName={deleteTarget?.name || ""}
+        confirmText="Move to Trash"
         onConfirm={handleDeleteSubmit}
       />
 
     </aside>
   );
 }
+

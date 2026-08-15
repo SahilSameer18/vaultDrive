@@ -11,6 +11,7 @@ import SharedWithMePage from "./pages/SharedWithMePage";
 import RecentActivityPage from "./pages/RecentActivityPage";
 import PublicSharePage from "./pages/PublicSharePage";
 import ProfilePage from "./pages/ProfilePage";
+import TrashPage from "./pages/TrashPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function AppRoutes() {
@@ -30,6 +31,7 @@ export default function AppRoutes() {
           <Route path="/shared" element={<SharedWithMePage />} />
           <Route path="/recent" element={<RecentActivityPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/trash" element={<TrashPage />} />
         </Route>
       </Route>
 
