@@ -134,6 +134,9 @@ export const filesApi = {
   unshareWithUser: (id, targetUserId) =>
     api.delete(`/files/${id}/share-user/${targetUserId}`),
 
+  // Storage stats (aggregated lightweight quota)
+  getStorageStats: () => api.get("/files/storage-stats"),
+
   // Views
   getSharedWithMe: () => api.get("/files/shared-with-me"),
   getByShareToken: (shareToken) => api.get(`/files/share/${shareToken}`),

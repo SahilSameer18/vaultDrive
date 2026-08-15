@@ -13,6 +13,7 @@ import {
   getFileSharedUsers,
   getSharedWithMe,
   getByShareToken,
+  getStorageStats,
 } from "../controllers/file.controller.js";
 import {
   signUploadSchema,
@@ -37,6 +38,8 @@ router.post("/sign-upload", validate(signUploadSchema), getSignUpload);
 // Confirm completed Cloudinary upload and save record to DB
 router.post("/confirm-upload", validate(confirmUploadSchema), confirmUpload);
 
+// Get aggregated user storage usage stats (lightweight quota calculation)
+router.get("/storage-stats", getStorageStats);
 
 // List user owned files (supports pagination, search, sorting, folder filtering)
 router.get("/", getFiles);

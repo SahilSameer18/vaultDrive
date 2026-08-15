@@ -59,7 +59,7 @@ export default function AppLayout() {
 
           {/* Sliding Drawer */}
           <div
-            className={`relative w-64 max-w-[80vw] h-full bg-vault-bg shadow-2xl z-10 transition-transform duration-300 ease-out ${
+            className={`relative w-72 sm:w-80 max-w-[85vw] h-full bg-vault-panel border-r border-vault-border shadow-2xl z-10 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
             }`}
           >

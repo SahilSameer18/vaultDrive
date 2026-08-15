@@ -171,9 +171,9 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
   );
 
   return (
-    <div className="space-y-2">
-      <p className="px-3 text-[10px] font-mono tracking-widest text-vault-muted uppercase">
-        DIRECTORIES
+    <div className="space-y-1.5">
+      <p className="px-2.5 text-[11px] font-medium text-vault-muted">
+        Folders
       </p>
       {renderNodes(tree)}
     </div>

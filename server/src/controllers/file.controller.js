@@ -600,3 +600,86 @@ export const getByShareToken = async (req, res, next) => {
     next(error);
   }
 };
+
+// Get aggregated storage usage stats (lightweight quota calculation)
+export const getStorageStats = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const TOTAL_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB
+
+    // 1. Fetch aggregate storage sum & count for active files
+    const aggregate = await prisma.file.aggregate({
+      where: {
+        userId,
+        deletedAt: null,
+      },
+      _sum: {
+        size: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    const totalBytes = aggregate._sum.size || 0;
+    const fileCount = aggregate._count.id || 0;
+    const usedPercentage = Math.min(
+      100,
+      parseFloat(((totalBytes / TOTAL_QUOTA_BYTES) * 100).toFixed(1))
+    );
+
+    // 2. Fetch category breakdown with small select (mimeType, size)
+    const files = await prisma.file.findMany({
+      where: { userId, deletedAt: null },
+      select: { mimeType: true, size: true },
+    });
+
+    const categories = {
+      image: { bytes: 0, count: 0 },
+      media: { bytes: 0, count: 0 },
+      doc: { bytes: 0, count: 0 },
+      archive: { bytes: 0, count: 0 },
+    };
+
+    for (const f of files) {
+      const mime = (f.mimeType || "").toLowerCase();
+      const size = f.size || 0;
+      if (mime.startsWith("image/")) {
+        categories.image.bytes += size;
+        categories.image.count += 1;
+      } else if (mime.startsWith("video/") || mime.startsWith("audio/")) {
+        categories.media.bytes += size;
+        categories.media.count += 1;
+      } else if (
+        mime.includes("pdf") ||
+        mime.includes("word") ||
+        mime.includes("document") ||
+        mime.includes("text") ||
+        mime.includes("sheet") ||
+        mime.includes("presentation")
+      ) {
+        categories.doc.bytes += size;
+        categories.doc.count += 1;
+      } else {
+        categories.archive.bytes += size;
+        categories.archive.count += 1;
+      }
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          totalBytes,
+          fileCount,
+          totalQuotaBytes: TOTAL_QUOTA_BYTES,
+          usedPercentage,
+          categories,
+        },
+        "Storage stats retrieved successfully"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};

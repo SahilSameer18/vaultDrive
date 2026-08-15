@@ -12,6 +12,7 @@ import RecentActivityPage from "./pages/RecentActivityPage";
 import PublicSharePage from "./pages/PublicSharePage";
 import ProfilePage from "./pages/ProfilePage";
 import TrashPage from "./pages/TrashPage";
+import StoragePage from "./pages/StoragePage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function AppRoutes() {
@@ -30,6 +31,7 @@ export default function AppRoutes() {
           <Route path="/folder/:folderId" element={<FolderPage />} />
           <Route path="/shared" element={<SharedWithMePage />} />
           <Route path="/recent" element={<RecentActivityPage />} />
+          <Route path="/storage" element={<StoragePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/trash" element={<TrashPage />} />
         </Route>

@@ -1,62 +1,33 @@
 import { useState, useEffect, useCallback } from "react";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, Link } from "react-router-dom";
 import { filesApi } from "../../api/files.api";
 import { foldersApi } from "../../api/folders.api";
+import { useAuth } from "../../context/AuthContext";
 import { formatBytes } from "../../utils/formatters";
-import { getFileCategory } from "../../utils/fileIcons";
 import FolderSidebar from "../folder/FolderSidebar";
 import RenameFolderModal from "../folder/RenameFolderModal";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal";
 
+const TOTAL_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB Quota
+
 export default function Sidebar({ onCloseMobileMenu }) {
-  const [allFolders, setAllFolders] = useState([]);
+  const { user } = useAuth();
   const [renameTarget, setRenameTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [allFolders, setAllFolders] = useState([]);
+  const [totalStorageBytes, setTotalStorageBytes] = useState(0);
   const location = useLocation();
-  const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalBytes: 0,
-    categories: {
-      image: 0,
-      media: 0,
-      doc: 0,
-      archive: 0,
-    },
-  });
 
   const loadStatsAndFolders = useCallback(async () => {
     try {
-      // 1. Fetch all user folders (no parentId filter) for directory tree
+      // 1. Fetch user directory tree
       const folderRes = await foldersApi.list(null);
       setAllFolders(folderRes.data.data.folders || []);
 
-      // 2. Fetch all user files for storage breakdown
-      const res = await filesApi.list(null);
-      const files = res.data.data.files || [];
-
-      let total = 0;
-      const cats = { image: 0, media: 0, doc: 0, archive: 0 };
-
-      files.forEach((f) => {
-        const size = f.size || 0;
-        total += size;
-
-        const category = getFileCategory(f.mimeType);
-        if (category === "image") {
-          cats.image += size;
-        } else if (category === "video" || category === "audio") {
-          cats.media += size;
-        } else if (category === "pdf" || category === "document") {
-          cats.doc += size;
-        } else {
-          cats.archive += size;
-        }
-      });
-
-      setStats({
-        totalBytes: total,
-        categories: cats,
-      });
+      // 2. Fetch lightweight aggregated storage stats from database
+      const statsRes = await filesApi.getStorageStats();
+      const statsData = statsRes.data.data;
+      setTotalStorageBytes(statsData.totalBytes || 0);
     } catch {
       // Fallback
     }
@@ -65,7 +36,7 @@ export default function Sidebar({ onCloseMobileMenu }) {
   useEffect(() => {
     loadStatsAndFolders();
 
-    // Listen for file and folder changes to refresh directory tree and storage breakdown
+    // Listen for file and folder changes to refresh directory tree and storage bar
     window.addEventListener("vault:files-changed", loadStatsAndFolders);
     window.addEventListener("vault:file-uploaded", loadStatsAndFolders);
 
@@ -84,8 +55,6 @@ export default function Sidebar({ onCloseMobileMenu }) {
     if (!deleteTarget) return;
     try {
       const deletedId = deleteTarget.id;
-      const targetParentId = deleteTarget.parentId;
-
       await foldersApi.delete(deletedId);
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
 
@@ -105,53 +74,73 @@ export default function Sidebar({ onCloseMobileMenu }) {
             curr = allFolders.find((f) => f.id === curr.parentId);
           }
         }
-
         if (isCurrentOrDescendant) {
-          const destination = targetParentId ? `/folder/${targetParentId}` : "/dashboard";
-          navigate(destination, { replace: true });
+          window.location.href = "/dashboard";
         }
       }
-    } catch {
-      // Handled silently or toast
     } finally {
       setDeleteTarget(null);
     }
   };
 
-  // Compute category percentages proportional to 1 GB total quota (1,073,741,824 bytes)
-  const TOTAL_QUOTA_BYTES = 1 * 1024 * 1024 * 1024;
-  const imagePct   = (stats.categories.image / TOTAL_QUOTA_BYTES) * 100;
-  const mediaPct   = (stats.categories.media / TOTAL_QUOTA_BYTES) * 100;
-  const docPct     = (stats.categories.doc / TOTAL_QUOTA_BYTES) * 100;
-  const archivePct = (stats.categories.archive / TOTAL_QUOTA_BYTES) * 100;
+  const usedPercentage = Math.min(
+    100,
+    parseFloat(((totalStorageBytes / TOTAL_QUOTA_BYTES) * 100).toFixed(1))
+  );
 
   return (
-    <aside className="w-64 border-r border-vault-border bg-vault-bg flex flex-col justify-between h-full select-none overflow-y-auto">
+    <aside className="w-full lg:w-64 border-r border-vault-border bg-vault-panel/30 flex flex-col justify-between h-full select-none">
       
-      {/* ── Top Section: Primary Navigation & Folder Directories ──────── */}
-      <div className="p-4 space-y-5">
+      {/* ── Top Section: Nav Links & Folder Tree ───────────────────────── */}
+      <div className="p-3.5 space-y-4 overflow-y-auto flex-1">
         
-        {/* Brand Header — Mobile only (since desktop topbar already shows VaultDrive brand) */}
-        <div className="px-3 pt-2 pb-1 flex items-center gap-2.5 lg:hidden">
-          <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-accent/40 flex items-center justify-center shadow-md shrink-0">
-            <svg className="w-4.5 h-4.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              <circle cx="12" cy="16" r="1.5" fill="currentColor" />
-            </svg>
+        {/* Mobile Drawer Header with Logo & Touch Close Target */}
+        <div className="flex items-center justify-between pb-3 border-b border-vault-border/60 lg:hidden">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-vault-surface border border-vault-accent/40 flex items-center justify-center shadow-md">
+              <svg className="w-4.5 h-4.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                <circle cx="12" cy="16" r="1.5" fill="currentColor" />
+              </svg>
+            </div>
+            <div>
+              <span className="font-bold text-base tracking-tight text-vault-text">VaultDrive</span>
+              <p className="text-[10px] font-mono text-vault-muted leading-none mt-0.5">Personal Cloud</p>
+            </div>
           </div>
-          <div>
-            <h2 className="font-bold text-base tracking-tight text-vault-text">VaultDrive</h2>
-            <p className="text-[9px] font-mono tracking-widest text-vault-muted">VAULT REPOSITORY</p>
-          </div>
+
+          {onCloseMobileMenu && (
+            <button
+              type="button"
+              onClick={onCloseMobileMenu}
+              className="p-2 rounded-xl border border-vault-border bg-vault-surface text-vault-muted hover:text-vault-text transition-colors cursor-pointer"
+              aria-label="Close navigation menu"
+            >
+              <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
         </div>
 
-        {/* Desktop Repository Tag */}
-        <div className="px-3 pt-2 hidden lg:block">
-          <p className="text-[10px] font-mono tracking-widest text-vault-muted">
-            VAULT REPOSITORY
-          </p>
-        </div>
+        {/* Mobile User Quick Info Pill */}
+        <Link
+          to="/profile"
+          onClick={onCloseMobileMenu}
+          className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl bg-vault-surface/60 border border-vault-border/60 hover:border-vault-accent/50 transition-colors"
+        >
+          <div className="w-8 h-8 rounded-lg bg-vault-accent/15 border border-vault-accent/40 flex items-center justify-center text-vault-accent font-mono font-bold text-xs">
+            {user?.username?.charAt(0)?.toUpperCase() || "V"}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-bold text-vault-text truncate">{user?.username || "Vault User"}</p>
+            <p className="text-[10px] font-mono text-vault-muted truncate">{user?.email}</p>
+          </div>
+          <svg className="w-3.5 h-3.5 text-vault-muted" viewBox="0 0 24 24" fill="none">
+            <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Link>
 
         {/* Core Navigation Links */}
         <nav className="space-y-1">
@@ -159,14 +148,14 @@ export default function Sidebar({ onCloseMobileMenu }) {
             to="/dashboard"
             onClick={onCloseMobileMenu}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
               }`
             }
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
             </svg>
             My Vault
@@ -176,14 +165,14 @@ export default function Sidebar({ onCloseMobileMenu }) {
             to="/shared"
             onClick={onCloseMobileMenu}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
               }`
             }
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.75" />
               <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
               <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.75" />
@@ -196,14 +185,14 @@ export default function Sidebar({ onCloseMobileMenu }) {
             to="/recent"
             onClick={onCloseMobileMenu}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
               }`
             }
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
               <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
             </svg>
@@ -211,44 +200,26 @@ export default function Sidebar({ onCloseMobileMenu }) {
           </NavLink>
 
           <NavLink
-            to="/profile"
-            onClick={onCloseMobileMenu}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
-                isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
-              }`
-            }
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.75" />
-              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1.75" />
-            </svg>
-            Account Profile
-          </NavLink>
-
-          <NavLink
             to="/trash"
             onClick={onCloseMobileMenu}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
               }`
             }
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none">
               <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             Trash Bin
           </NavLink>
         </nav>
 
-        {/* Dynamic Interactive Directory Folder Tree */}
+        {/* Directory Folder Tree */}
         {allFolders.length > 0 && (
-          <div className="pt-2 border-t border-vault-border/60">
+          <div className="pt-3 border-t border-vault-border/50">
             <FolderSidebar
               folders={allFolders}
               onSelectFolder={onCloseMobileMenu}
@@ -260,70 +231,34 @@ export default function Sidebar({ onCloseMobileMenu }) {
 
       </div>
 
-      {/* ── Bottom Section: Proportional Storage Breakdown Bar ─────────── */}
-      <div className="p-4 border-t border-vault-border bg-vault-panel/40 shrink-0">
-        <div className="flex items-center justify-between mb-2.5">
-          <span className="text-[9px] font-mono tracking-widest text-vault-muted">STORAGE USED</span>
-          <span className="text-[10px] font-mono text-vault-accent font-semibold">
-            {formatBytes(stats.totalBytes)} / 1 GB
+      {/* ── Bottom Section: Sleek Storage Card (Clickable to /storage) ─ */}
+      <Link
+        to="/storage"
+        onClick={onCloseMobileMenu}
+        className="p-3.5 border-t border-vault-border bg-vault-panel/40 hover:bg-vault-panel/70 transition-colors shrink-0 space-y-2 block group cursor-pointer"
+        title="View Storage Breakdown"
+      >
+        <div className="flex items-center justify-between text-[11px] font-mono">
+          <span className="text-vault-muted group-hover:text-vault-text transition-colors font-medium">Storage Used</span>
+          <span className="text-vault-accent font-semibold flex items-center gap-1">
+            {formatBytes(totalStorageBytes)} <span className="text-vault-muted font-normal">/ 1 GB</span>
+            <svg className="w-3 h-3 text-vault-muted group-hover:text-vault-accent group-hover:translate-x-0.5 transition-all" viewBox="0 0 24 24" fill="none">
+              <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </span>
         </div>
 
-        {/* Proportional 6px Multi-Category Metallic Bar */}
-        <div className="h-[6px] rounded-full bg-vault-surface border border-vault-border overflow-hidden flex mb-3.5 shadow-inner">
-          {stats.totalBytes > 0 ? (
-            <>
-              {imagePct > 0 && (
-                <div
-                  className="h-full bg-[#6FA88A] transition-all duration-300"
-                  style={{ width: `${imagePct}%` }}
-                  title={`Images: ${formatBytes(stats.categories.image)}`}
-                />
-              )}
-              {mediaPct > 0 && (
-                <div
-                  className="h-full bg-[#B8935A] transition-all duration-300"
-                  style={{ width: `${mediaPct}%` }}
-                  title={`Media: ${formatBytes(stats.categories.media)}`}
-                />
-              )}
-              {docPct > 0 && (
-                <div
-                  className="h-full bg-[#38BDF8] transition-all duration-300"
-                  style={{ width: `${docPct}%` }}
-                  title={`Docs: ${formatBytes(stats.categories.doc)}`}
-                />
-              )}
-              {archivePct > 0 && (
-                <div
-                  className="h-full bg-[#8B8F99] transition-all duration-300"
-                  style={{ width: `${archivePct}%` }}
-                  title={`Archives: ${formatBytes(stats.categories.archive)}`}
-                />
-              )}
-            </>
-          ) : (
-            <div className="h-full w-full bg-vault-surface" />
-          )}
+        {/* Sleek Gradient Progress Bar */}
+        <div className="h-1.5 w-full rounded-full bg-vault-surface border border-vault-border overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-vault-accent to-amber-400 transition-all duration-300 rounded-full group-hover:brightness-110"
+            style={{ width: `${Math.max(1, usedPercentage)}%` }}
+            title={`${usedPercentage}% used`}
+          />
         </div>
+      </Link>
 
-        {/* Category Legend */}
-        <div className="grid grid-cols-2 gap-y-2 text-[9px] font-mono text-vault-muted">
-          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.image)}>
-            <span className="w-2 h-2 rounded-full bg-[#6FA88A]" /> Images
-          </span>
-          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.media)}>
-            <span className="w-2 h-2 rounded-full bg-[#B8935A]" /> Video & Audio
-          </span>
-          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.doc)}>
-            <span className="w-2 h-2 rounded-full bg-[#38BDF8]" /> Docs & PDFs
-          </span>
-          <span className="flex items-center gap-1.5" title={formatBytes(stats.categories.archive)}>
-            <span className="w-2 h-2 rounded-full bg-[#8B8F99]" /> Archives & Other
-          </span>
-        </div>
-      </div>
-
+      {/* Rename Folder Modal */}
       <RenameFolderModal
         isOpen={!!renameTarget}
         onClose={() => setRenameTarget(null)}
@@ -331,6 +266,7 @@ export default function Sidebar({ onCloseMobileMenu }) {
         onRenameFolder={handleRenameSubmit}
       />
 
+      {/* Delete / Move to Trash Folder Modal */}
       <DeleteConfirmModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -344,4 +280,3 @@ export default function Sidebar({ onCloseMobileMenu }) {
     </aside>
   );
 }
-
