@@ -198,11 +198,23 @@ export default function Topbar({ onToggleMobileMenu }) {
                   <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>
                 </div>
 
-                <div className="py-1">
-                  <div className="flex items-center gap-2 px-3 py-2 text-xs font-mono text-vault-success">
+                <div className="py-1 space-y-0.5">
+                  <div className="flex items-center gap-2 px-3 py-1.5 text-xs font-mono text-vault-success border-b border-vault-border/40 pb-2 mb-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-vault-success" />
                     AUTHENTICATED
                   </div>
+
+                  <Link
+                    to="/profile"
+                    onClick={() => setProfileOpen(false)}
+                    className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2"
+                  >
+                    <svg className="w-3.5 h-3.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.75" />
+                      <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1.75" />
+                    </svg>
+                    My Profile
+                  </Link>
                 </div>
 
                 <button

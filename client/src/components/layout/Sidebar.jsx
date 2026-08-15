@@ -209,6 +209,24 @@ export default function Sidebar({ onCloseMobileMenu }) {
             </svg>
             Recent Activity
           </NavLink>
+
+          <NavLink
+            to="/profile"
+            onClick={onCloseMobileMenu}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+                isActive
+                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold"
+                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50"
+              }`
+            }
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.75" />
+              <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="1.75" />
+            </svg>
+            Account Profile
+          </NavLink>
         </nav>
 
         {/* Dynamic Interactive Directory Folder Tree */}
