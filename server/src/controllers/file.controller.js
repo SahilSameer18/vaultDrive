@@ -226,8 +226,8 @@ export const getFileById = async (req, res, next) => {
       },
     });
 
-    if (!file) {
-      throw new ApiError(404, "File not found");
+    if (!file || (file.deletedAt && !isOwner)) {
+      throw new ApiError(404, "File not found or has been moved to trash");
     }
 
     // Check authorization: Owner OR Public OR Shared with User
@@ -549,7 +549,10 @@ export const getSharedWithMe = async (req, res, next) => {
     const userId = req.user.id;
 
     const sharedRecords = await prisma.sharedFile.findMany({
-      where: { userId },
+      where: {
+        userId,
+        file: { deletedAt: null },
+      },
       include: {
         file: {
           include: {
@@ -586,8 +589,8 @@ export const getByShareToken = async (req, res, next) => {
       },
     });
 
-    if (!file || !file.isPublic) {
-      throw new ApiError(404, "Share link not found or has been revoked");
+    if (!file || !file.isPublic || file.deletedAt) {
+      throw new ApiError(404, "Share link not found, revoked, or file moved to trash");
     }
 
     return res

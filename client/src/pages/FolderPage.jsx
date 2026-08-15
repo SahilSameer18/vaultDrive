@@ -33,9 +33,6 @@ export default function FolderPage() {
   const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(folderId);
 
   useEffect(() => {
-    fetchFolders(folderId);
-    fetchFiles(folderId);
-
     const handleUploadEvent = () => {
       fetchFiles(folderId);
       fetchFolders(folderId);
@@ -147,7 +144,7 @@ export default function FolderPage() {
   const hasItems  = folders.length > 0 || files.length > 0;
 
   return (
-    <div className="min-h-[calc(100vh-7rem)] flex flex-col justify-between fade-in select-none pb-2 space-y-6">
+    <div className="space-y-6 fade-in select-none pb-12">
       
       {/* ── Header & Path ────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vault-border">
