@@ -15,9 +15,9 @@ export const getSignUpload = async (req, res, next) => {
     const { filename, mimeType, size, folderId } = req.body;
     const userId = req.user.id;
 
-    // Validate 1 GB storage quota before issuing signature
+    // Enforce 1 GB storage quota check before issuing upload signature
     const storageSum = await prisma.file.aggregate({
-      where: { userId },
+      where: { userId, deletedAt: null },
       _sum: { size: true },
     });
     const currentUsedBytes = storageSum._sum.size || 0;
@@ -68,9 +68,9 @@ export const confirmUpload = async (req, res, next) => {
     const { name, size, mimeType, resourceType, url, publicId, folderId } = req.body;
     const userId = req.user.id;
 
-    // Enforce 1 GB storage quota check on confirm
+    // Enforce 1 GB storage quota check on confirm (counting active non-trashed files)
     const storageSum = await prisma.file.aggregate({
-      where: { userId },
+      where: { userId, deletedAt: null },
       _sum: { size: true },
     });
     const currentUsedBytes = storageSum._sum.size || 0;
@@ -162,9 +162,10 @@ export const getFiles = async (req, res, next) => {
     const limitNum = Math.max(1, parseInt(limit, 10) || 20);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build Prisma query filter
+    // Build Prisma query filter for active (non-trashed) files
     const where = {
       userId,
+      deletedAt: null,
       ...(folderId === "root" || folderId === "null"
         ? { folderId: null }
         : folderId
@@ -296,7 +297,7 @@ export const updateFile = async (req, res, next) => {
   }
 };
 
-// Delete file from Cloudinary storage and database
+// Move file to Trash (soft delete)
 export const deleteFile = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -311,15 +312,15 @@ export const deleteFile = async (req, res, next) => {
       throw new ApiError(403, "Forbidden: Only file owner can delete file");
     }
 
-    // Delete file asset from Cloudinary using exact stored resourceType
-    await deleteFromCloudinary(file.publicId, file.resourceType);
-
-    // Delete file record from DB
-    await prisma.file.delete({ where: { id } });
+    // Soft delete file by setting deletedAt timestamp
+    await prisma.file.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, null, "File deleted successfully"));
+      .json(new ApiResponse(200, null, "File moved to Trash successfully"));
   } catch (error) {
     next(error);
   }

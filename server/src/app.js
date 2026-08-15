@@ -51,6 +51,7 @@ import authRouter from "./routes/auth.routes.js";
 import fileRouter from "./routes/file.routes.js";
 import folderRouter from "./routes/folder.routes.js";
 import notificationRouter from "./routes/notification.routes.js";
+import trashRouter from "./routes/trash.routes.js";
 
 // Health check route
 app.get("/", (req, res) => {
@@ -62,6 +63,7 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/files", fileRouter);
 app.use("/api/v1/folders", folderRouter);
 app.use("/api/v1/notifications", notificationRouter);
+app.use("/api/v1/trash", trashRouter);
 
 // Global Error Handler
 app.use(errorMiddleware);

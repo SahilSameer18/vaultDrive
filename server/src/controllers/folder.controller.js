@@ -19,6 +19,30 @@ const checkCircularDependency = async (folderId, targetParentId) => {
   return false;
 };
 
+// Helper function to collect a folder ID and all its recursive descendant folder IDs
+export const getAllDescendantFolderIds = async (folderId, userId) => {
+  const allFolders = await prisma.folder.findMany({
+    where: { userId },
+    select: { id: true, parentId: true },
+  });
+
+  const descendantIds = [folderId];
+  const queue = [folderId];
+
+  while (queue.length > 0) {
+    const currentId = queue.shift();
+    const children = allFolders.filter((f) => f.parentId === currentId);
+    for (const child of children) {
+      if (!descendantIds.includes(child.id)) {
+        descendantIds.push(child.id);
+        queue.push(child.id);
+      }
+    }
+  }
+
+  return descendantIds;
+};
+
 // Create a new folder under root or inside a parent folder
 export const createFolder = async (req, res, next) => {
   try {
@@ -41,16 +65,17 @@ export const createFolder = async (req, res, next) => {
       const parentFolder = await prisma.folder.findUnique({
         where: { id: normalizedParentId },
       });
-      if (!parentFolder || parentFolder.userId !== userId) {
-        throw new ApiError(404, "Parent folder not found");
+      if (!parentFolder || parentFolder.userId !== userId || parentFolder.deletedAt) {
+        throw new ApiError(404, "Parent folder not found or in trash");
       }
     }
 
-    // Prevent duplicate folder names under the same parent directory
+    // Prevent duplicate folder names under the same active parent directory
     const existingFolder = await prisma.folder.findFirst({
       where: {
         userId,
         parentId: normalizedParentId,
+        deletedAt: null,
         name: {
           equals: trimmedName,
           mode: "insensitive",
@@ -81,13 +106,13 @@ export const createFolder = async (req, res, next) => {
   }
 };
 
-// List folders owned by the user (supports parentId query filter)
+// List active folders owned by the user (supports parentId query filter)
 export const getFolders = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { parentId } = req.query;
 
-    const whereClause = { userId };
+    const whereClause = { userId, deletedAt: null };
     if (parentId === "root" || parentId === "null") {
       whereClause.parentId = null;
     } else if (parentId) {
@@ -99,7 +124,10 @@ export const getFolders = async (req, res, next) => {
       orderBy: { name: "asc" },
       include: {
         _count: {
-          select: { files: true, children: true },
+          select: {
+            files: { where: { deletedAt: null } },
+            children: { where: { deletedAt: null } },
+          },
         },
       },
     });
@@ -123,47 +151,58 @@ export const getFolderById = async (req, res, next) => {
     const folder = await prisma.folder.findUnique({
       where: { id },
       include: {
-        parent: {
-          select: { id: true, name: true, parentId: true },
-        },
         children: {
+          where: { deletedAt: null },
           select: {
             id: true,
             name: true,
             createdAt: true,
-            _count: { select: { files: true, children: true } },
+            _count: {
+              select: {
+                files: { where: { deletedAt: null } },
+                children: { where: { deletedAt: null } },
+              },
+            },
           },
           orderBy: { name: "asc" },
         },
         files: {
+          where: { deletedAt: null },
           orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    if (!folder || folder.userId !== userId) {
-      throw new ApiError(404, "Folder not found");
+    if (!folder || folder.userId !== userId || folder.deletedAt) {
+      throw new ApiError(404, "Folder not found or in trash");
     }
 
-    // Build full ancestor breadcrumb chain
+    // High-speed in-memory breadcrumb construction (single database query for all user folders)
+    const allUserFolders = await prisma.folder.findMany({
+      where: { userId, deletedAt: null },
+      select: { id: true, name: true, parentId: true },
+    });
+
+    const folderMap = new Map(allUserFolders.map((f) => [f.id, f]));
     const breadcrumbs = [];
-    let currentParent = folder.parent;
-    while (currentParent) {
-      breadcrumbs.unshift({ id: currentParent.id, name: currentParent.name });
-      if (currentParent.parentId) {
-        currentParent = await prisma.folder.findUnique({
-          where: { id: currentParent.parentId },
-          select: { id: true, name: true, parentId: true },
-        });
-      } else {
-        currentParent = null;
-      }
+    let currId = folder.parentId;
+
+    while (currId && folderMap.has(currId)) {
+      const p = folderMap.get(currId);
+      breadcrumbs.unshift({ id: p.id, name: p.name });
+      currId = p.parentId;
     }
     breadcrumbs.push({ id: folder.id, name: folder.name });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, { folder: { ...folder, breadcrumbs } }, "Folder details retrieved successfully"));
+      .json(
+        new ApiResponse(
+          200,
+          { folder: { ...folder, breadcrumbs } },
+          "Folder details retrieved successfully"
+        )
+      );
   } catch (error) {
     next(error);
   }
@@ -177,8 +216,8 @@ export const updateFolder = async (req, res, next) => {
     const { name, parentId } = req.body;
 
     const folder = await prisma.folder.findUnique({ where: { id } });
-    if (!folder || folder.userId !== userId) {
-      throw new ApiError(404, "Folder not found");
+    if (!folder || folder.userId !== userId || folder.deletedAt) {
+      throw new ApiError(404, "Folder not found or in trash");
     }
 
     const targetName = name !== undefined ? name.trim() : folder.name;
@@ -202,8 +241,8 @@ export const updateFolder = async (req, res, next) => {
         const targetParent = await prisma.folder.findUnique({
           where: { id: targetParentId },
         });
-        if (!targetParent || targetParent.userId !== userId) {
-          throw new ApiError(404, "Target parent folder not found");
+        if (!targetParent || targetParent.userId !== userId || targetParent.deletedAt) {
+          throw new ApiError(404, "Target parent folder not found or in trash");
         }
         // Check if targetParent is a descendant of folder (cycle prevention)
         const isCycle = await checkCircularDependency(id, targetParentId);
@@ -221,6 +260,7 @@ export const updateFolder = async (req, res, next) => {
       where: {
         userId,
         parentId: targetParentId,
+        deletedAt: null,
         name: {
           equals: targetName,
           mode: "insensitive",
@@ -258,7 +298,7 @@ export const updateFolder = async (req, res, next) => {
   }
 };
 
-// Delete a folder (safe cascading deletion: files inside deleted folder have folderId set to NULL)
+// Soft delete a folder and all its descendant subfolders & files (moves entire tree to Trash together!)
 export const deleteFolder = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -269,13 +309,32 @@ export const deleteFolder = async (req, res, next) => {
       throw new ApiError(404, "Folder not found");
     }
 
-    await prisma.folder.delete({ where: { id } });
+    // Collect all recursive descendant folder IDs
+    const allFolderIds = await getAllDescendantFolderIds(id, userId);
+    const now = new Date();
+
+    // Transactionally soft delete folder, subfolders, and all files inside them
+    await prisma.$transaction([
+      prisma.file.updateMany({
+        where: { folderId: { in: allFolderIds }, userId },
+        data: { deletedAt: now },
+      }),
+      prisma.folder.updateMany({
+        where: { id: { in: allFolderIds }, userId },
+        data: { deletedAt: now },
+      }),
+    ]);
 
     return res
       .status(200)
-      .json(new ApiResponse(200, null, "Folder deleted successfully"));
+      .json(
+        new ApiResponse(
+          200,
+          { trashedFolderCount: allFolderIds.length },
+          "Folder and all contents moved to Trash successfully"
+        )
+      );
   } catch (error) {
     next(error);
   }
 };
-

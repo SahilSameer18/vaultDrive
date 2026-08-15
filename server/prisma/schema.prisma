@@ -54,27 +54,31 @@ model File {
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   folder      Folder?      @relation(fields: [folderId], references: [id], onDelete: SetNull) // SetNull so deleting a folder moves files to root
   sharedWith  SharedFile[]
+  deletedAt   DateTime?    // null = active file, timestamp = in Trash
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
   @@index([userId])        // fast queries by owner
   @@index([folderId])      // fast queries by folder
+  @@index([userId, deletedAt]) // fast filtering for active vs trashed files
 }
 
 model Folder {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   name      String
   userId    String
   parentId  String?
-  parent    Folder?  @relation("FolderTree", fields: [parentId], references: [id])
-  children  Folder[] @relation("FolderTree")
+  parent    Folder?   @relation("FolderTree", fields: [parentId], references: [id])
+  children  Folder[]  @relation("FolderTree")
   files     File[]
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deletedAt DateTime? // null = active folder, timestamp = in Trash
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([userId])        // fast queries by owner
   @@index([parentId])      // fast tree traversal
+  @@index([userId, deletedAt]) // fast filtering for active vs trashed folders
 }
 
 model SharedFile {
