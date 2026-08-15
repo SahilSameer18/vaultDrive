@@ -130,6 +130,10 @@ flowchart TD
 ### 👁️ Inline Media Previews
 - Previews for images, video, audio, PDFs, text, and code files via React portals.
 
+### 📊 Storage & Analytics Dashboard
+- **Visual Analytics Page (`/storage`)**: Category highlight cards (Documents, Images, Media, Other Files), circular SVG donut ring chart, and free space indicators.
+- **Lightweight Storage Stats API**: Dedicated `GET /api/v1/files/storage-stats` calculates quota and category breakdown in PostgreSQL, eliminating client-side file over-fetching.
+
 ### 👤 Account Profile
 - Profile page (`/profile`) displaying username, email, membership rank, and active session status.
 
@@ -279,6 +283,7 @@ Open `http://localhost:5173` in your browser.
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/v1/files` | 🔒 Protected | List files (`?folderId`, `?search`, `?sortBy`, `?sortOrder`, `?page`, `?limit`) |
+| `GET` | `/api/v1/files/storage-stats` | 🔒 Protected | Get aggregated storage quota and category breakdown from database |
 | `POST` | `/api/v1/files/sign-upload` | 🔒 Protected | Request HMAC signature for Cloudinary upload |
 | `POST` | `/api/v1/files/confirm-upload` | 🔒 Protected | Confirm upload and save file metadata |
 | `GET` | `/api/v1/files/:id` | 🔒 Protected | Get file by ID |
