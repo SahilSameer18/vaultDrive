@@ -1,0 +1,17 @@
+{
+  "short_name": "VaultDrive",
+  "name": "VaultDrive — Secure Digital Vault",
+  "description": "Upload, organize, and share files with bank-grade security and controlled access.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "/dashboard",
+  "background_color": "#14161A",
+  "theme_color": "#14161A",
+  "display": "standalone",
+  "orientation": "portrait"
+}

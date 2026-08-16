@@ -1,0 +1,16 @@
+# robots.txt for VaultDrive
+User-agent: *
+Allow: /$
+Allow: /login
+Allow: /register
+
+# Block search engine crawlers from indexing private vaults, folders, and shared file links
+Disallow: /dashboard
+Disallow: /folder/
+Disallow: /trash
+Disallow: /storage
+Disallow: /profile
+Disallow: /recent
+Disallow: /shared
+Disallow: /share/
+Disallow: /api/
