@@ -114,12 +114,13 @@ flowchart TD
 - **Single-Query Breadcrumbs**: Breadcrumb paths built from a single indexed database query and in-memory map.
 - **Cycle Prevention**: Ancestor check prevents moving a folder into one of its own descendants.
 
-### ⚡ Upload Pipeline & Quota
+### ⚡ Upload Pipeline & Multi-File Batching
 - **Direct Presigned HMAC Uploads**: Direct browser-to-Cloudinary uploads using HMAC SHA-256 signatures (`sign-upload` → Cloudinary → `confirm-upload`). Server does not buffer file bytes in memory.
+- **Multi-File Batch Queue**: Select up to 10 files at once with controlled 2-stream concurrency worker queue, individual `AbortController` cancellation, and drag-and-drop queue reordering.
 - **Chunked Uploads**: Slices files ≥10MB into chunks with exponential backoff retries.
 - **1 GB Storage Quota**: Backend enforces quota checks before issuing signatures and on upload confirmation.
 - **Visibility Toggle**: Switches files between `PRIVATE` and `PUBLIC`.
-- **Drag-and-Drop**: Whole-page drag-and-drop overlay for file uploads.
+- **Drag-and-Drop**: Whole-page drag-and-drop overlay with batch file detection.
 
 ### 🔔 Sharing & Notifications
 - **Public Share Links**: 64-character hex share tokens for unauthenticated access at `/share/:shareToken`.
@@ -136,6 +137,11 @@ flowchart TD
 
 ### 👤 Account Profile
 - Profile page (`/profile`) displaying username, email, membership rank, and active session status.
+
+### 🌐 SEO, PWA & Search Privacy
+- **Search Metadata**: Open Graph, Twitter Cards, and Schema.org `SoftwareApplication` structured JSON-LD for rich social share previews.
+- **Search Bot Privacy (`robots.txt`)**: Allows search engines to index public landing pages while explicitly blocking crawlers from private user vaults, folders, and shared file tokens.
+- **PWA Mobile Manifest**: Supports standalone mobile installation with custom golden vault brand favicon and dark `#14161A` theme.
 
 ---
 
@@ -358,3 +364,4 @@ Notification
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
+
