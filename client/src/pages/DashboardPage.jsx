@@ -316,7 +316,7 @@ export default function DashboardPage() {
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        onUploadFile={handleUploadFile}
+        folderId={null}
       />
 
       <ShareModal

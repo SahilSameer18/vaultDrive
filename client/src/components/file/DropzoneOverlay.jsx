@@ -33,7 +33,7 @@ export default function DropzoneOverlay({ onFileDropped }) {
 
       const files = e.dataTransfer.files;
       if (files && files.length > 0 && onFileDropped) {
-        onFileDropped(files[0]);
+        onFileDropped(files);
       }
     }
 

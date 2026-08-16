@@ -303,7 +303,7 @@ export default function FolderPage() {
       <UploadModal
         isOpen={isUploadOpen}
         onClose={() => setIsUploadOpen(false)}
-        onUploadFile={handleUploadFile}
+        folderId={folderId}
       />
 
       <ShareModal

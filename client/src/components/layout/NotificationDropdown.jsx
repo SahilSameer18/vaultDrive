@@ -44,13 +44,11 @@ export default function NotificationDropdown() {
 
     window.addEventListener("focus", handleSync);
     window.addEventListener("vault:notifications-changed", handleSync);
-    window.addEventListener("vault:files-changed", handleSync);
 
     return () => {
       clearInterval(interval);
       window.removeEventListener("focus", handleSync);
       window.removeEventListener("vault:notifications-changed", handleSync);
-      window.removeEventListener("vault:files-changed", handleSync);
     };
   }, []);
 

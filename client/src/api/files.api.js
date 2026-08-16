@@ -9,14 +9,14 @@ export const filesApi = {
   confirmUpload: (data) => api.post("/files/confirm-upload", data),
 
   // Perform direct Cloudinary upload (single for <10MB, chunked for ≥10MB)
-  uploadDirectToCloudinary: async (file, folderId = null, onUploadProgress) => {
+  uploadDirectToCloudinary: async (file, folderId = null, onUploadProgress = null, signal = null) => {
     // 1. Get presigned HMAC upload parameters from backend
-    const signRes = await filesApi.getSignUpload({
+    const signRes = await api.post("/files/sign-upload", {
       filename: file.name,
       mimeType: file.type || "application/octet-stream",
       size: file.size,
       folderId: folderId || null,
-    });
+    }, { signal });
 
     const { signature, timestamp, apiKey, cloudName, folder, publicId } =
       signRes.data.data;
@@ -36,6 +36,7 @@ export const filesApi = {
       formData.append("public_id", publicId);
 
       const res = await axios.post(uploadUrl, formData, {
+        signal,
         onUploadProgress: (e) => {
           if (onUploadProgress && e.total) {
             const percent = Math.round((e.loaded * 100) / e.total);
@@ -53,6 +54,8 @@ export const filesApi = {
       let uploadedBytes = 0;
 
       for (let i = 0; i < totalChunks; i++) {
+        if (signal?.aborted) throw new Error("Upload aborted");
+
         const start = i * CHUNK_SIZE;
         const end = Math.min(start + CHUNK_SIZE, file.size);
         const chunk = file.slice(start, end);
@@ -72,6 +75,7 @@ export const filesApi = {
         while (attempts < maxAttempts) {
           try {
             chunkRes = await axios.post(uploadUrl, formData, {
+              signal,
               headers: {
                 "X-Unique-Upload-Id": uniqueUploadId,
                 "Content-Range": `bytes ${start}-${end - 1}/${file.size}`,
@@ -86,6 +90,7 @@ export const filesApi = {
             });
             break; // Success! Exit retry loop
           } catch (err) {
+            if (signal?.aborted) throw err;
             attempts++;
             if (attempts >= maxAttempts) throw err;
             // Exponential backoff delay (1s, 2s) before retrying same chunk
