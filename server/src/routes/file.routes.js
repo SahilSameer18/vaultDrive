@@ -12,6 +12,7 @@ import {
   unshareWithUser,
   getFileSharedUsers,
   getSharedWithMe,
+  getSharedByMe,
   getByShareToken,
   getStorageStats,
 } from "../controllers/file.controller.js";
@@ -46,6 +47,9 @@ router.get("/", getFiles);
 
 // List files shared with current user
 router.get("/shared-with-me", getSharedWithMe);
+
+// List files shared BY current user (public or shared with others)
+router.get("/shared-by-me", getSharedByMe);
 
 // Get single file details (owner, public, or shared user)
 router.get("/:id", getFileById);

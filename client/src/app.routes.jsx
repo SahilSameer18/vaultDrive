@@ -8,6 +8,7 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import FolderPage from "./pages/FolderPage";
 import SharedWithMePage from "./pages/SharedWithMePage";
+import SharedByMePage from "./pages/SharedByMePage";
 import RecentActivityPage from "./pages/RecentActivityPage";
 import PublicSharePage from "./pages/PublicSharePage";
 import ProfilePage from "./pages/ProfilePage";
@@ -34,6 +35,7 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/folder/:folderId" element={<FolderPage />} />
           <Route path="/shared" element={<SharedWithMePage />} />
+          <Route path="/shared-by-me" element={<SharedByMePage />} />
           <Route path="/recent" element={<RecentActivityPage />} />
           <Route path="/storage" element={<StoragePage />} />
           <Route path="/profile" element={<ProfilePage />} />

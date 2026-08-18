@@ -144,6 +144,7 @@ export const filesApi = {
 
   // Views
   getSharedWithMe: () => api.get("/files/shared-with-me"),
+  getSharedByMe: () => api.get("/files/shared-by-me"),
   getByShareToken: (shareToken) => api.get(`/files/share/${shareToken}`),
 };
 

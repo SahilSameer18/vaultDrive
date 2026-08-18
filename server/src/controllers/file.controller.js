@@ -577,6 +577,41 @@ export const getSharedWithMe = async (req, res, next) => {
   }
 };
 
+// List files shared BY current user (either publicly active or shared with specific users)
+export const getSharedByMe = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+
+    const files = await prisma.file.findMany({
+      where: {
+        userId,
+        deletedAt: null,
+        OR: [
+          { isPublic: true },
+          { sharedWith: { some: {} } },
+        ],
+      },
+      include: {
+        sharedWith: {
+          include: {
+            user: {
+              select: { id: true, username: true, email: true },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+      orderBy: { updatedAt: "desc" },
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { files }, "Shared-by-me files retrieved successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
 // PUBLIC access to view/download file using share token (no authentication required)
 export const getByShareToken = async (req, res, next) => {
   try {
@@ -684,4 +719,3 @@ export const getStorageStats = async (req, res, next) => {
     next(error);
   }
 };
-

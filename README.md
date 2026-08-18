@@ -115,11 +115,18 @@ flowchart TD
 - **Visibility Toggle**: Switches files between `PRIVATE` and `PUBLIC`.
 - **Drag-and-Drop**: Whole-page drag-and-drop overlay with batch file detection.
 
-### 🔔 Sharing & Notifications
+### 🔔 Sharing & Permissions Management
+- **"Shared with Me" Dashboard (`/shared`)**: Dedicated view for all files shared with the user by other VaultDrive accounts.
+- **"Shared by Me" Dashboard (`/shared-by-me`)**: Dedicated management dashboard for all files shared outward by the user—featuring `PUBLIC LINK` badges (with 1-click **Copy Link**) and `SHARED WITH N USERS` badges with quick access to permissions, preview, and access revocation.
 - **Public Share Links**: 64-character hex share tokens for unauthenticated access at `/share/:shareToken`.
 - **User-to-User Sharing**: Share files directly with registered users by username or email.
 - **Access Guards**: Public links and shared-with-me access are suspended while a file is in Trash.
 - **Notifications**: Alerts for `FILE_SHARED`, `ACCESS_REVOKED`, and `STORAGE_WARNING` (at 80% quota usage).
+
+### 🧹 Automatic Token Lifecycle & Database Cleanup
+- **Render-Optimized Startup Sweeper**: Automatically executes global expired refresh token cleanup on server boot, handling Render Free Tier sleep/wake cycles with 0 manual intervention.
+- **Continuous 24-Hour Schedule**: Scheduled maintenance interval for active server sessions.
+- **In-Session Pruning**: Authenticating sessions (login, register, Google OAuth, token refresh) prune stale tokens for that user before generating new tokens.
 
 ### 👁️ Inline Media Previews
 - Previews for images, video, audio, PDFs, text, and code files via React portals.
@@ -136,9 +143,19 @@ flowchart TD
 ### 📊 Storage & Analytics Dashboard
 - **Visual Analytics Page (`/storage`)**: Category highlight cards (Documents, Images, Media, Other Files), circular SVG donut ring chart, and free space indicators.
 - **High-Performance SQL Aggregation**: Dedicated `GET /api/v1/files/storage-stats` calculates quota and category breakdown directly inside PostgreSQL via raw SQL `GROUP BY` aggregations, replacing in-memory file loops.
+- **Smooth Skeleton Loader**: Tailored `<StorageSkeleton />` matching page geometry to eliminate layout shifts on initial data load.
 
-### 🛡️ Custom Branded Loading Screen
-- **Orbital Vault Mechanism**: Full-screen startup animation featuring rotating orbital rings, 3D glassmorphic emblem, and status beams during session verification and route authorization.
+### 🛡️ Unified Golden Vault Loading System
+- **Orbital Vault Mechanism**: Full-screen animation featuring rotating orbital rings, 3D glassmorphic emblem, and status beams.
+- **Universal Loading Consistency**: Standardized with custom contextual messages across:
+  - **App Boot / Route Authorization** (*"Verifying vault access..."*)
+  - **Session Logout** (*"Locking your vault…"*)
+  - **Public File Decryption** (*"Decrypting shared vault file…"*)
+
+### 📜 Modular Landing Page & Legal Compliance
+- **Decoupled Architecture**: Landing page modularized into 6 focused subcomponents (`LandingNavbar`, `HeroSection`, `CoreBenefits`, `ComparisonMatrix`, `FaqSection`, `LandingFooter`).
+- **Legal Compliance**: Full dark-mode **Terms of Service** (`/terms`) and **Privacy Policy** (`/privacy`) pages with legal consent integration on user registration.
+- **Route Navigation Helper**: `ScrollToTop` ensures instant top-of-page rendering when navigating between marketing, legal, and application pages.
 
 ### 🌐 SEO, PWA & Search Privacy
 - **Search Metadata**: Open Graph, Twitter Cards, and Schema.org `SoftwareApplication` structured JSON-LD for rich social share previews.
@@ -153,6 +170,7 @@ flowchart TD
 | :--- | :--- |
 | **HTTP Headers** | `helmet()` with CSP whitelisting `self` and `https://res.cloudinary.com`. HSTS enabled in production. |
 | **Authentication** | Dual-token JWT; refresh tokens stored as bcrypt hashes. Access token delivered exclusively via HttpOnly secure cookie (no JSON body exposure). |
+| **Token Lifecycle Cleanup** | Global expired token sweep on server boot (for Render sleep cycles), continuous 24h interval, and per-user stale token purge on session auth. |
 | **Session Invalidation**| Password changes purge all existing refresh token records for the user across all devices. |
 | **Trash Access Guard** | Public share links, shared-with-me, and permanent delete endpoints return `404` for non-trashed or unauthorized assets. |
 | **Input Sanitization** | `sanitizeFilename()` strips path traversal and invalid characters before upload. |
@@ -300,6 +318,7 @@ Open `http://localhost:5173` in your browser.
 | `PATCH` | `/api/v1/files/:id` | 🔒 Protected | Rename file or update properties |
 | `DELETE` | `/api/v1/files/:id` | 🔒 Protected | Move file to Trash |
 | `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared with current user |
+| `GET` | `/api/v1/files/shared-by-me` | 🔒 Protected | List files shared outward by current user (public or with specific users) |
 | `GET` | `/api/v1/files/share/:shareToken` | Public | Access file via public share token |
 | `POST` | `/api/v1/files/:id/share-link` | 🔒 Protected | Generate public share link |
 | `DELETE` | `/api/v1/files/:id/share-link` | 🔒 Protected | Revoke public share link |
