@@ -9,6 +9,7 @@ export default function FileCard({
   viewMode = "grid",
   onTogglePrivacy,
   onOpenShare,
+  onRename,
   onDelete,
   onPreview,
 }) {
@@ -131,6 +132,18 @@ export default function FileCard({
                 >
                   Share Options
                 </button>
+                {onRename && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onRename(file);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                  >
+                    Rename File
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {
@@ -225,6 +238,18 @@ export default function FileCard({
                 >
                   Share Options
                 </button>
+                {onRename && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onRename(file);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                  >
+                    Rename File
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => {

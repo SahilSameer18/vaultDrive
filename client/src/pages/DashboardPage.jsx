@@ -12,6 +12,7 @@ import ShareModal from "../components/file/ShareModal";
 import FilePreviewModal from "../components/file/FilePreviewModal";
 import CreateFolderModal from "../components/folder/CreateFolderModal";
 import RenameFolderModal from "../components/folder/RenameFolderModal";
+import RenameFileModal from "../components/file/RenameFileModal";
 import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 import FileSortDropdown from "../components/file/FileSortDropdown";
 import PaginationControls from "../components/ui/PaginationControls";
@@ -27,10 +28,11 @@ export default function DashboardPage() {
   const [shareFile, setShareFile]             = useState(null);
   const [previewFile, setPreviewFile]         = useState(null);
   const [renameFolderTarget, setRenameFolderTarget] = useState(null);
+  const [renameFileTarget, setRenameFileTarget]     = useState(null);
   const [deleteTarget, setDeleteTarget]       = useState(null);
 
   const { folders, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(null);
-  const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, uploadFile, togglePrivacy, deleteFile, updateFileInState } = useFiles(null);
+  const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, uploadFile, togglePrivacy, deleteFile, renameFile, updateFileInState } = useFiles(null);
 
   useEffect(() => {
     const handleUploadEvent = () => {
@@ -66,6 +68,18 @@ export default function DashboardPage() {
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch (err) {
       const msg = err.response?.data?.message || err.message || "Failed to rename folder";
+      addToast(msg, "error");
+      throw err;
+    }
+  };
+
+  const handleRenameFile = async (fileId, newName) => {
+    try {
+      await renameFile(fileId, newName);
+      addToast(`File renamed to "${newName}"`, "success");
+      window.dispatchEvent(new CustomEvent("vault:files-changed"));
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to rename file";
       addToast(msg, "error");
       throw err;
     }
@@ -223,6 +237,7 @@ export default function DashboardPage() {
           onTogglePrivacy={handleTogglePrivacy}
           onOpenShare={(file) => setShareFile(file)}
           onPreviewFile={(file) => setPreviewFile(file)}
+          onRenameFile={(file) => setRenameFileTarget(file)}
           onDeleteFile={(fileId) => {
             const f = files.find((item) => item.id === fileId);
             setDeleteTarget({ type: "file", item: f || { id: fileId, name: "File" } });
@@ -297,6 +312,13 @@ export default function DashboardPage() {
         onClose={() => setRenameFolderTarget(null)}
         folder={renameFolderTarget}
         onRenameFolder={handleRenameFolder}
+      />
+
+      <RenameFileModal
+        isOpen={!!renameFileTarget}
+        onClose={() => setRenameFileTarget(null)}
+        file={renameFileTarget}
+        onRenameFile={handleRenameFile}
       />
 
       <DeleteConfirmModal

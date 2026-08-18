@@ -103,6 +103,16 @@ export function useFiles(folderId = null) {
     setFiles((prev) => prev.filter((f) => f.id !== fileId));
   };
 
+  // Rename file
+  const renameFile = async (fileId, newName) => {
+    const res = await filesApi.update(fileId, { name: newName });
+    const updatedFile = res.data.data.file;
+    setFiles((prev) =>
+      prev.map((f) => (f.id === fileId ? { ...f, ...updatedFile } : f))
+    );
+    return updatedFile;
+  };
+
   // Update single file in state (e.g. after ShareModal update)
   const updateFileInState = (updatedFile) => {
     setFiles((prev) =>
@@ -127,6 +137,7 @@ export function useFiles(folderId = null) {
     uploadFile,
     togglePrivacy,
     deleteFile,
+    renameFile,
     updateFileInState,
   };
 }

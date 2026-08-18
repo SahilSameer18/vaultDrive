@@ -7,6 +7,7 @@ export default function FileGrid({
   viewMode = "grid",
   onTogglePrivacy,
   onOpenShare,
+  onRenameFile,
   onDeleteFile,
   onRenameFolder,
   onDeleteFolder,
@@ -117,6 +118,7 @@ export default function FileGrid({
                 viewMode={viewMode}
                 onTogglePrivacy={onTogglePrivacy}
                 onOpenShare={onOpenShare}
+                onRename={onRenameFile}
                 onDelete={onDeleteFile}
                 onPreview={onPreviewFile}
               />
