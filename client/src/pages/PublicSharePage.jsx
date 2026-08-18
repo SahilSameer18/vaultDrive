@@ -5,6 +5,7 @@ import { FileCategoryIcon } from "../utils/fileIcons";
 import { formatBytes, formatDate } from "../utils/formatters";
 import { handleFileDownload } from "../utils/download";
 import FilePreviewModal from "../components/file/FilePreviewModal";
+import VaultLoadingScreen from "../components/ui/VaultLoadingScreen";
 
 export default function PublicSharePage() {
   const { shareToken } = useParams();
@@ -28,6 +29,16 @@ export default function PublicSharePage() {
       }
     })();
   }, [shareToken]);
+
+  if (loading) {
+    return (
+      <VaultLoadingScreen
+        message="Decrypting shared vault file…"
+        headerTag="✦ Encrypted File Access ✦"
+        footerTag="Verified Safe & Protected"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-vault-bg text-vault-text font-sans flex flex-col justify-between relative selection:bg-vault-accent/30">
@@ -66,12 +77,7 @@ export default function PublicSharePage() {
       <main className="relative z-10 flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md text-center fade-in">
           
-          {loading ? (
-            <div className="py-12 flex items-center justify-center text-xs font-mono text-vault-muted">
-              <span className="w-2 h-2 rounded-full bg-vault-accent animate-ping mr-2" />
-              Decrypting public share link...
-            </div>
-          ) : error ? (
+          {error ? (
             <div className="space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-vault-panel border border-vault-danger/40 flex items-center justify-center text-vault-danger mx-auto">
                 <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">

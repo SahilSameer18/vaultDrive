@@ -1,4 +1,8 @@
-export default function VaultLoadingScreen() {
+export default function VaultLoadingScreen({
+  message = "Verifying vault access...",
+  headerTag = "✦ VaultDrive Encrypted System ✦",
+  footerTag = "End-to-End Secure Storage",
+}) {
   return (
     <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-between bg-vault-bg p-6 select-none font-sans overflow-hidden">
       {/* ── Ambient Background Glows ────────────────────────────────────────── */}
@@ -8,7 +12,7 @@ export default function VaultLoadingScreen() {
       {/* Top Header Label */}
       <div className="w-full flex items-center justify-center pt-4">
         <span className="text-[10px] font-mono tracking-widest text-vault-muted/70 uppercase">
-          ✦ VaultDrive Encrypted System ✦
+          {headerTag}
         </span>
       </div>
 
@@ -40,7 +44,7 @@ export default function VaultLoadingScreen() {
           </h1>
           <p className="text-xs font-mono text-vault-muted flex items-center justify-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-vault-accent animate-ping" />
-            Verifying vault access...
+            {message}
           </p>
         </div>
 
@@ -56,7 +60,7 @@ export default function VaultLoadingScreen() {
         <svg className="w-3.5 h-3.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        <span>End-to-End Secure Storage</span>
+        <span>{footerTag}</span>
       </div>
 
     </div>

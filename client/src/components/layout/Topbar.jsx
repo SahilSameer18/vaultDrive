@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useSearch } from "../../context/SearchContext";
 import NotificationDropdown from "./NotificationDropdown";
+import VaultLoadingScreen from "../ui/VaultLoadingScreen";
 
 export default function Topbar({ onToggleMobileMenu }) {
   const { user, logout } = useAuth();
@@ -67,22 +68,11 @@ export default function Topbar({ onToggleMobileMenu }) {
       {/* ── Full-screen logout overlay via portal ──────────────────────────── */}
       {loggingOut &&
         createPortal(
-          <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/80 backdrop-blur-md select-none">
-            <div className="flex flex-col items-center gap-5 p-8 sm:p-10 rounded-2xl border border-vault-border bg-vault-panel shadow-2xl">
-              <div className="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-2 border-vault-accent/30 border-t-vault-accent animate-spin" />
-                <svg className="w-6 h-6 text-vault-accent" viewBox="0 0 24 24" fill="none">
-                  <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-                  <circle cx="12" cy="16" r="1.5" fill="currentColor" />
-                </svg>
-              </div>
-              <div className="text-center space-y-1">
-                <p className="text-sm font-semibold text-vault-text">Signing out</p>
-                <p className="text-xs font-mono text-vault-muted">Locking your vault…</p>
-              </div>
-            </div>
-          </div>,
+          <VaultLoadingScreen
+            message="Locking your vault…"
+            headerTag="✦ Session Termination ✦"
+            footerTag="Encrypted Session Closed"
+          />,
           document.body
         )}
 

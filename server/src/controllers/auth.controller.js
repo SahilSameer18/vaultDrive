@@ -19,6 +19,14 @@ const getCookieOptions = () => ({
 
 // Generate JWT tokens and save hashed refresh token in database
 const generateAndStoreTokens = async (userId) => {
+  // Prune any stale/expired tokens belonging to this user
+  await prisma.refreshToken.deleteMany({
+    where: {
+      userId,
+      expiresAt: { lt: new Date() },
+    },
+  });
+
   const accessToken = generateAccessToken(userId);
   const refreshToken = generateRefreshToken(userId);
 

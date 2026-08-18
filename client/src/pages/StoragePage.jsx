@@ -4,6 +4,82 @@ import { filesApi } from "../api/files.api";
 import { useAuth } from "../context/AuthContext";
 import { formatBytes } from "../utils/formatters";
 
+function StorageSkeleton() {
+  return (
+    <div className="space-y-8 animate-fade-in-up">
+      {/* 4 Category Highlight Skeleton Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="p-4 rounded-2xl border border-vault-border/50 bg-vault-panel/40 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2.5">
+              <div className="skeleton w-8 h-8 rounded-xl" />
+              <div className="skeleton h-4 w-24 rounded" />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="skeleton h-3 w-12 rounded" />
+                <div className="skeleton h-3 w-16 rounded" />
+              </div>
+              <div className="skeleton h-1.5 w-full rounded-full" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Main Details Section */}
+      <div className="space-y-4">
+        <div className="skeleton h-6 w-36 rounded" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          {/* Left Donut Card */}
+          <div className="lg:col-span-5 p-6 sm:p-8 rounded-2xl border border-vault-border/50 bg-vault-panel/40 flex flex-col items-center justify-center relative min-h-[300px]">
+            <div className="relative w-44 h-44 rounded-full border-8 border-vault-surface skeleton flex items-center justify-center">
+              <div className="w-28 h-28 rounded-full bg-vault-panel flex flex-col items-center justify-center space-y-1.5">
+                <div className="skeleton h-5 w-16 rounded" />
+                <div className="skeleton h-3 w-12 rounded" />
+              </div>
+            </div>
+            <div className="skeleton h-3 w-32 rounded mt-4" />
+          </div>
+
+          {/* Right 4 Detail Tiles + Free space */}
+          <div className="lg:col-span-7 flex flex-col justify-between gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="p-4 rounded-xl border border-vault-border/50 bg-vault-panel/40 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="skeleton w-3 h-3 rounded-full" />
+                    <div className="space-y-1.5">
+                      <div className="skeleton h-3.5 w-20 rounded" />
+                      <div className="skeleton h-2.5 w-12 rounded" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5 text-right">
+                    <div className="skeleton h-3.5 w-14 rounded ml-auto" />
+                    <div className="skeleton h-2.5 w-8 rounded ml-auto" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Free space banner skeleton */}
+            <div className="p-4 rounded-xl border border-vault-border/50 bg-vault-panel/40 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="skeleton w-3 h-3 rounded-full" />
+                <div className="space-y-1.5">
+                  <div className="skeleton h-3.5 w-32 rounded" />
+                  <div className="skeleton h-2.5 w-20 rounded" />
+                </div>
+              </div>
+              <div className="skeleton h-4 w-16 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function StoragePage() {
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
@@ -77,8 +153,13 @@ export default function StoragePage() {
         </p>
       </div>
 
-      {/* ── 4 Category Highlight Cards ────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ── Content Viewport: Skeleton vs Data ─────────────────────────────── */}
+      {loading ? (
+        <StorageSkeleton />
+      ) : (
+        <>
+          {/* ── 4 Category Highlight Cards ────────────────────────────────────── */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* 1. Documents Card */}
         <div className="p-4 rounded-2xl border border-sky-500/20 bg-sky-500/5 flex flex-col justify-between space-y-4 shadow-sm">
@@ -374,8 +455,10 @@ export default function StoragePage() {
         </div>
 
       </div>
+    </>
+  )}
 
-    </div>
+</div>
   );
 }
 
