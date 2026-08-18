@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Topbar from "./components/layout/Topbar";
 import Sidebar from "./components/layout/Sidebar";
@@ -13,8 +13,40 @@ import {
 
 export default function AppLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("vault:sidebar_collapsed") === "true";
+    } catch {
+      return false;
+    }
+  });
+
   const location = useLocation();
   const { addToast } = useToast();
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("vault:sidebar_collapsed", String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  };
+
+  // Keyboard shortcut Ctrl+B or Cmd+B to toggle sidebar on desktop
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   // Extract folderId from URL if user is inside /folder/:folderId
   const folderMatch = location.pathname.match(/\/folder\/([^/]+)/);
@@ -60,14 +92,25 @@ export default function AppLayout() {
       <DropzoneOverlay onFileDropped={handleDroppedFiles} />
 
       {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
-      <Topbar onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)} />
+      <Topbar
+        onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
+        sidebarCollapsed={sidebarCollapsed}
+        onToggleSidebar={toggleSidebar}
+      />
 
       {/* ── Body: Sidebar + Main Content Viewport ────────────────────────── */}
       <div className="flex-1 flex overflow-hidden relative">
         
-        {/* Desktop Sidebar (Permanent) */}
-        <div className="hidden lg:block h-full">
-          <Sidebar />
+        {/* Desktop Sidebar (Permanent Collapsible) */}
+        <div
+          className={`hidden lg:block h-full shrink-0 transition-[width] duration-200 ease-out overflow-hidden ${
+            sidebarCollapsed ? "w-[72px]" : "w-64 xl:w-72"
+          }`}
+        >
+          <Sidebar
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={toggleSidebar}
+          />
         </div>
 
         {/* Mobile Drawer Overlay (Slide in on mobile toggle) */}
@@ -104,4 +147,6 @@ export default function AppLayout() {
     </div>
   );
 }
+
+
 

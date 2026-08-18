@@ -65,11 +65,11 @@ export default function SharedWithMePage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {sharedFiles.map((file) => (
             <div
               key={file.id}
-              className="p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-all flex flex-col justify-between"
+              className="p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-[border-color,box-shadow] duration-150 flex flex-col justify-between"
             >
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div className="w-10 h-10 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center">

@@ -117,14 +117,14 @@ export default function SharedByMePage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {sharedFiles.map((file) => {
             const hasUsers = file.sharedWith && file.sharedWith.length > 0;
 
             return (
               <div
                 key={file.id}
-                className="p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-all flex flex-col justify-between group shadow-sm"
+                className="p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-[border-color,box-shadow] duration-150 flex flex-col justify-between group shadow-sm"
               >
                 {/* Top Info */}
                 <div>

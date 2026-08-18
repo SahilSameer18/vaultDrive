@@ -6,7 +6,7 @@ import { useSearch } from "../../context/SearchContext";
 import NotificationDropdown from "./NotificationDropdown";
 import VaultLoadingScreen from "../ui/VaultLoadingScreen";
 
-export default function Topbar({ onToggleMobileMenu }) {
+export default function Topbar({ onToggleMobileMenu, sidebarCollapsed = false, onToggleSidebar }) {
   const { user, logout } = useAuth();
   const { searchQuery, setSearchQuery } = useSearch();
   const [profileOpen, setProfileOpen] = useState(false);

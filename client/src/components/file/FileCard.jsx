@@ -35,7 +35,7 @@ export default function FileCard({
   if (viewMode === "list") {
     return (
       <div
-        className={`group relative flex items-center justify-between gap-4 p-3 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 hover:bg-vault-panel/80 transition-all duration-200 select-none animate-fade-in-up ${
+        className={`group relative flex items-center justify-between gap-4 p-3 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 hover:bg-vault-panel/80 transition-[border-color,background-color] duration-150 select-none ${
           menuOpen ? "z-40" : "z-0"
         }`}
       >
@@ -165,7 +165,7 @@ export default function FileCard({
   // Grid View
   return (
     <div
-      className={`group relative p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/50 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 flex flex-col justify-between select-none animate-fade-in-up ${
+      className={`group relative p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/50 hover:-translate-y-1 hover:shadow-xl transition-[border-color,transform,box-shadow] duration-150 flex flex-col justify-between select-none ${
         menuOpen ? "z-40" : "z-0"
       }`}
     >

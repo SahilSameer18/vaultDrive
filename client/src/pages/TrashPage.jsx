@@ -217,7 +217,7 @@ export default function TrashPage() {
                 Folders ({folders.length})
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {folders.map((folder) => {
                   const isProcessing = actionLoading === folder.id;
                   const totalSub = (folder._count?.files || 0) + (folder._count?.children || 0);
@@ -225,7 +225,7 @@ export default function TrashPage() {
                   return (
                     <div
                       key={folder.id}
-                      className="p-4 rounded-xl border border-vault-border bg-vault-panel/60 hover:border-vault-accent/40 transition-all flex flex-col justify-between group relative"
+                      className="p-4 rounded-xl border border-vault-border bg-vault-panel/60 hover:border-vault-accent/40 transition-[border-color,background-color] duration-150 flex flex-col justify-between group relative"
                     >
                       {/* Top: Folder Info */}
                       <div
@@ -287,14 +287,14 @@ export default function TrashPage() {
                 Files ({files.length})
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {files.map((file) => {
                   const isProcessing = actionLoading === file.id;
 
                   return (
                     <div
                       key={file.id}
-                      className="p-4 rounded-xl border border-vault-border bg-vault-panel/60 hover:border-vault-accent/40 transition-all flex flex-col justify-between group"
+                      className="p-4 rounded-xl border border-vault-border bg-vault-panel/60 hover:border-vault-accent/40 transition-[border-color,background-color] duration-150 flex flex-col justify-between group"
                     >
                       {/* Top: File Info */}
                       <div className="flex items-start gap-3">

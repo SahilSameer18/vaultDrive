@@ -25,14 +25,14 @@ export default function FileGrid({
           <div
             className={
               viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5"
                 : "space-y-2"
             }
           >
             {folders.map((folder) => (
               <div
                 key={folder.id}
-                className="group relative flex items-center justify-between p-3.5 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/50 transition-all select-none"
+                className="group relative flex items-center justify-between p-3.5 rounded-xl border border-vault-border bg-vault-panel hover:border-vault-accent/50 transition-[border-color,background-color] duration-150 select-none"
               >
                 <Link
                   to={`/folder/${folder.id}`}
@@ -60,7 +60,7 @@ export default function FileGrid({
                         e.stopPropagation();
                         onRenameFolder(folder);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-vault-muted hover:text-vault-accent hover:bg-vault-surface transition-all"
+                      className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1.5 rounded-lg text-vault-muted hover:text-vault-accent hover:bg-vault-surface transition-all cursor-pointer"
                       title="Rename Folder"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
@@ -78,7 +78,7 @@ export default function FileGrid({
                         e.stopPropagation();
                         onDeleteFolder(folder);
                       }}
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-vault-muted hover:text-vault-danger hover:bg-vault-danger/10 transition-all"
+                      className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-1.5 rounded-lg text-vault-muted hover:text-vault-danger hover:bg-vault-danger/10 transition-all cursor-pointer"
                       title="Delete Folder"
                     >
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
@@ -107,7 +107,7 @@ export default function FileGrid({
           <div
             className={
               viewMode === "grid"
-                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
                 : "space-y-2"
             }
           >
