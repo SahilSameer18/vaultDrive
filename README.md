@@ -131,12 +131,22 @@ flowchart TD
 ### 👁️ Inline Media Previews
 - Previews for images, video, audio, PDFs, text, and code files via React portals.
 
+### 🏷️ File Renaming with Extension Protection
+- **Extension Isolation**: Dedicated renaming interface splits filename into editable base name and locked extension badge, preventing accidental corruption of file type associations upon download.
+- **In-Place Reactivity**: State updates in-place across directory trees without requiring full page refetches.
+
+### 👤 Account Profile & Security Management
+- **Profile Updates**: Direct username modification (`PATCH /api/v1/auth/profile`) with real-time uniqueness validation.
+- **Dual-Mode Password Security**: Google OAuth users can set a password to enable hybrid (Google + Email/Password) login. Existing password users must verify their current password via bcrypt before updating (`PATCH /api/v1/auth/change-password`).
+- **Session Revocation**: Changing a password automatically purges all active refresh tokens in the database, signing out all other active devices.
+- **Dynamic Account Badging**: Badges detect and display authentication type (`Google Account`, `VaultDrive Account`, or `Demo Account`) alongside password status.
+
 ### 📊 Storage & Analytics Dashboard
 - **Visual Analytics Page (`/storage`)**: Category highlight cards (Documents, Images, Media, Other Files), circular SVG donut ring chart, and free space indicators.
-- **Lightweight Storage Stats API**: Dedicated `GET /api/v1/files/storage-stats` calculates quota and category breakdown in PostgreSQL, eliminating client-side file over-fetching.
+- **High-Performance SQL Aggregation**: Dedicated `GET /api/v1/files/storage-stats` calculates quota and category breakdown directly inside PostgreSQL via raw SQL `GROUP BY` aggregations, replacing in-memory file loops.
 
-### 👤 Account Profile
-- Profile page (`/profile`) displaying username, email, membership rank, and active session status.
+### 🛡️ Custom Branded Loading Screen
+- **Orbital Vault Mechanism**: Full-screen startup animation featuring rotating orbital rings, 3D glassmorphic emblem, and status beams during session verification and route authorization.
 
 ### 🌐 SEO, PWA & Search Privacy
 - **Search Metadata**: Open Graph, Twitter Cards, and Schema.org `SoftwareApplication` structured JSON-LD for rich social share previews.
@@ -150,8 +160,9 @@ flowchart TD
 | Layer | Implementation Details |
 | :--- | :--- |
 | **HTTP Headers** | `helmet()` with CSP whitelisting `self` and `https://res.cloudinary.com`. HSTS enabled in production. |
-| **Authentication** | Dual-token JWT; refresh tokens stored as bcrypt hashes (cost 10). |
-| **Trash Access Guard** | Public share links and shared-with-me endpoints return `404` for trashed files. |
+| **Authentication** | Dual-token JWT; refresh tokens stored as bcrypt hashes. Access token delivered exclusively via HttpOnly secure cookie (no JSON body exposure). |
+| **Session Invalidation**| Password changes purge all existing refresh token records for the user across all devices. |
+| **Trash Access Guard** | Public share links, shared-with-me, and permanent delete endpoints return `404` for non-trashed or unauthorized assets. |
 | **Input Sanitization** | `sanitizeFilename()` strips path traversal and invalid characters before upload. |
 | **Payload Validation** | Zod schemas validate request body, query, and params via shared middleware. |
 | **Access Control (IDOR)** | `file.userId === req.user.id` verified on mutating operations. |
@@ -273,6 +284,8 @@ Open `http://localhost:5173` in your browser.
 | `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token, issue access token |
 | `POST` | `/api/v1/auth/logout` | 🔒 Protected | Revoke token and clear cookies |
 | `GET` | `/api/v1/auth/me` | 🔒 Protected | Get current user profile |
+| `PATCH` | `/api/v1/auth/profile` | 🔒 Protected | Update profile username |
+| `PATCH` | `/api/v1/auth/change-password` | 🔒 Protected | Set or change password with verification |
 
 ### Folders
 
@@ -364,4 +377,5 @@ Notification
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
+
 
