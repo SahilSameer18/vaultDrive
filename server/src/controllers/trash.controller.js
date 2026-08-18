@@ -209,8 +209,8 @@ export const deletePermanently = async (req, res, next) => {
 
     if (type === "folder") {
       const folder = await prisma.folder.findUnique({ where: { id } });
-      if (!folder || folder.userId !== userId) {
-        throw new ApiError(404, "Folder not found");
+      if (!folder || folder.userId !== userId || !folder.deletedAt) {
+        throw new ApiError(404, "Trashed folder not found");
       }
 
       // Collect all descendant folder IDs and files
@@ -245,8 +245,8 @@ export const deletePermanently = async (req, res, next) => {
     } else {
       // Single file permanent deletion
       const file = await prisma.file.findUnique({ where: { id } });
-      if (!file || file.userId !== userId) {
-        throw new ApiError(404, "File not found");
+      if (!file || file.userId !== userId || !file.deletedAt) {
+        throw new ApiError(404, "Trashed file not found");
       }
 
       // Destroy Cloudinary asset

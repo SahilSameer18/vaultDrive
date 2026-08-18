@@ -90,7 +90,7 @@ export const register = async (req, res, next) => {
       .json(
         new ApiResponse(
           201,
-          { user, accessToken },
+          { user },
           "User registered successfully"
         )
       );
@@ -152,7 +152,7 @@ export const login = async (req, res, next) => {
       .json(
         new ApiResponse(
           200,
-          { user: userWithoutPassword, accessToken },
+          { user: userWithoutPassword },
           "Login successful"
         )
       );
@@ -396,7 +396,7 @@ export const googleLogin = async (req, res, next) => {
       .json(
         new ApiResponse(
           200,
-          { user: userWithoutPassword, accessToken },
+          { user: userWithoutPassword },
           "Google login successful"
         )
       );
@@ -459,7 +459,7 @@ export const demoLogin = async (req, res, next) => {
       .json(
         new ApiResponse(
           200,
-          { user: userWithoutPassword, accessToken },
+          { user: userWithoutPassword },
           "Demo login successful"
         )
       );

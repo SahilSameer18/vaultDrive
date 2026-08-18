@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { NavLink, useLocation, Link } from "react-router-dom";
+import { NavLink, useLocation, Link, useNavigate } from "react-router-dom";
 import { filesApi } from "../../api/files.api";
 import { foldersApi } from "../../api/folders.api";
 import { useAuth } from "../../context/AuthContext";
@@ -17,6 +17,7 @@ export default function Sidebar({ onCloseMobileMenu }) {
   const [allFolders, setAllFolders] = useState([]);
   const [totalStorageBytes, setTotalStorageBytes] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const loadStatsAndFolders = useCallback(async () => {
     try {
@@ -75,7 +76,7 @@ export default function Sidebar({ onCloseMobileMenu }) {
           }
         }
         if (isCurrentOrDescendant) {
-          window.location.href = "/dashboard";
+          navigate("/dashboard");
         }
       }
     } finally {

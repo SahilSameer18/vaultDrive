@@ -100,7 +100,7 @@ export default function StoragePage() {
             <div className="h-1.5 w-full rounded-full bg-vault-surface overflow-hidden">
               <div
                 className="h-full bg-sky-400 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(docPct > 0 ? 3 : 0, docPct * 5))}%` }}
+                style={{ width: `${Math.min(100, Math.max(docPct > 0 ? 3 : 0, docPct))}%` }}
               />
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function StoragePage() {
             <div className="h-1.5 w-full rounded-full bg-vault-surface overflow-hidden">
               <div
                 className="h-full bg-emerald-400 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(imgPct > 0 ? 3 : 0, imgPct * 5))}%` }}
+                style={{ width: `${Math.min(100, Math.max(imgPct > 0 ? 3 : 0, imgPct))}%` }}
               />
             </div>
           </div>
@@ -152,7 +152,7 @@ export default function StoragePage() {
             <div className="h-1.5 w-full rounded-full bg-vault-surface overflow-hidden">
               <div
                 className="h-full bg-amber-400 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(mediaPct > 0 ? 3 : 0, mediaPct * 5))}%` }}
+                style={{ width: `${Math.min(100, Math.max(mediaPct > 0 ? 3 : 0, mediaPct))}%` }}
               />
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function StoragePage() {
             <div className="h-1.5 w-full rounded-full bg-vault-surface overflow-hidden">
               <div
                 className="h-full bg-purple-400 rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, Math.max(archivePct > 0 ? 3 : 0, archivePct * 5))}%` }}
+                style={{ width: `${Math.min(100, Math.max(archivePct > 0 ? 3 : 0, archivePct))}%` }}
               />
             </div>
           </div>

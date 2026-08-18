@@ -135,8 +135,8 @@ export default function ProfilePage() {
                 }`}
               >
                 <span
-                  className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
-                    emailNotifs ? "left-4.5" : "left-0.5"
+                  className={`w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-transform ${
+                    emailNotifs ? "translate-x-4" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -156,8 +156,8 @@ export default function ProfilePage() {
                 }`}
               >
                 <span
-                  className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform ${
-                    autoPrivate ? "left-4.5" : "left-0.5"
+                  className={`w-4 h-4 rounded-full bg-white absolute top-0.5 left-0.5 transition-transform ${
+                    autoPrivate ? "translate-x-4" : "translate-x-0"
                   }`}
                 />
               </button>

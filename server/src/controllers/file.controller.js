@@ -226,12 +226,14 @@ export const getFileById = async (req, res, next) => {
       },
     });
 
+    // Declare isOwner before the guard to avoid use-before-declaration (ReferenceError in strict mode)
+    const isOwner = file?.userId === userId;
+
     if (!file || (file.deletedAt && !isOwner)) {
       throw new ApiError(404, "File not found or has been moved to trash");
     }
 
     // Check authorization: Owner OR Public OR Shared with User
-    const isOwner = file.userId === userId;
     const isPublic = file.isPublic;
 
     let isShared = false;
@@ -628,11 +630,26 @@ export const getStorageStats = async (req, res, next) => {
       parseFloat(((totalBytes / TOTAL_QUOTA_BYTES) * 100).toFixed(1))
     );
 
-    // 2. Fetch category breakdown with small select (mimeType, size)
-    const files = await prisma.file.findMany({
-      where: { userId, deletedAt: null },
-      select: { mimeType: true, size: true },
-    });
+    // 2. Aggregate category breakdown via a single SQL GROUP BY (no JS iteration over all files)
+    const categoryRows = await prisma.$queryRaw`
+      SELECT
+        CASE
+          WHEN "mimeType" LIKE 'image/%' THEN 'image'
+          WHEN "mimeType" LIKE 'video/%' OR "mimeType" LIKE 'audio/%' THEN 'media'
+          WHEN lower("mimeType") LIKE '%pdf%'
+            OR lower("mimeType") LIKE '%word%'
+            OR lower("mimeType") LIKE '%document%'
+            OR lower("mimeType") LIKE '%text%'
+            OR lower("mimeType") LIKE '%sheet%'
+            OR lower("mimeType") LIKE '%presentation%' THEN 'doc'
+          ELSE 'archive'
+        END AS category,
+        COALESCE(SUM(size), 0)::bigint AS bytes,
+        COUNT(id)::bigint AS count
+      FROM "File"
+      WHERE "userId" = ${userId} AND "deletedAt" IS NULL
+      GROUP BY category
+    `;
 
     const categories = {
       image: { bytes: 0, count: 0 },
@@ -641,28 +658,12 @@ export const getStorageStats = async (req, res, next) => {
       archive: { bytes: 0, count: 0 },
     };
 
-    for (const f of files) {
-      const mime = (f.mimeType || "").toLowerCase();
-      const size = f.size || 0;
-      if (mime.startsWith("image/")) {
-        categories.image.bytes += size;
-        categories.image.count += 1;
-      } else if (mime.startsWith("video/") || mime.startsWith("audio/")) {
-        categories.media.bytes += size;
-        categories.media.count += 1;
-      } else if (
-        mime.includes("pdf") ||
-        mime.includes("word") ||
-        mime.includes("document") ||
-        mime.includes("text") ||
-        mime.includes("sheet") ||
-        mime.includes("presentation")
-      ) {
-        categories.doc.bytes += size;
-        categories.doc.count += 1;
-      } else {
-        categories.archive.bytes += size;
-        categories.archive.count += 1;
+    // Prisma returns BigInt for SQL aggregates — convert to Number for JSON serialisation
+    for (const row of categoryRows) {
+      const key = row.category;
+      if (categories[key] !== undefined) {
+        categories[key].bytes = Number(row.bytes);
+        categories[key].count = Number(row.count);
       }
     }
 
