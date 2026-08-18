@@ -7,6 +7,7 @@ import { formatBytes } from "../../utils/formatters";
 import FolderSidebar from "../folder/FolderSidebar";
 import RenameFolderModal from "../folder/RenameFolderModal";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal";
+import UserAvatar from "../ui/UserAvatar";
 
 const TOTAL_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB Quota
 
@@ -131,9 +132,7 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
           onClick={onCloseMobileMenu}
           className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl bg-vault-surface/60 border border-vault-border/60 hover:border-vault-accent/50 transition-colors"
         >
-          <div className="w-8 h-8 rounded-lg bg-vault-accent/15 border border-vault-accent/40 flex items-center justify-center text-vault-accent font-mono font-bold text-xs">
-            {user?.username?.charAt(0)?.toUpperCase() || "V"}
-          </div>
+          <UserAvatar user={user} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-vault-text truncate">{user?.username || "Vault User"}</p>
             <p className="text-[10px] font-mono text-vault-muted truncate">{user?.email}</p>

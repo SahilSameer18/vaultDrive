@@ -8,6 +8,7 @@ import {
   googleLogin,
   updateProfile,
   changePassword,
+  updateAvatar,
 } from "../controllers/auth.controller.js";
 import {
   registerSchema,
@@ -15,6 +16,7 @@ import {
   googleLoginSchema,
   updateProfileSchema,
   changePasswordSchema,
+  updateAvatarSchema,
 } from "../validators/auth.validator.js";
 import validate from "../middlewares/validate.middleware.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
@@ -34,9 +36,6 @@ router.post("/login", loginLimiter, validate(loginSchema), login);
 // Authenticate Google OAuth ID token (rate limited to 10 failed req/15m)
 router.post("/google", loginLimiter, validate(googleLoginSchema), googleLogin);
 
-
-
-
 // Rotate refresh token and issue new access token
 router.post("/refresh", refresh);
 
@@ -49,9 +48,10 @@ router.get("/me", authenticate, getMe);
 // Update profile (username)
 router.patch("/profile", authenticate, validate(updateProfileSchema), updateProfile);
 
+// Update profile picture (avatar)
+router.patch("/avatar", authenticate, validate(updateAvatarSchema), updateAvatar);
+
 // Set or change password (SET for OAuth users, CHANGE for password accounts)
 router.patch("/change-password", authenticate, validate(changePasswordSchema), changePassword);
 
 export default router;
-
-

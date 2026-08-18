@@ -8,6 +8,31 @@ export const filesApi = {
   // Confirm completed Cloudinary upload and save record to DB
   confirmUpload: (data) => api.post("/files/confirm-upload", data),
 
+  // Upload user avatar image directly to Cloudinary without creating a file record in Vault
+  uploadAvatarToCloudinary: async (file) => {
+    const signRes = await api.post("/files/sign-upload", {
+      filename: file.name,
+      mimeType: file.type || "image/jpeg",
+      size: file.size,
+    });
+
+    const { signature, timestamp, apiKey, cloudName, folder, publicId } =
+      signRes.data.data;
+
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", apiKey);
+    formData.append("timestamp", timestamp);
+    formData.append("signature", signature);
+    formData.append("folder", folder);
+    formData.append("public_id", publicId);
+
+    const res = await axios.post(uploadUrl, formData);
+    return res.data.secure_url || res.data.url;
+  },
+
   // Perform direct Cloudinary upload (single for <10MB, chunked for ≥10MB)
   uploadDirectToCloudinary: async (file, folderId = null, onUploadProgress = null, signal = null) => {
     // 1. Get presigned HMAC upload parameters from backend

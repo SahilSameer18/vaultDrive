@@ -53,3 +53,11 @@ export const changePasswordSchema = z.object({
       path: ["confirmPassword"],
     }),
 });
+
+// Validation schema for updating user avatar
+export const updateAvatarSchema = z.object({
+  body: z.object({
+    avatarUrl: z.string().url("Invalid avatar URL").optional().nullable(),
+  }),
+});
+

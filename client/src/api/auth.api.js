@@ -9,4 +9,5 @@ export const authApi = {
   refresh: () => api.post("/auth/refresh"),
   updateProfile: (data) => api.patch("/auth/profile", data),
   changePassword: (data) => api.patch("/auth/change-password", data),
+  updateAvatar: (data) => api.patch("/auth/avatar", data),
 };

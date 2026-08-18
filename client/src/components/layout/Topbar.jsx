@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useSearch } from "../../context/SearchContext";
 import NotificationDropdown from "./NotificationDropdown";
 import VaultLoadingScreen from "../ui/VaultLoadingScreen";
+import UserAvatar from "../ui/UserAvatar";
 
 export default function Topbar({ onToggleMobileMenu, sidebarCollapsed = false, onToggleSidebar }) {
   const { user, logout } = useAuth();
@@ -213,9 +214,7 @@ export default function Topbar({ onToggleMobileMenu, sidebarCollapsed = false, o
                     aria-label="User Account Menu"
                   >
                     {/* User Avatar Circle */}
-                    <div className="w-7 h-7 rounded-lg bg-vault-accent/15 border border-vault-accent/40 flex items-center justify-center text-vault-accent font-mono font-bold text-xs shadow-sm">
-                      {user?.username?.charAt(0)?.toUpperCase() || "V"}
-                    </div>
+                    <UserAvatar user={user} size="sm" />
 
                     {/* Subtle Dropdown Chevron */}
                     <svg
@@ -233,9 +232,12 @@ export default function Topbar({ onToggleMobileMenu, sidebarCollapsed = false, o
                   {profileOpen && (
                     <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-2xl border border-vault-border bg-vault-panel/95 backdrop-blur-xl shadow-2xl p-2 z-50 animate-scale-up">
                       {/* User Info Header Card */}
-                      <div className="p-3 rounded-xl bg-vault-surface/60 border border-vault-border/50 mb-2">
-                        <p className="text-xs font-bold text-vault-text truncate">{user?.username}</p>
-                        <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>
+                      <div className="p-3 rounded-xl bg-vault-surface/60 border border-vault-border/50 mb-2 flex items-center gap-3">
+                        <UserAvatar user={user} size="md" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-bold text-vault-text truncate">{user?.username}</p>
+                          <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>
+                        </div>
                       </div>
 
                       {/* Navigation Items */}

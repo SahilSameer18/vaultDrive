@@ -138,6 +138,8 @@ flowchart TD
 - **In-Place Reactivity**: State updates in-place across directory trees without requiring full page refetches.
 
 ### 👤 Account Profile & Security Management
+- **Custom Profile Pictures & Avatars**: Upload custom avatar images (`.png`, `.jpg`, `.webp` up to 5MB) directly to Cloudinary from `/profile` (`PATCH /api/v1/auth/avatar`), sync Google profile photos automatically for OAuth users, or revert to initial letter monograms anytime.
+- **Global `<UserAvatar />` Component**: Reusable circular avatar with automatic fallback to gold-accent monogram badges if an image fails to load.
 - **Profile Updates**: Direct username modification (`PATCH /api/v1/auth/profile`) with real-time uniqueness validation.
 - **Dual-Mode Password Security**: Google OAuth users can set a password to enable hybrid (Google + Email/Password) login. Existing password users must verify their current password via bcrypt before updating (`PATCH /api/v1/auth/change-password`).
 - **Session Revocation**: Changing a password automatically purges all active refresh tokens in the database, signing out all other active devices.
@@ -296,6 +298,7 @@ Open `http://localhost:5173` in your browser.
 | `POST` | `/api/v1/auth/logout` | 🔒 Protected | Revoke token and clear cookies |
 | `GET` | `/api/v1/auth/me` | 🔒 Protected | Get current user profile |
 | `PATCH` | `/api/v1/auth/profile` | 🔒 Protected | Update profile username |
+| `PATCH` | `/api/v1/auth/avatar` | 🔒 Protected | Update or remove profile picture avatar |
 | `PATCH` | `/api/v1/auth/change-password` | 🔒 Protected | Set or change password with verification |
 
 ### Folders

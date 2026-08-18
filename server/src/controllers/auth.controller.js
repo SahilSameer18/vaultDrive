@@ -494,3 +494,36 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
+// ─── Update / Remove Avatar ──────────────────────────────────────────────────
+export const updateAvatar = async (req, res, next) => {
+  try {
+    const { avatarUrl } = req.body;
+    const userId = req.user.id;
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl: avatarUrl ? avatarUrl.trim() : null },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatarUrl: true,
+        createdAt: true,
+        passwordHash: true,
+      },
+    });
+
+    const { passwordHash, ...user } = updated;
+    const message = avatarUrl
+      ? "Profile picture updated successfully"
+      : "Profile picture removed successfully";
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { user: { ...user, hasPassword: !!passwordHash } }, message));
+  } catch (error) {
+    next(error);
+  }
+};
+
+

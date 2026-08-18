@@ -35,9 +35,9 @@ export function ToastProvider({ children }) {
                 : "bg-vault-panel border-vault-accent/40 text-vault-text"
             }`}
           >
-            <div className="flex items-center gap-2 min-w-0">
+            <div className="flex items-start gap-2.5 min-w-0 flex-1">
               <span
-                className={`w-2 h-2 rounded-full shrink-0 ${
+                className={`w-2 h-2 rounded-full shrink-0 mt-1 ${
                   toast.type === "error"
                     ? "bg-vault-danger"
                     : toast.type === "success"
@@ -45,7 +45,7 @@ export function ToastProvider({ children }) {
                     : "bg-vault-accent"
                 }`}
               />
-              <span className="truncate">{toast.message}</span>
+              <span className="break-words leading-relaxed flex-1">{toast.message}</span>
             </div>
             <button
               type="button"

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../components/ui/Toast";
 import { authApi } from "../api/auth.api";
 import { filesApi } from "../api/files.api";
 import { formatDate, formatBytes } from "../utils/formatters";
+import UserAvatar from "../components/ui/UserAvatar";
 
 // ─── Deterministic avatar colour based on username ────────────────────────────
 const AVATAR_COLOURS = [
@@ -101,6 +102,10 @@ export default function ProfilePage() {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
+  // ── Avatar Upload state ───────────────────────────────────────────────────
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
+
   // ── Edit Username state ───────────────────────────────────────────────────
   const [username, setUsername] = useState(user?.username || "");
   const [usernameError, setUsernameError] = useState("");
@@ -144,6 +149,50 @@ export default function ProfilePage() {
     : 0;
 
   // ── Handlers ──────────────────────────────────────────────────────────────
+  const handleAvatarFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+
+    if (!file.type.startsWith("image/")) {
+      addToast("Please select a valid image file (PNG, JPG, WebP)", "error");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      addToast("Avatar image must be under 5MB", "error");
+      return;
+    }
+
+    setUploadingAvatar(true);
+    addToast("Uploading profile picture...", "info");
+    try {
+      const avatarUrl = await filesApi.uploadAvatarToCloudinary(file);
+      if (!avatarUrl) throw new Error("Cloudinary did not return a valid image URL");
+      const res = await authApi.updateAvatar({ avatarUrl });
+      updateUser(res.data.data.user);
+      addToast("Profile picture updated successfully!", "success");
+    } catch (err) {
+      const msg = err.response?.data?.message || err.message || "Failed to upload profile picture";
+      addToast(msg, "error");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    setUploadingAvatar(true);
+    try {
+      const res = await authApi.updateAvatar({ avatarUrl: null });
+      updateUser(res.data.data.user);
+      addToast("Profile picture removed", "success");
+    } catch (err) {
+      const msg = err.response?.data?.message || "Failed to remove profile picture";
+      addToast(msg, "error");
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSaveUsername = async () => {
     setUsernameError("");
     if (!usernameValid) {
@@ -225,18 +274,80 @@ export default function ProfilePage() {
         {/* Ambient glow */}
         <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full bg-vault-accent/8 blur-3xl pointer-events-none" />
 
-        {/* Avatar */}
-        <div className="relative shrink-0">
-          <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white font-mono font-bold text-3xl shadow-2xl border border-white/10`}>
-            {user?.username?.charAt(0)?.toUpperCase() || "V"}
-          </div>
-          <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-vault-success border-2 border-vault-panel shadow-md" title="Active session" />
+        {/* Hidden File Input for Avatar Upload */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif"
+          onChange={handleAvatarFileSelect}
+          className="hidden"
+        />
+
+        {/* Interactive Avatar with Camera Upload Badge */}
+        <div className="relative group shrink-0">
+          <UserAvatar user={user} size="2xl" className="shadow-2xl border-2 border-vault-accent/50" />
+
+          {/* Camera Upload Button Overlay on Hover */}
+          <button
+            type="button"
+            disabled={uploadingAvatar}
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white cursor-pointer disabled:cursor-not-allowed"
+            title="Upload new profile picture"
+          >
+            {uploadingAvatar ? (
+              <span className="text-[10px] font-mono text-vault-accent animate-pulse">Uploading...</span>
+            ) : (
+              <>
+                <svg className="w-5 h-5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                  <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.75"/>
+                </svg>
+                <span className="text-[9px] font-mono mt-0.5 text-vault-text">Change</span>
+              </>
+            )}
+          </button>
+
+          <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-vault-success border-2 border-vault-panel shadow-md" title="Active session" />
         </div>
 
-        {/* Info */}
-        <div className="flex-1 text-center sm:text-left min-w-0 space-y-1">
-          <h2 className="text-xl sm:text-2xl font-bold text-vault-text truncate">{user?.username || "—"}</h2>
-          <p className="text-xs font-mono text-vault-muted truncate">{user?.email}</p>
+        {/* Info & Avatar Actions */}
+        <div className="flex-1 text-center sm:text-left min-w-0 space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-vault-text truncate">{user?.username || "—"}</h2>
+              <p className="text-xs font-mono text-vault-muted truncate">{user?.email}</p>
+            </div>
+
+            {/* Avatar Action Buttons */}
+            <div className="flex items-center justify-center sm:justify-start gap-2 pt-1 sm:pt-0">
+              <button
+                type="button"
+                disabled={uploadingAvatar}
+                onClick={() => fileInputRef.current?.click()}
+                className="px-3 py-1.5 rounded-xl border border-vault-border bg-vault-surface hover:border-vault-accent/50 text-vault-text hover:text-vault-accent text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              >
+                <svg className="w-3.5 h-3.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.75"/>
+                </svg>
+                {uploadingAvatar ? "Uploading..." : "Upload Photo"}
+              </button>
+
+              {user?.avatarUrl && (
+                <button
+                  type="button"
+                  disabled={uploadingAvatar}
+                  onClick={handleRemoveAvatar}
+                  className="px-3 py-1.5 rounded-xl border border-vault-danger/30 bg-vault-danger/10 hover:bg-vault-danger/20 text-vault-danger text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  title="Remove custom photo and revert to monogram"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          </div>
+
           <p className="text-[11px] font-mono text-vault-muted pt-1">
             Member since {user?.createdAt ? formatDate(user.createdAt) : "—"}
           </p>
