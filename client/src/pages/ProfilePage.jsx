@@ -278,7 +278,7 @@ export default function ProfilePage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif"
+          accept="image/png,image/jpeg,image/webp"
           onChange={handleAvatarFileSelect}
           className="hidden"
         />

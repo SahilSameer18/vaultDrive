@@ -23,6 +23,7 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 import {
   registerLimiter,
   loginLimiter,
+  avatarLimiter,
 } from "../middlewares/rateLimit.middleware.js";
 
 const router = Router();
@@ -48,8 +49,8 @@ router.get("/me", authenticate, getMe);
 // Update profile (username)
 router.patch("/profile", authenticate, validate(updateProfileSchema), updateProfile);
 
-// Update profile picture (avatar)
-router.patch("/avatar", authenticate, validate(updateAvatarSchema), updateAvatar);
+// Update profile picture (avatar, rate limited to 15 req/15m)
+router.patch("/avatar", authenticate, avatarLimiter, validate(updateAvatarSchema), updateAvatar);
 
 // Set or change password (SET for OAuth users, CHANGE for password accounts)
 router.patch("/change-password", authenticate, validate(changePasswordSchema), changePassword);

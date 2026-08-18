@@ -139,6 +139,7 @@ flowchart TD
 
 ### 👤 Account Profile & Security Management
 - **Custom Profile Pictures & Avatars**: Upload custom avatar images (`.png`, `.jpg`, `.webp` up to 5MB) directly to Cloudinary from `/profile` (`PATCH /api/v1/auth/avatar`), sync Google profile photos automatically for OAuth users, or revert to initial letter monograms anytime.
+- **Server-Side Avatar Guards**: Backend validates `mimeType` against strict static image formats (`image/jpeg`, `image/png`, `image/webp`), caps avatar signatures at 5MB, and rate limits avatar changes to **4 uploads per 1 hour**.
 - **Global `<UserAvatar />` Component**: Reusable circular avatar with automatic fallback to gold-accent monogram badges if an image fails to load.
 - **Profile Updates**: Direct username modification (`PATCH /api/v1/auth/profile`) with real-time uniqueness validation.
 - **Dual-Mode Password Security**: Google OAuth users can set a password to enable hybrid (Google + Email/Password) login. Existing password users must verify their current password via bcrypt before updating (`PATCH /api/v1/auth/change-password`).

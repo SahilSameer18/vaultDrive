@@ -31,3 +31,12 @@ export const loginLimiter = rateLimit({
   },
 });
 
+// Rate limiter for Avatar updates (4 attempts per 1 hour)
+export const avatarLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 4,
+  message: {
+    success: false,
+    message: "Too many avatar updates. You can change your profile picture at most 4 times per hour.",
+  },
+});

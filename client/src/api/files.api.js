@@ -14,6 +14,7 @@ export const filesApi = {
       filename: file.name,
       mimeType: file.type || "image/jpeg",
       size: file.size,
+      purpose: "avatar",
     });
 
     const { signature, timestamp, apiKey, cloudName, folder, publicId } =

@@ -12,8 +12,25 @@ const TOTAL_STORAGE_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB (1,073,741,824
 // Generate Cloudinary presigned upload parameters & HMAC signature for direct client uploads
 export const getSignUpload = async (req, res, next) => {
   try {
-    const { filename, mimeType, size, folderId } = req.body;
+    const { filename, mimeType, size, folderId, purpose } = req.body;
     const userId = req.user.id;
+    const uploadSize = size || 0;
+
+    // 1. Avatar-specific limitations (Max 5MB, Image types only)
+    if (purpose === "avatar") {
+      const allowedAvatarMimes = ["image/jpeg", "image/png", "image/webp"];
+      if (!mimeType || !allowedAvatarMimes.includes(mimeType.toLowerCase())) {
+        throw new ApiError(400, "Avatar must be a valid image file (JPEG, PNG, WebP)");
+      }
+      if (uploadSize > 5 * 1024 * 1024) {
+        throw new ApiError(400, "Avatar image size cannot exceed 5 MB");
+      }
+    } else {
+      // General file upload size limit (Max 100 MB per file)
+      if (uploadSize > 100 * 1024 * 1024) {
+        throw new ApiError(400, "Maximum file upload limit is 100 MB per file");
+      }
+    }
 
     // Enforce 1 GB storage quota check before issuing upload signature
     const storageSum = await prisma.file.aggregate({
@@ -21,7 +38,6 @@ export const getSignUpload = async (req, res, next) => {
       _sum: { size: true },
     });
     const currentUsedBytes = storageSum._sum.size || 0;
-    const uploadSize = size || 0;
 
     if (currentUsedBytes + uploadSize > TOTAL_STORAGE_QUOTA_BYTES) {
       const usedMB = (currentUsedBytes / (1024 * 1024)).toFixed(1);
