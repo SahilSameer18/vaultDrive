@@ -107,7 +107,7 @@ function VaultMechanism() {
 }
 
 export default function LoginPage() {
-  const { login, googleLogin, demoLogin } = useAuth();
+  const { login, googleLogin } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -116,7 +116,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -154,22 +153,6 @@ export default function LoginPage() {
   const handleGoogleError = () => {
     setError("Google Sign-In was cancelled or failed.");
     addToast("Google Sign-In was cancelled or failed.", "error");
-  };
-
-  const handleDemoLogin = async () => {
-    try {
-      setError("");
-      setDemoLoading(true);
-      await demoLogin();
-      addToast("Welcome Reviewer! Signed into Demo Workspace.", "success");
-      navigate("/dashboard", { replace: true });
-    } catch (err) {
-      const msg = err.response?.data?.message || "Demo login failed";
-      setError(msg);
-      addToast(msg, "error");
-    } finally {
-      setDemoLoading(false);
-    }
   };
 
 
@@ -338,26 +321,6 @@ export default function LoginPage() {
                 Verifying with server… (may take a moment)
               </div>
             )}
-
-            {/* 1-Click Demo Login for Reviewers */}
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={demoLoading}
-              className="w-full py-3 px-4 rounded-xl text-xs font-semibold text-[#B8935A] bg-[#181B21] border border-[#B8935A]/50 hover:bg-[#B8935A]/10 hover:border-[#B8935A] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md mb-6 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {demoLoading ? (
-                <>
-                  <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
-                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  Signing In…
-                </>
-              ) : (
-                <><span>⚡</span> 1-Click Demo Login (Reviewer Access)</>
-              )}
-            </button>
 
 
 

@@ -246,12 +246,6 @@ export default function Topbar({ onToggleMobileMenu }) {
                       <div className="p-3 rounded-xl bg-vault-surface/60 border border-vault-border/50 mb-2">
                         <p className="text-xs font-bold text-vault-text truncate">{user?.username}</p>
                         <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span className="text-[9px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">
-                            {user?.avatarUrl ? "Google Account" : user?.hasPassword ? "VaultDrive Account" : "Demo Account"}
-                          </span>
-                        </div>
                       </div>
 
                       {/* Navigation Items */}

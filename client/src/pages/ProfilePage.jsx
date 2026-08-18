@@ -234,41 +234,12 @@ export default function ProfilePage() {
         </div>
 
         {/* Info */}
-        <div className="flex-1 text-center sm:text-left min-w-0 space-y-2">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-vault-text truncate">{user?.username || "—"}</h2>
-            <p className="text-xs font-mono text-vault-muted truncate">{user?.email}</p>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-1">
-            {/* Auth method badge — determined by avatarUrl (OAuth) and hasPassword */}
-            {user?.avatarUrl ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-400 text-[11px] font-semibold">
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Google Account
-              </span>
-            ) : user?.hasPassword ? (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-vault-accent/15 border border-vault-accent/30 text-vault-accent text-[11px] font-semibold">
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/></svg>
-                VaultDrive Account
-              </span>
-            ) : (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-vault-muted/15 border border-vault-border text-vault-muted text-[11px] font-semibold">
-                Demo Account
-              </span>
-            )}
-
-            {/* hasPassword chip — for OAuth users who also set a password */}
-            {user?.avatarUrl && user?.hasPassword && (
-              <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-vault-success/15 border border-vault-success/30 text-vault-success text-[11px] font-semibold">
-                + Password Login Enabled
-              </span>
-            )}
-
-            <span className="text-[11px] font-mono text-vault-muted">
-              Member since {user?.createdAt ? formatDate(user.createdAt) : "—"}
-            </span>
-          </div>
+        <div className="flex-1 text-center sm:text-left min-w-0 space-y-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-vault-text truncate">{user?.username || "—"}</h2>
+          <p className="text-xs font-mono text-vault-muted truncate">{user?.email}</p>
+          <p className="text-[11px] font-mono text-vault-muted pt-1">
+            Member since {user?.createdAt ? formatDate(user.createdAt) : "—"}
+          </p>
         </div>
       </div>
 
@@ -453,17 +424,9 @@ export default function ProfilePage() {
               <span className="font-mono text-vault-muted text-[10px] truncate max-w-[140px]">{user?.id?.slice(0, 16)}…</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-vault-border/40">
-              <span className="text-vault-muted font-mono">Auth Method</span>
-              <span className="font-semibold text-vault-text">
-                {user?.avatarUrl ? "Google OAuth" : "Email + Password"}
-              </span>
+              <span className="text-vault-muted font-mono">Email</span>
+              <span className="font-semibold text-vault-text truncate max-w-[180px]">{user?.email || "—"}</span>
             </div>
-            {user?.avatarUrl && user?.hasPassword && (
-              <div className="flex items-center justify-between py-2 border-b border-vault-border/40">
-                <span className="text-vault-muted font-mono">Also Supports</span>
-                <span className="font-semibold text-vault-success text-[11px]">Email + Password ✓</span>
-              </div>
-            )}
             <div className="flex items-center justify-between py-2">
               <span className="text-vault-muted font-mono">Member Since</span>
               <span className="font-semibold text-vault-text">{user?.createdAt ? formatDate(user.createdAt) : "—"}</span>

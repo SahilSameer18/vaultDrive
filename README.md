@@ -12,13 +12,6 @@
 
 ---
 
-## ⚡ Quick Start (Demo Access)
-
-1. Open the [Live Application](https://vaultdrive-s.vercel.app).
-2. Click **`⚡ 1-Click Demo Access`** on the Landing, Login, or Register page to log into a test workspace.
-
----
-
 ## 👨‍💻 Developer & Links
 
 - **Developer**: **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18))
@@ -139,7 +132,6 @@ flowchart TD
 - **Profile Updates**: Direct username modification (`PATCH /api/v1/auth/profile`) with real-time uniqueness validation.
 - **Dual-Mode Password Security**: Google OAuth users can set a password to enable hybrid (Google + Email/Password) login. Existing password users must verify their current password via bcrypt before updating (`PATCH /api/v1/auth/change-password`).
 - **Session Revocation**: Changing a password automatically purges all active refresh tokens in the database, signing out all other active devices.
-- **Dynamic Account Badging**: Badges detect and display authentication type (`Google Account`, `VaultDrive Account`, or `Demo Account`) alongside password status.
 
 ### 📊 Storage & Analytics Dashboard
 - **Visual Analytics Page (`/storage`)**: Category highlight cards (Documents, Images, Media, Other Files), circular SVG donut ring chart, and free space indicators.
@@ -280,7 +272,6 @@ Open `http://localhost:5173` in your browser.
 | `POST` | `/api/v1/auth/register` | Public | Register new account |
 | `POST` | `/api/v1/auth/login` | Public | Login with email/username + password |
 | `POST` | `/api/v1/auth/google` | Public | Authenticate Google OAuth ID Token |
-| `POST` | `/api/v1/auth/demo-login` | Public | 1-Click Demo Login |
 | `POST` | `/api/v1/auth/refresh` | Public | Rotate refresh token, issue access token |
 | `POST` | `/api/v1/auth/logout` | 🔒 Protected | Revoke token and clear cookies |
 | `GET` | `/api/v1/auth/me` | 🔒 Protected | Get current user profile |

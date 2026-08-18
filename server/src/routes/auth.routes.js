@@ -6,7 +6,6 @@ import {
   logout,
   getMe,
   googleLogin,
-  demoLogin,
   updateProfile,
   changePassword,
 } from "../controllers/auth.controller.js";
@@ -34,9 +33,6 @@ router.post("/login", loginLimiter, validate(loginSchema), login);
 
 // Authenticate Google OAuth ID token (rate limited to 10 failed req/15m)
 router.post("/google", loginLimiter, validate(googleLoginSchema), googleLogin);
-
-// 1-Click Demo Login for Reviewers
-router.post("/demo-login", loginLimiter, demoLogin);
 
 
 
