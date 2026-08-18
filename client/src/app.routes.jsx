@@ -13,6 +13,8 @@ import PublicSharePage from "./pages/PublicSharePage";
 import ProfilePage from "./pages/ProfilePage";
 import TrashPage from "./pages/TrashPage";
 import StoragePage from "./pages/StoragePage";
+import TermsPage from "./pages/TermsPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function AppRoutes() {
@@ -22,6 +24,8 @@ export default function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/share/:shareToken" element={<PublicSharePage />} />
 
       {/* ── Protected Vault Routes (AppLayout Shell) ────────────────────── */}

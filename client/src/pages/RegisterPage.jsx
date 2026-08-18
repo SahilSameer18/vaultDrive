@@ -339,6 +339,19 @@ export default function RegisterPage() {
               >
                 {formLoading ? "Creating Account..." : "Create Account"}
               </button>
+
+              {/* Terms and Privacy Consent */}
+              <p className="text-center text-[11px] text-[#8B8F99] mt-2.5 leading-relaxed">
+                By creating an account, you agree to our{" "}
+                <Link to="/terms" className="text-[#B8935A] hover:underline font-medium">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="text-[#B8935A] hover:underline font-medium">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
             </form>
 
             {/* Divider */}
