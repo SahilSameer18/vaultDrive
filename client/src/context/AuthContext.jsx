@@ -56,8 +56,13 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Patch user state in-place after profile/password updates (no re-fetch needed)
+  const updateUser = (updatedFields) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedFields } : prev));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, register, login, googleLogin, demoLogin, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, register, login, googleLogin, demoLogin, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -71,4 +76,3 @@ export function useAuth() {
   if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
   return ctx;
 }
-

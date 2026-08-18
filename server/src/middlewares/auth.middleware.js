@@ -14,7 +14,7 @@ export const authenticate = async (req, res, next) => {
 
     const decoded = verifyAccessToken(token);
 
-    const user = await prisma.user.findUnique({
+    const dbUser = await prisma.user.findUnique({
       where: { id: decoded.id },
       select: {
         id: true,
@@ -22,14 +22,17 @@ export const authenticate = async (req, res, next) => {
         username: true,
         avatarUrl: true,
         createdAt: true,
+        passwordHash: true,
       },
     });
 
-    if (!user) {
+    if (!dbUser) {
       throw new ApiError(401, "Unauthorized: User no longer exists");
     }
 
-    req.user = user;
+    // Expose hasPassword flag without leaking the actual hash
+    const { passwordHash, ...userFields } = dbUser;
+    req.user = { ...userFields, hasPassword: !!passwordHash };
     next();
   } catch (error) {
     if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") {
@@ -38,4 +41,3 @@ export const authenticate = async (req, res, next) => {
     next(error);
   }
 };
-

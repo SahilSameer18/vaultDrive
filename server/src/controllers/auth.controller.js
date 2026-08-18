@@ -468,4 +468,84 @@ export const demoLogin = async (req, res, next) => {
   }
 };
 
+// ─── Update Profile (username) ────────────────────────────────────────────────
+export const updateProfile = async (req, res, next) => {
+  try {
+    const { username } = req.body;
+    const userId = req.user.id;
+
+    // Ensure username is not already taken by another user
+    const existing = await prisma.user.findUnique({ where: { username } });
+    if (existing && existing.id !== userId) {
+      throw new ApiError(409, "Username is already taken");
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { username },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        avatarUrl: true,
+        createdAt: true,
+        passwordHash: true,
+      },
+    });
+
+    const { passwordHash, ...user } = updated;
+
+    return res.status(200).json(
+      new ApiResponse(200, { user: { ...user, hasPassword: !!passwordHash } }, "Profile updated successfully")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ─── Set / Change Password ────────────────────────────────────────────────────
+// SET mode  (OAuth user — no passwordHash): only newPassword + confirmPassword required
+// CHANGE mode (password account)          : currentPassword must be verified first
+export const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, passwordHash: true },
+    });
+
+    if (!user) throw new ApiError(404, "User not found");
+
+    if (user.passwordHash) {
+      // CHANGE mode — current password is required and must be correct
+      if (!currentPassword) {
+        throw new ApiError(400, "Current password is required to change your password");
+      }
+      const isValid = await bcrypt.compare(currentPassword, user.passwordHash);
+      if (!isValid) {
+        throw new ApiError(401, "Current password is incorrect");
+      }
+    }
+
+    // Hash new password and save
+    const newHash = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: newHash },
+    });
+
+    // Invalidate all existing refresh tokens (forces re-login on all other devices)
+    await prisma.refreshToken.deleteMany({ where: { userId } });
+
+    const message = user.passwordHash
+      ? "Password changed successfully. Other sessions have been signed out."
+      : "Password set successfully. You can now sign in with your email and password.";
+
+    return res.status(200).json(new ApiResponse(200, null, message));
+  } catch (error) {
+    next(error);
+  }
+};
 

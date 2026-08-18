@@ -8,4 +8,6 @@ export const authApi = {
   logout: () => api.post("/auth/logout"),
   getMe: () => api.get("/auth/me"),
   refresh: () => api.post("/auth/refresh"),
+  updateProfile: (data) => api.patch("/auth/profile", data),
+  changePassword: (data) => api.patch("/auth/change-password", data),
 };

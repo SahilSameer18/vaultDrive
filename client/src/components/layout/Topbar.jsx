@@ -248,7 +248,9 @@ export default function Topbar({ onToggleMobileMenu }) {
                         <p className="text-[10px] font-mono text-vault-muted truncate mt-0.5">{user?.email}</p>
                         <div className="mt-2 flex items-center gap-1.5">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          <span className="text-[9px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">Free Starter Plan</span>
+                          <span className="text-[9px] font-mono font-semibold text-emerald-400 uppercase tracking-wider">
+                            {user?.avatarUrl ? "Google Account" : user?.hasPassword ? "VaultDrive Account" : "Demo Account"}
+                          </span>
                         </div>
                       </div>
 

@@ -1,18 +1,21 @@
 import { Router } from "express";
 import {
   register,
-
   login,
   refresh,
   logout,
   getMe,
   googleLogin,
   demoLogin,
+  updateProfile,
+  changePassword,
 } from "../controllers/auth.controller.js";
 import {
   registerSchema,
   loginSchema,
   googleLoginSchema,
+  updateProfileSchema,
+  changePasswordSchema,
 } from "../validators/auth.validator.js";
 import validate from "../middlewares/validate.middleware.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
@@ -47,5 +50,12 @@ router.post("/logout", logout);
 // Fetch current authenticated user profile details
 router.get("/me", authenticate, getMe);
 
+// Update profile (username)
+router.patch("/profile", authenticate, validate(updateProfileSchema), updateProfile);
+
+// Set or change password (SET for OAuth users, CHANGE for password accounts)
+router.patch("/change-password", authenticate, validate(changePasswordSchema), changePassword);
+
 export default router;
+
 
