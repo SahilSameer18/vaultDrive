@@ -6,6 +6,7 @@ import { authApi } from "../api/auth.api";
 import { filesApi } from "../api/files.api";
 import { formatDate, formatBytes } from "../utils/formatters";
 import UserAvatar from "../components/ui/UserAvatar";
+import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 
 // ─── Deterministic avatar colour based on username ────────────────────────────
 const AVATAR_COLOURS = [
@@ -104,6 +105,7 @@ export default function ProfilePage() {
 
   // ── Avatar Upload state ───────────────────────────────────────────────────
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [confirmRemoveAvatarOpen, setConfirmRemoveAvatarOpen] = useState(false);
   const fileInputRef = useRef(null);
 
   // ── Edit Username state ───────────────────────────────────────────────────
@@ -331,14 +333,14 @@ export default function ProfilePage() {
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.75"/>
                 </svg>
-                {uploadingAvatar ? "Uploading..." : "Upload Photo"}
+                {uploadingAvatar ? "Uploading..." : user?.avatarUrl ? "Change Photo" : "Upload Photo"}
               </button>
 
               {user?.avatarUrl && (
                 <button
                   type="button"
                   disabled={uploadingAvatar}
-                  onClick={handleRemoveAvatar}
+                  onClick={() => setConfirmRemoveAvatarOpen(true)}
                   className="px-3 py-1.5 rounded-xl border border-vault-danger/30 bg-vault-danger/10 hover:bg-vault-danger/20 text-vault-danger text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
                   title="Remove custom photo and revert to monogram"
                 >
@@ -616,6 +618,17 @@ export default function ProfilePage() {
           </button>
         </div>
       </Card>
+
+      {/* ── 6 · Remove Avatar Confirmation Modal ──────────────────────── */}
+      <DeleteConfirmModal
+        isOpen={confirmRemoveAvatarOpen}
+        onClose={() => setConfirmRemoveAvatarOpen(false)}
+        title="Remove Profile Picture"
+        description="Are you sure you want to remove your custom profile picture? Your account will revert back to the default monogram avatar."
+        confirmText="Remove Picture"
+        isPermanent={true}
+        onConfirm={handleRemoveAvatar}
+      />
 
     </div>
   );

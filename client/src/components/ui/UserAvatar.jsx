@@ -11,12 +11,10 @@ const SIZE_CLASSES = {
 
 export default function UserAvatar({ user, size = "sm", className = "", showBorder = true }) {
   const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Reset states whenever user avatarUrl updates
+  // Reset error state if avatar URL changes
   useEffect(() => {
     setImageError(false);
-    setImageLoaded(false);
   }, [user?.avatarUrl]);
 
   const sizeClass = SIZE_CLASSES[size] || SIZE_CLASSES.sm;
@@ -25,7 +23,7 @@ export default function UserAvatar({ user, size = "sm", className = "", showBord
     user?.email?.charAt(0)?.toUpperCase() ||
     "V";
 
-  const hasAvatarUrl = Boolean(user?.avatarUrl);
+  const showImage = Boolean(user?.avatarUrl) && !imageError;
 
   return (
     <div
@@ -33,27 +31,19 @@ export default function UserAvatar({ user, size = "sm", className = "", showBord
         showBorder ? "border border-vault-accent/40" : ""
       } ${className}`}
     >
-      {/* Monogram Fallback (Always mounted as background layer) */}
-      <div className="w-full h-full bg-gradient-to-br from-vault-surface via-vault-panel to-[#14161A] text-vault-accent font-mono font-bold flex items-center justify-center shadow-inner">
-        {initial}
-      </div>
-
-      {/* Real Image (Overlays on top when available and successfully loaded) */}
-      {hasAvatarUrl && !imageError && (
+      {showImage ? (
         <img
+          key={user.avatarUrl}
           src={user.avatarUrl}
           alt={user.username || "User profile"}
           referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
-          onLoad={() => setImageLoaded(true)}
-          onError={() => {
-            setImageError(true);
-            setImageLoaded(false);
-          }}
-          className={`absolute inset-0 w-full h-full object-cover rounded-full transition-opacity duration-200 ${
-            imageLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          onError={() => setImageError(true)}
+          className="w-full h-full object-cover rounded-full"
         />
+      ) : (
+        <div className="w-full h-full bg-gradient-to-br from-vault-surface via-vault-panel to-[#14161A] text-vault-accent font-mono font-bold flex items-center justify-center shadow-inner">
+          {initial}
+        </div>
       )}
     </div>
   );
