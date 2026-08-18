@@ -101,11 +101,13 @@ flowchart TD
 - **Token Rotation**: Axios interceptor handles `401 Unauthorized` responses and queues concurrent requests during token refresh.
 - **Rate Limiting**: Auth endpoints limited to 10 requests per 15 minutes; global API limited to 500 requests per 15 minutes.
 
-### 📁 Folder Management
+### 📁 Folder & Workspace Navigation
+- **Collapsible Desktop Sidebar (`Ctrl + B`)**: Dual-mode navigation allowing users to toggle between full view (`w-64`) and compact icon-only mode (`w-[72px]`), gaining ~200px of screen real estate with persistent `localStorage` memory and `Ctrl+B` keyboard shortcut.
 - **Directory Tree**: Sidebar directory navigation with expandable nodes, active state tracking, and branch lines.
 - **Nested Hierarchy**: Support for arbitrary folder nesting with breadcrumb navigation.
 - **Single-Query Breadcrumbs**: Breadcrumb paths built from a single indexed database query and in-memory map.
 - **Cycle Prevention**: Ancestor check prevents moving a folder into one of its own descendants.
+- **Mobile-First Touch Ergonomics**: Full-width card layout on phones with 1-touch folder actions (Rename & Move to Trash always visible on mobile, smooth hover on desktop).
 
 ### ⚡ Upload Pipeline & Multi-File Batching
 - **Direct Presigned HMAC Uploads**: Direct browser-to-Cloudinary uploads using HMAC SHA-256 signatures (`sign-upload` → Cloudinary → `confirm-upload`). Server does not buffer file bytes in memory.
