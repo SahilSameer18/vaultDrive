@@ -4,17 +4,35 @@ import { formatBytes, formatDate } from "../../utils/formatters";
 import { getFileCategory } from "../../utils/fileIcons";
 import { handleFileDownload } from "../../utils/download";
 
-// Helper to infer category from filename extension as fallback
-function inferCategory(filename, mimeType) {
-  const primary = getFileCategory(mimeType);
-  if (primary && primary !== "file") return primary;
-
+// Helper to infer preview category from filename extension and mimeType
+function inferCategory(filename = "", mimeType = "") {
   const ext = filename?.split(".").pop()?.toLowerCase();
-  if (["png", "jpg", "jpeg", "webp", "gif", "svg"].includes(ext)) return "image";
-  if (["mp4", "webm", "mov", "mkv"].includes(ext)) return "video";
-  if (["mp3", "wav", "ogg", "m4a"].includes(ext)) return "audio";
-  if (ext === "pdf") return "pdf";
-  if (["js", "jsx", "ts", "tsx", "html", "css", "json", "txt", "md", "py", "java"].includes(ext)) return "code";
+  const type = mimeType?.toLowerCase() || "";
+
+  if (["png", "jpg", "jpeg", "webp", "gif", "svg", "bmp", "ico"].includes(ext) || type.startsWith("image/")) return "image";
+  if (["mp4", "webm", "mov", "mkv", "avi"].includes(ext) || type.startsWith("video/")) return "video";
+  if (["mp3", "wav", "ogg", "m4a", "aac", "flac"].includes(ext) || type.startsWith("audio/")) return "audio";
+  if (ext === "pdf" || type.includes("pdf")) return "pdf";
+  if (
+    ["doc", "docx", "xls", "xlsx", "ppt", "pptx", "csv", "rtf", "odt", "ods", "odp"].includes(ext) ||
+    type.includes("word") ||
+    type.includes("officedocument") ||
+    type.includes("excel") ||
+    type.includes("spreadsheet") ||
+    type.includes("powerpoint") ||
+    type.includes("presentation") ||
+    type.includes("msword")
+  ) {
+    return "office";
+  }
+  if (
+    ["js", "jsx", "ts", "tsx", "html", "css", "json", "txt", "md", "py", "java", "c", "cpp", "go", "rs", "sql", "sh", "yaml", "yml", "xml"].includes(ext) ||
+    type.startsWith("text/") ||
+    type.includes("json") ||
+    type.includes("javascript")
+  ) {
+    return "code";
+  }
   return "file";
 }
 
@@ -140,6 +158,12 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
           ) : category === "pdf" ? (
             <iframe
               src={file.url}
+              title={file.name}
+              className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
+            />
+          ) : category === "office" ? (
+            <iframe
+              src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}&embedded=true`}
               title={file.name}
               className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
             />

@@ -130,8 +130,10 @@ flowchart TD
 - **Continuous 24-Hour Schedule**: Scheduled maintenance interval for active server sessions.
 - **In-Session Pruning**: Authenticating sessions (login, register, Google OAuth, token refresh) prune stale tokens for that user before generating new tokens.
 
-### 👁️ Inline Media Previews
-- Previews for images, video, audio, PDFs, text, and code files via React portals.
+### 👁️ Inline Multi-Format Media & Document Previews
+- **Rich In-Browser Media Previews**: React portal overlays for Images (`.png`, `.jpg`, `.webp`, `.svg`, `.gif`), HTML5 Videos (`.mp4`, `.webm`, `.mov`), and Audio (`.mp3`, `.wav`, `.ogg`).
+- **Interactive Document Previews**: Embedded PDF reader and Google Docs Viewer integration for Microsoft Office files (`.docx`, `.xlsx`, `.pptx`, `.csv`, `.doc`, `.xls`, `.ppt`).
+- **Dark Code & Text Reader**: Syntax-friendly preview for code and text files (`.js`, `.jsx`, `.ts`, `.tsx`, `.html`, `.css`, `.json`, `.txt`, `.md`, `.py`, `.java`).
 
 ### 🏷️ File Renaming with Extension Protection
 - **Extension Isolation**: Dedicated renaming interface splits filename into editable base name and locked extension badge, preventing accidental corruption of file type associations upon download.
@@ -393,5 +395,3 @@ Notification
 ## 📜 License & Copyright
 
 Designed and engineered by **Sahil Sameer** ([@SahilSameer18](https://github.com/SahilSameer18)).
-
-

@@ -31,7 +31,12 @@ app.use(
           "https://lh3.googleusercontent.com",
         ],
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
-        frameSrc: ["'self'", "https://res.cloudinary.com"],
+        frameSrc: [
+          "'self'",
+          "https://res.cloudinary.com",
+          "https://docs.google.com",
+          "https://*.google.com",
+        ],
         connectSrc: ["'self'", "https://res.cloudinary.com"],
         upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
       },
@@ -77,5 +82,3 @@ app.use("/api/v1/trash", trashRouter);
 app.use(errorMiddleware);
 
 export default app;
-
-
