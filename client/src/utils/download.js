@@ -1,18 +1,25 @@
 /**
- * Force-downloads a file from a URL (including cross-origin Cloudinary URLs)
- * directly to the user's local hard drive.
+ * Force-downloads a file from a URL (including backend gatekeeper streaming URLs
+ * and authenticated cross-origin Cloudinary URLs) directly to the user's local hard drive.
  */
 export async function handleFileDownload(url, fileName = "download") {
   if (!url) return;
 
   try {
-    // 1. Try Cloudinary URL transformation first (inject fl_attachment flag)
     let downloadUrl = url;
-    if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
-      downloadUrl = url.replace("/upload/", "/upload/fl_attachment/");
+
+    // 1. If it's a backend gatekeeper streaming URL, append ?action=download to enforce attachment headers
+    if (downloadUrl.includes("/content") || downloadUrl.includes("/share/")) {
+      const separator = downloadUrl.includes("?") ? "&" : "?";
+      if (!downloadUrl.includes("action=download")) {
+        downloadUrl += `${separator}action=download`;
+      }
+    } else if (downloadUrl.includes("res.cloudinary.com") && downloadUrl.includes("/upload/")) {
+      // 2. Cloudinary direct URL transformation for dashboard (inject fl_attachment flag)
+      downloadUrl = downloadUrl.replace("/upload/", "/upload/fl_attachment/");
     }
 
-    // 2. Fetch binary blob and force browser download
+    // 3. Fetch binary blob and trigger native save
     const response = await fetch(downloadUrl, { mode: "cors" });
     if (!response.ok) throw new Error("Fetch failed");
 
@@ -30,10 +37,16 @@ export async function handleFileDownload(url, fileName = "download") {
     setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
   } catch (err) {
     console.warn("Direct blob download fallback triggered:", err);
-    // Fallback: force open in new window if blob fetch is blocked
-    const fallbackUrl = url.includes("res.cloudinary.com") && url.includes("/upload/")
-      ? url.replace("/upload/", "/upload/fl_attachment/")
-      : url;
+    // Fallback: force trigger download in new window/tab
+    let fallbackUrl = url;
+    if (fallbackUrl.includes("/content") || fallbackUrl.includes("/share/")) {
+      const separator = fallbackUrl.includes("?") ? "&" : "?";
+      if (!fallbackUrl.includes("action=download")) {
+        fallbackUrl += `${separator}action=download`;
+      }
+    } else if (fallbackUrl.includes("res.cloudinary.com") && fallbackUrl.includes("/upload/")) {
+      fallbackUrl = fallbackUrl.replace("/upload/", "/upload/fl_attachment/");
+    }
     window.open(fallbackUrl, "_blank");
   }
 }

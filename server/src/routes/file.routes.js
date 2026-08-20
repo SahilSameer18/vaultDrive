@@ -14,6 +14,7 @@ import {
   getSharedWithMe,
   getSharedByMe,
   getByShareToken,
+  streamSharedFileContent,
   getStorageStats,
 } from "../controllers/file.controller.js";
 import {
@@ -27,8 +28,10 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-// PUBLIC Endpoint — Access file via shareable token (no authentication required)
+// PUBLIC Endpoints — Access file metadata and secure streaming via shareable token (no auth required)
 router.get("/share/:shareToken", getByShareToken);
+router.get("/share/:shareToken/content", streamSharedFileContent);
+router.head("/share/:shareToken/content", streamSharedFileContent);
 
 // All endpoints below require user authentication
 router.use(authenticate);

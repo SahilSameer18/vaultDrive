@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { filesApi } from "../api/files.api";
 import { FileCategoryIcon } from "../utils/fileIcons";
@@ -7,28 +7,54 @@ import { handleFileDownload } from "../utils/download";
 import FilePreviewModal from "../components/file/FilePreviewModal";
 import VaultLoadingScreen from "../components/ui/VaultLoadingScreen";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
+const API_ORIGIN = API_URL.replace(/\/api\/v1\/?$/, "");
+
+const resolveContentUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${API_ORIGIN}${url.startsWith("/") ? "" : "/"}${url}`;
+};
+
 export default function PublicSharePage() {
   const { shareToken } = useParams();
   const [file, setFile] = useState(null);
+  const [contentUrl, setContentUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const hasRetriedRef = useRef(false);
+
+  const fetchShareMetadata = useCallback(async () => {
+    try {
+      const res = await filesApi.getByShareToken(shareToken);
+      const rawFile = res.data.data.file;
+      const rawContentUrl = res.data.data.contentUrl;
+      const resolvedUrl = resolveContentUrl(rawContentUrl);
+      setFile(rawFile);
+      setContentUrl(resolvedUrl);
+      return resolvedUrl;
+    } catch (err) {
+      setError(err.response?.data?.message || "Public share link is invalid or has been revoked.");
+      return null;
+    }
+  }, [shareToken]);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
       setError(null);
-      try {
-        const res = await filesApi.getByShareToken(shareToken);
-        // Backend returns: new ApiResponse(200, { file }, "Public file retrieved successfully")
-        setFile(res.data.data.file);
-      } catch (err) {
-        setError(err.response?.data?.message || "Public share link is invalid or has been revoked.");
-      } finally {
-        setLoading(false);
-      }
+      await fetchShareMetadata();
+      setLoading(false);
     })();
-  }, [shareToken]);
+  }, [fetchShareMetadata]);
+
+  // Transparent single-retry token refresher on 401/403 expiration
+  const handleRefreshContentUrl = async () => {
+    if (hasRetriedRef.current) return null;
+    hasRetriedRef.current = true;
+    return await fetchShareMetadata();
+  };
 
   if (loading) {
     return (
@@ -68,7 +94,7 @@ export default function PublicSharePage() {
 
           <span className="px-2.5 py-1 text-[10px] font-mono text-vault-success bg-vault-success/10 border border-vault-success/30 rounded-full flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-vault-success" />
-            PUBLIC SHARE REPOSITORY
+            SECURED GATEKEEPER ACCESS
           </span>
         </div>
       </header>
@@ -100,7 +126,7 @@ export default function PublicSharePage() {
                   <FileCategoryIcon mimetype={file.mimeType} className="w-6 h-6" />
                 </div>
                 <span className="px-2.5 py-1 rounded border border-vault-success/30 bg-vault-success/10 text-[10px] font-mono text-vault-success">
-                  PUBLIC ACCESS
+                  SECURE SHARE
                 </span>
               </div>
 
@@ -120,13 +146,13 @@ export default function PublicSharePage() {
                 <button
                   type="button"
                   onClick={() => setPreviewOpen(true)}
-                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold border border-vault-border bg-vault-surface text-vault-text hover:border-vault-accent transition-colors"
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold border border-vault-border bg-vault-surface text-vault-text hover:border-vault-accent transition-colors cursor-pointer"
                 >
                   Preview File
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleFileDownload(file.url, file.name)}
+                  onClick={() => handleFileDownload(contentUrl, file.name)}
                   className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Download
@@ -148,7 +174,8 @@ export default function PublicSharePage() {
         <FilePreviewModal
           isOpen={previewOpen}
           onClose={() => setPreviewOpen(false)}
-          file={file}
+          file={{ ...file, url: contentUrl }}
+          onRefreshUrl={handleRefreshContentUrl}
         />
       )}
 

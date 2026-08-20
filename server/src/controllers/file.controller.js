@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import jwt from "jsonwebtoken";
+import { Readable } from "node:stream";
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
@@ -6,6 +8,14 @@ import {
   generateUploadSignature,
   deleteFromCloudinary,
 } from "../utils/cloudinary.upload.js";
+
+const getShareSecret = () => {
+  const secret = process.env.SHARE_ACCESS_TOKEN_SECRET;
+  if (!secret) {
+    throw new ApiError(500, "Server misconfiguration: SHARE_ACCESS_TOKEN_SECRET must be set");
+  }
+  return secret;
+};
 
 const TOTAL_STORAGE_QUOTA_BYTES = 1 * 1024 * 1024 * 1024; // 1 GB (1,073,741,824 bytes)
 
@@ -628,7 +638,7 @@ export const getSharedByMe = async (req, res, next) => {
   }
 };
 
-// PUBLIC access to view/download file using share token (no authentication required)
+// PUBLIC access to view file metadata using share token (no authentication required, never exposes raw CDN url)
 export const getByShareToken = async (req, res, next) => {
   try {
     const { shareToken } = req.params;
@@ -646,9 +656,102 @@ export const getByShareToken = async (req, res, next) => {
       throw new ApiError(404, "Share link not found, revoked, or file moved to trash");
     }
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, { file }, "Public file retrieved successfully"));
+    // 1. Mint 1-hour short-lived access JWT scoped to this exact shareToken
+    const accessToken = jwt.sign(
+      { shareToken: file.shareToken, type: "share_access" },
+      getShareSecret(),
+      { expiresIn: "1h" }
+    );
+
+    // 2. Return sanitized metadata without raw Cloudinary URL or publicId
+    const { url, publicId, ...safeFile } = file;
+    const contentUrl = `/api/v1/files/share/${file.shareToken}/content?access=${accessToken}`;
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { file: safeFile, contentUrl },
+        "Public file retrieved successfully"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GATEKEEPER ENDPOINT — Streams file bytes securely or returns HEAD status probe
+export const streamSharedFileContent = async (req, res, next) => {
+  try {
+    const { shareToken } = req.params;
+    const { access, action, download } = req.query;
+
+    // 1. Token validation (runs identically for both GET and HEAD)
+    if (!access) {
+      throw new ApiError(401, "Access token required");
+    }
+
+    let decoded;
+    try {
+      decoded = jwt.verify(access, getShareSecret());
+    } catch {
+      throw new ApiError(401, "Access token expired or invalid");
+    }
+
+    if (decoded.type !== "share_access" || decoded.shareToken !== shareToken) {
+      throw new ApiError(403, "Invalid access token: token does not match this file");
+    }
+
+    // 2. File state validation in database (runs for both GET and HEAD)
+    const file = await prisma.file.findUnique({ where: { shareToken } });
+    if (!file || !file.isPublic || file.deletedAt) {
+      throw new ApiError(404, "This file is no longer available, revoked, or moved to trash");
+    }
+
+    // 3. Security & Caching Headers
+    res.setHeader("Content-Type", file.mimeType || "application/octet-stream");
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+
+    const isDownload = action === "download" || download === "true";
+    const dispositionType = isDownload ? "attachment" : "inline";
+    const asciiSafeName = file.name.replace(/[^\x20-\x7E]/g, "_").replace(/"/g, '\\"');
+    res.setHeader(
+      "Content-Disposition",
+      `${dispositionType}; filename="${asciiSafeName}"; filename*=UTF-8''${encodeURIComponent(file.name)}`
+    );
+
+    // 4. HEAD request short-circuits here after validation passes
+    if (req.method === "HEAD") {
+      if (file.size) res.setHeader("Content-Length", file.size);
+      return res.status(200).end();
+    }
+
+    // 5. GET streams raw bytes directly from Cloudinary server-side (with Range header support for video/audio seek & buffer)
+    const fetchHeaders = {};
+    if (req.headers.range) {
+      fetchHeaders.range = req.headers.range;
+    }
+
+    const response = await fetch(file.url, { headers: fetchHeaders });
+    if (!response.ok && response.status !== 206) {
+      throw new ApiError(502, "Failed to retrieve asset from storage provider");
+    }
+
+    res.setHeader("Accept-Ranges", "bytes");
+
+    if (response.status === 206) {
+      res.status(206);
+      const contentRange = response.headers.get("content-range");
+      if (contentRange) {
+        res.setHeader("Content-Range", contentRange);
+      }
+    }
+
+    const contentLength = response.headers.get("content-length");
+    if (contentLength) {
+      res.setHeader("Content-Length", contentLength);
+    }
+
+    Readable.fromWeb(response.body).pipe(res);
   } catch (error) {
     next(error);
   }

@@ -36,11 +36,18 @@ function inferCategory(filename = "", mimeType = "") {
   return "file";
 }
 
-export default function FilePreviewModal({ isOpen, onClose, file }) {
+export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }) {
   const [textContent, setTextContent] = useState("");
   const [loadingText, setLoadingText] = useState(false);
+  const [mediaError, setMediaError] = useState(false);
 
   const category = file ? inferCategory(file.name, file.mimeType) : "file";
+  const isGatekeeperUrl = Boolean(file?.url && (file.url.includes("/share/") || file.url.includes("/content")));
+
+  // Reset error state on file change
+  useEffect(() => {
+    setMediaError(false);
+  }, [file?.url]);
 
   // Global Escape key listener
   useEffect(() => {
@@ -53,12 +60,38 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
+  // Handle media load error via HEAD probe check
+  const handleMediaError = async () => {
+    if (!file?.url) return;
+    try {
+      const check = await fetch(file.url, { method: "HEAD" });
+      if (check.status === 401 || check.status === 403) {
+        if (onRefreshUrl) {
+          const refreshed = await onRefreshUrl();
+          if (refreshed) {
+            setMediaError(false);
+            return;
+          }
+        }
+      }
+      setMediaError(true);
+    } catch {
+      setMediaError(true);
+    }
+  };
+
   // Fetch text file contents if code/text file
   useEffect(() => {
     if (file && (category === "code" || file.mimeType?.includes("text") || file.mimeType?.includes("json"))) {
       setLoadingText(true);
       fetch(file.url)
-        .then((res) => res.text())
+        .then((res) => {
+          if (res.status === 401 || res.status === 403) {
+            handleMediaError();
+            throw new Error("Unauthorized or expired");
+          }
+          return res.text();
+        })
         .then((data) => {
           setTextContent(data.slice(0, 10000));
           setLoadingText(false);
@@ -101,7 +134,7 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
             </div>
           </div>
 
-          {/* Action buttons: Download & Sharp Close Button */}
+          {/* Action buttons: Download & Close Button */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               type="button"
@@ -127,17 +160,40 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
 
         {/* ── Media Preview Body Viewport ─────────────────────────────────── */}
         <div className="flex-1 bg-[#14161A] p-4 overflow-hidden flex items-center justify-center relative">
-          {category === "image" ? (
+          {mediaError ? (
+            <div className="text-center py-12 space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-vault-danger/10 border border-vault-danger/30 flex items-center justify-center text-vault-danger mx-auto">
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 9v4m0 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-vault-text">Unable to load media preview</p>
+                <p className="text-xs text-vault-muted mt-1">Access token may have expired or file was moved to Trash.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleFileDownload(file.url, file.name)}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
+              >
+                Download File Instead
+              </button>
+            </div>
+          ) : category === "image" ? (
             <img
+              key={file.url}
               src={file.url}
               alt={file.name}
+              onError={handleMediaError}
               className="max-h-full max-w-full object-contain rounded-xl shadow-2xl border border-vault-border"
             />
           ) : category === "video" ? (
             <video
+              key={file.url}
               src={file.url}
               controls
               autoPlay
+              onError={handleMediaError}
               className="max-h-full max-w-full rounded-xl shadow-2xl border border-vault-border"
             />
           ) : category === "audio" ? (
@@ -153,20 +209,50 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
                 <h4 className="text-sm font-bold text-vault-text truncate">{file.name}</h4>
                 <p className="text-xs font-mono text-vault-muted mt-1">{formatBytes(file.size)}</p>
               </div>
-              <audio src={file.url} controls className="w-full" />
+              <audio key={file.url} src={file.url} controls onError={handleMediaError} className="w-full" />
             </div>
           ) : category === "pdf" ? (
             <iframe
+              key={file.url}
               src={file.url}
               title={file.name}
+              onError={handleMediaError}
               className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
             />
           ) : category === "office" ? (
-            <iframe
-              src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}&embedded=true`}
-              title={file.name}
-              className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
-            />
+            isGatekeeperUrl ? (
+              // Office docs via Gatekeeper: show protected download card to prevent leaking to third-party Google viewers
+              <div className="text-center py-12 space-y-4">
+                <div className="w-16 h-16 rounded-2xl bg-vault-panel border border-vault-border flex items-center justify-center text-vault-accent mx-auto shadow-lg">
+                  <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke="currentColor" strokeWidth="1.75" />
+                    <path d="M14 2v6h6M8 12h8M8 16h5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-vault-text">Protected Office Document</p>
+                  <p className="text-xs text-vault-muted mt-1 max-w-sm mx-auto">
+                    Direct browser preview is disabled on shared links to keep document contents private. Download to view safely.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleFileDownload(file.url, file.name)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+                  >
+                    Download Document
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <iframe
+                key={file.url}
+                src={`https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}&embedded=true`}
+                title={file.name}
+                className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
+              />
+            )
           ) : category === "code" || file.mimeType?.includes("text") || file.mimeType?.includes("json") ? (
             <div className="w-full h-full p-4 rounded-xl border border-vault-border bg-[#14161A] overflow-auto font-mono text-xs text-[#E8E6E0]">
               {loadingText ? (
@@ -188,15 +274,13 @@ export default function FilePreviewModal({ isOpen, onClose, file }) {
                 <p className="text-xs text-vault-muted mt-1">Download the asset to view its contents on your device.</p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
-                <a
-                  href={file.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
+                <button
+                  type="button"
+                  onClick={() => handleFileDownload(file.url, file.name)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
                 >
                   Download Asset
-                </a>
+                </button>
                 <button
                   type="button"
                   onClick={onClose}

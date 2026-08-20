@@ -118,6 +118,9 @@ flowchart TD
 - **Drag-and-Drop**: Whole-page drag-and-drop overlay with batch file detection.
 
 ### 🔔 Sharing & Permissions Management
+- **Zero-Leak Gatekeeper Streaming Proxy (`/share/:shareToken/content`)**: Public share links never expose raw Cloudinary URLs to the client. Previews and downloads stream server-side through a single gatekeeper checkpoint with short-lived (1-hour), file-scoped JWT access tickets (`?access=<jwt>`), isolated secret verification (`SHARE_ACCESS_TOKEN_SECRET`), live `Content-Length` headers, and `Cache-Control: no-store`.
+- **RFC 5987 / RFC 6266 Headers**: Dual ASCII & UTF-8 filename encoding with conditional `Content-Disposition: attachment` when `?action=download` is passed.
+- **HEAD-Probe Token Auto-Recovery**: Client-side media players transparently probe 401/403 expirations via `HEAD` requests and silently re-mint fresh access tickets without disrupting viewing.
 - **"Shared with Me" Dashboard (`/shared`)**: Dedicated view for all files shared with the user by other VaultDrive accounts.
 - **"Shared by Me" Dashboard (`/shared-by-me`)**: Dedicated management dashboard for all files shared outward by the user—featuring `PUBLIC LINK` badges (with 1-click **Copy Link**) and `SHARED WITH N USERS` badges with quick access to permissions, preview, and access revocation.
 - **Public Share Links**: 64-character hex share tokens for unauthenticated access at `/share/:shareToken`.
@@ -175,7 +178,7 @@ flowchart TD
 
 | Layer | Implementation Details |
 | :--- | :--- |
-| **HTTP Headers** | `helmet()` with CSP whitelisting `self` and `https://res.cloudinary.com`. HSTS enabled in production. |
+| **HTTP Headers** | `helmet()` with tailored CSP whitelisting `self`, `*.cloudinary.com` (for direct uploads, avatars & authenticated in-vault media), `*.googleusercontent.com` (Google avatars), and `docs.google.com` (Office docs viewer). HSTS enabled in production. |
 | **Authentication** | Dual-token JWT; refresh tokens stored as bcrypt hashes. Access token delivered exclusively via HttpOnly secure cookie (no JSON body exposure). |
 | **Token Lifecycle Cleanup** | Global expired token sweep on server boot (for Render sleep cycles), continuous 24h interval, and per-user stale token purge on session auth. |
 | **Session Invalidation**| Password changes purge all existing refresh token records for the user across all devices. |
@@ -249,6 +252,7 @@ DIRECT_URL="postgresql://user:pass@ep-direct.region.aws.neon.tech/neondb?sslmode
 
 ACCESS_TOKEN_SECRET="your-access-token-secret"
 REFRESH_TOKEN_SECRET="your-refresh-token-secret"
+SHARE_ACCESS_TOKEN_SECRET="your-share-access-token-secret"
 ACCESS_TOKEN_EXPIRY="15m"
 REFRESH_TOKEN_EXPIRY="7d"
 
@@ -327,7 +331,8 @@ Open `http://localhost:5173` in your browser.
 | `DELETE` | `/api/v1/files/:id` | 🔒 Protected | Move file to Trash |
 | `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared with current user |
 | `GET` | `/api/v1/files/shared-by-me` | 🔒 Protected | List files shared outward by current user (public or with specific users) |
-| `GET` | `/api/v1/files/share/:shareToken` | Public | Access file via public share token |
+| `GET` | `/api/v1/files/share/:shareToken` | Public | Access file metadata via public share token (zero CDN URL leak) |
+| `GET` | `/api/v1/files/share/:shareToken/content` | Public | Stream secure file bytes / download via Gatekeeper (`?access=<jwt>`, `?action=download`) |
 | `POST` | `/api/v1/files/:id/share-link` | 🔒 Protected | Generate public share link |
 | `DELETE` | `/api/v1/files/:id/share-link` | 🔒 Protected | Revoke public share link |
 | `GET` | `/api/v1/files/:id/share-user` | 🔒 Protected | List users with explicit access |
