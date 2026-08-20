@@ -20,7 +20,8 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: [
           "'self'",
           "data:",
@@ -87,3 +88,4 @@ app.use("/api/v1/trash", trashRouter);
 app.use(errorMiddleware);
 
 export default app;
+
