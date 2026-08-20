@@ -37,7 +37,12 @@ app.use(
           "https://docs.google.com",
           "https://*.google.com",
         ],
-        connectSrc: ["'self'", "https://res.cloudinary.com"],
+        connectSrc: [
+          "'self'",
+          "https://res.cloudinary.com",
+          "https://api.cloudinary.com",
+          "https://*.cloudinary.com",
+        ],
         upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null,
       },
     },
