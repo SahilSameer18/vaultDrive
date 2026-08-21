@@ -19,8 +19,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        scriptSrc: ["'self'", "https://accounts.google.com/gsi/client", "https://accounts.google.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://fonts.googleapis.com"],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         imgSrc: [
           "'self'",
@@ -34,12 +34,14 @@ app.use(
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
         frameSrc: [
           "'self'",
+          "https://accounts.google.com",
           "https://res.cloudinary.com",
           "https://docs.google.com",
           "https://*.google.com",
         ],
         connectSrc: [
           "'self'",
+          "https://accounts.google.com",
           "https://res.cloudinary.com",
           "https://api.cloudinary.com",
           "https://*.cloudinary.com",
