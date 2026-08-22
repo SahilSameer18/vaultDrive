@@ -8,6 +8,7 @@ import {
   generateUploadSignature,
   deleteFromCloudinary,
 } from "../utils/cloudinary.upload.js";
+import { getAllDescendantFolderIds } from "./folder.controller.js";
 
 const getShareSecret = () => {
   const secret = process.env.SHARE_ACCESS_TOKEN_SECRET;
@@ -349,6 +350,83 @@ export const deleteFile = async (req, res, next) => {
     return res
       .status(200)
       .json(new ApiResponse(200, null, "File moved to Trash successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Batch move multiple files and/or folders to Trash
+export const batchTrashItems = async (req, res, next) => {
+  try {
+    const { fileIds = [], folderIds = [] } = req.body;
+    const userId = req.user.id;
+
+    if (!Array.isArray(fileIds) || !Array.isArray(folderIds)) {
+      throw new ApiError(400, "fileIds and folderIds must be arrays");
+    }
+
+    if (fileIds.length === 0 && folderIds.length === 0) {
+      throw new ApiError(400, "No items selected to move to Trash");
+    }
+
+    const now = new Date();
+    const transactionSteps = [];
+
+    // 1. Soft-delete directly selected files
+    if (fileIds.length > 0) {
+      transactionSteps.push(
+        prisma.file.updateMany({
+          where: {
+            id: { in: fileIds },
+            userId,
+            deletedAt: null,
+          },
+          data: { deletedAt: now },
+        })
+      );
+    }
+
+    // 2. Soft-delete directly selected folders + all descendant subfolders & files
+    if (folderIds.length > 0) {
+      const allTargetFolderIds = new Set();
+      for (const fId of folderIds) {
+        const descendantIds = await getAllDescendantFolderIds(fId, userId);
+        descendantIds.forEach((id) => allTargetFolderIds.add(id));
+      }
+      const folderIdsArray = Array.from(allTargetFolderIds);
+
+      transactionSteps.push(
+        prisma.file.updateMany({
+          where: {
+            folderId: { in: folderIdsArray },
+            userId,
+            deletedAt: null,
+          },
+          data: { deletedAt: now },
+        })
+      );
+
+      transactionSteps.push(
+        prisma.folder.updateMany({
+          where: {
+            id: { in: folderIdsArray },
+            userId,
+            deletedAt: null,
+          },
+          data: { deletedAt: now },
+        })
+      );
+    }
+
+    await prisma.$transaction(transactionSteps);
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { trashedFiles: fileIds.length, trashedFolders: folderIds.length },
+        "Selected items moved to Trash successfully"
+      )
+    );
   } catch (error) {
     next(error);
   }
@@ -838,3 +916,6 @@ export const getStorageStats = async (req, res, next) => {
     next(error);
   }
 };
+
+
+

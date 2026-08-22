@@ -154,6 +154,8 @@ export const filesApi = {
   getById: (id) => api.get(`/files/${id}`),
   update: (id, data) => api.patch(`/files/${id}`, data),
   delete: (id) => api.delete(`/files/${id}`),
+  batchTrash: (fileIds = [], folderIds = []) =>
+    api.post("/files/batch-trash", { fileIds, folderIds }),
 
   // Sharing — links
   generateShareLink: (id) => api.post(`/files/${id}/share-link`),
@@ -173,4 +175,3 @@ export const filesApi = {
   getSharedByMe: () => api.get("/files/shared-by-me"),
   getByShareToken: (shareToken) => api.get(`/files/share/${shareToken}`),
 };
-

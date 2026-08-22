@@ -16,6 +16,7 @@ import {
   getByShareToken,
   streamSharedFileContent,
   getStorageStats,
+  batchTrashItems,
 } from "../controllers/file.controller.js";
 import {
   signUploadSchema,
@@ -53,6 +54,9 @@ router.get("/shared-with-me", getSharedWithMe);
 
 // List files shared BY current user (public or shared with others)
 router.get("/shared-by-me", getSharedByMe);
+
+// Batch move multiple files and folders to Trash
+router.post("/batch-trash", batchTrashItems);
 
 // Get single file details (owner, public, or shared user)
 router.get("/:id", getFileById);

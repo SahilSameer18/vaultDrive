@@ -112,6 +112,10 @@ flowchart TD
 ### ⚡ Upload Pipeline & Multi-File Batching
 - **Direct Presigned HMAC Uploads**: Direct browser-to-Cloudinary uploads using HMAC SHA-256 signatures (`sign-upload` → Cloudinary → `confirm-upload`). Server does not buffer file bytes in memory.
 - **Multi-File Batch Queue**: Select up to 10 files at once with controlled 2-stream concurrency worker queue, individual `AbortController` cancellation, and drag-and-drop queue reordering.
+- **Multi-Item Selection & Floating Batch Action Bar**: Checkbox selection on both files and folders across Grid and List views with active gold ring indicators, dynamic total byte count calculations, and keyboard shortcuts (`Ctrl+A` / `Cmd+A` to Select All, `Esc` to Deselect).
+- **1-Click Batch Operations**:
+  - 🗑️ **Atomic Batch Move-to-Trash**: Moves multiple selected files, folders, and recursive descendant subtrees to Trash in a single database transaction (`POST /api/v1/files/batch-trash`).
+  - 📥 **Sequential Batch Download**: Automatically downloads all selected files sequentially with popup-guard pacing.
 - **Chunked Uploads**: Slices files ≥10MB into chunks with exponential backoff retries.
 - **1 GB Storage Quota**: Backend enforces quota checks before issuing signatures and on upload confirmation.
 - **Visibility Toggle**: Switches files between `PRIVATE` and `PUBLIC`.
@@ -329,6 +333,7 @@ Open `http://localhost:5173` in your browser.
 | `GET` | `/api/v1/files/:id` | 🔒 Protected | Get file by ID |
 | `PATCH` | `/api/v1/files/:id` | 🔒 Protected | Rename file or update properties |
 | `DELETE` | `/api/v1/files/:id` | 🔒 Protected | Move file to Trash |
+| `POST` | `/api/v1/files/batch-trash` | 🔒 Protected | Atomic batch move of multiple files and folders to Trash |
 | `GET` | `/api/v1/files/shared-with-me` | 🔒 Protected | List files shared with current user |
 | `GET` | `/api/v1/files/shared-by-me` | 🔒 Protected | List files shared outward by current user (public or with specific users) |
 | `GET` | `/api/v1/files/share/:shareToken` | Public | Access file metadata via public share token (zero CDN URL leak) |
