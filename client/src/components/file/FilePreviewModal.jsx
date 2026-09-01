@@ -214,7 +214,15 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
           ) : category === "pdf" ? (
             <iframe
               key={file.url}
-              src={file.url}
+              src={
+                // On mobile phones, use Google Docs Viewer so Android Chrome & iOS Safari render multi-page PDFs cleanly inside iframe
+                typeof window !== "undefined" &&
+                (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768) &&
+                file.url.startsWith("http") &&
+                !isGatekeeperUrl
+                  ? `https://docs.google.com/viewer?url=${encodeURIComponent(file.url)}&embedded=true`
+                  : file.url
+              }
               title={file.name}
               onError={handleMediaError}
               className="w-full h-full rounded-xl border border-vault-border bg-white shadow-2xl"
