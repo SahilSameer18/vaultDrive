@@ -26,13 +26,15 @@ function avatarGradient(username = "") {
 // ─── Password strength helper ─────────────────────────────────────────────────
 function passwordStrength(pw = "") {
   if (pw.length === 0) return null;
+  if (pw.length < 6) return { label: "Too short (min 6 characters)", colour: "bg-vault-danger", width: "w-1/4" };
   const hasUpper = /[A-Z]/.test(pw);
+  const hasLower = /[a-z]/.test(pw);
   const hasNumber = /\d/.test(pw);
   const hasSpecial = /[^a-zA-Z0-9]/.test(pw);
-  const score = [pw.length >= 8, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
-  if (score <= 1) return { label: "Weak", colour: "bg-vault-danger", width: "w-1/4" };
-  if (score === 2) return { label: "Fair", colour: "bg-amber-400", width: "w-2/4" };
-  if (score === 3) return { label: "Good", colour: "bg-yellow-300", width: "w-3/4" };
+  const isLong = pw.length >= 8;
+  const score = [hasUpper, hasLower, hasNumber, hasSpecial, isLong].filter(Boolean).length;
+  if (score <= 2) return { label: "Weak", colour: "bg-amber-500", width: "w-2/4" };
+  if (score <= 4) return { label: "Good", colour: "bg-yellow-400", width: "w-3/4" };
   return { label: "Strong", colour: "bg-vault-success", width: "w-full" };
 }
 
@@ -471,7 +473,7 @@ export default function ProfilePage() {
                 <div className="h-1 w-full rounded-full bg-vault-surface overflow-hidden">
                   <div className={`h-full rounded-full transition-all duration-300 ${strength.colour} ${strength.width}`} />
                 </div>
-                <p className={`text-[10px] font-mono font-semibold ${strength.label === "Weak" ? "text-vault-danger" : strength.label === "Strong" ? "text-vault-success" : "text-amber-400"}`}>
+                <p className={`text-[10px] font-mono font-semibold ${strength.colour === "bg-vault-danger" ? "text-vault-danger" : strength.label === "Strong" ? "text-vault-success" : "text-amber-400"}`}>
                   {strength.label}
                 </p>
               </div>
