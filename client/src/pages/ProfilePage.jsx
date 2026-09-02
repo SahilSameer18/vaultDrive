@@ -228,10 +228,8 @@ export default function ProfilePage() {
       const res = await authApi.changePassword(payload);
       addToast(res.data.message, "success");
 
-      // If they just SET a password (OAuth user), update hasPassword in context
-      if (!user?.hasPassword) {
-        updateUser({ hasPassword: true });
-      }
+      // Ensure hasPassword flag in context is true
+      updateUser({ hasPassword: true });
 
       setCurrentPw(""); setNewPw(""); setConfirmPw("");
     } catch (err) {

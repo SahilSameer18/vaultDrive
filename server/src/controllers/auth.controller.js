@@ -98,7 +98,7 @@ export const register = async (req, res, next) => {
       .json(
         new ApiResponse(
           201,
-          { user },
+          { user: { ...user, hasPassword: true } },
           "User registered successfully"
         )
       );
@@ -153,6 +153,7 @@ export const login = async (req, res, next) => {
       username: user.username,
       avatarUrl: user.avatarUrl,
       createdAt: user.createdAt,
+      hasPassword: true,
     };
 
     return res
@@ -397,6 +398,7 @@ export const googleLogin = async (req, res, next) => {
       username: user.username,
       avatarUrl: user.avatarUrl,
       createdAt: user.createdAt,
+      hasPassword: !!user.passwordHash,
     };
 
     return res
