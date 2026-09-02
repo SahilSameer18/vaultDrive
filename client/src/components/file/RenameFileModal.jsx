@@ -119,7 +119,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
             <button
               type="submit"
               disabled={loading || !isChanged}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md cursor-pointer"
             >
               {loading ? "Saving..." : "Save Name"}
             </button>

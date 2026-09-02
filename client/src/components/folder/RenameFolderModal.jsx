@@ -85,7 +85,7 @@ export default function RenameFolderModal({ isOpen, onClose, folder, onRenameFol
             <button
               type="submit"
               disabled={loading || !name.trim() || name === folder.name}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md"
+              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md"
             >
               {loading ? "Saving..." : "Save Name"}
             </button>

@@ -75,7 +75,7 @@ export default function FileCard({
               <div
                 className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                   isSelected
-                    ? "bg-vault-accent border-vault-accent text-[#14161A]"
+                    ? "bg-vault-accent border-vault-accent text-vault-bg"
                     : "border-vault-muted/70 bg-vault-surface hover:border-vault-accent"
                 }`}
               >
@@ -260,7 +260,7 @@ export default function FileCard({
               <div
                 className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                   isSelected
-                    ? "bg-vault-accent border-vault-accent text-[#14161A]"
+                    ? "bg-vault-accent border-vault-accent text-vault-bg"
                     : "border-vault-muted/70 bg-vault-surface hover:border-vault-accent"
                 }`}
               >

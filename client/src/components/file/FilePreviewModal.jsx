@@ -159,7 +159,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
         </div>
 
         {/* ── Media Preview Body Viewport ─────────────────────────────────── */}
-        <div className="flex-1 bg-[#14161A] p-4 overflow-hidden flex items-center justify-center relative">
+        <div className="flex-1 bg-vault-bg p-4 overflow-hidden flex items-center justify-center relative">
           {mediaError ? (
             <div className="text-center py-12 space-y-4">
               <div className="w-14 h-14 rounded-2xl bg-vault-danger/10 border border-vault-danger/30 flex items-center justify-center text-vault-danger mx-auto">
@@ -174,7 +174,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
               <button
                 type="button"
                 onClick={() => handleFileDownload(file.url, file.name)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
               >
                 Download File Instead
               </button>
@@ -247,7 +247,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
                   <button
                     type="button"
                     onClick={() => handleFileDownload(file.url, file.name)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
                   >
                     Download Document
                   </button>
@@ -262,7 +262,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
               />
             )
           ) : category === "code" || file.mimeType?.includes("text") || file.mimeType?.includes("json") ? (
-            <div className="w-full h-full p-4 rounded-xl border border-vault-border bg-[#14161A] overflow-auto font-mono text-xs text-[#E8E6E0]">
+            <div className="w-full h-full p-4 rounded-xl border border-vault-border bg-vault-bg overflow-auto font-mono text-xs text-vault-text">
               {loadingText ? (
                 <div className="py-12 text-center text-vault-muted">Loading preview text...</div>
               ) : (
@@ -285,7 +285,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
                 <button
                   type="button"
                   onClick={() => handleFileDownload(file.url, file.name)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
                 >
                   Download Asset
                 </button>

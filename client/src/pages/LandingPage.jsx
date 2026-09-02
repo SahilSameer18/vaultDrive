@@ -7,7 +7,7 @@ import LandingFooter from "../components/landing/LandingFooter";
 
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#0C0D10] text-[#E8E6E0] selection:bg-[#B8935A]/30 selection:text-[#E8E6E0]">
+    <div className="relative min-h-screen overflow-x-hidden bg-vault-landing-bg text-vault-text selection:bg-vault-accent/30 selection:text-vault-text">
       {/* Background Grid */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-grid-pattern opacity-60" />
 
@@ -33,5 +33,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-

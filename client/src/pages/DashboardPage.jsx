@@ -335,7 +335,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold font-mono text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl text-xs font-semibold font-mono text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -386,7 +386,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
           >
             Upload First File
           </button>

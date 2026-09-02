@@ -41,7 +41,7 @@ export default function UserAvatar({ user, size = "sm", className = "", showBord
           className="w-full h-full object-cover rounded-full"
         />
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-vault-surface via-vault-panel to-[#14161A] text-vault-accent font-mono font-bold flex items-center justify-center shadow-inner">
+        <div className="w-full h-full bg-gradient-to-br from-vault-surface via-vault-panel to-vault-bg text-vault-accent font-mono font-bold flex items-center justify-center shadow-inner">
           {initial}
         </div>
       )}

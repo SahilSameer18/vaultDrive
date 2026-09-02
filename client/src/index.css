@@ -9,11 +9,19 @@
   --color-vault-border: #2A2E37;
   --color-vault-accent: #B8935A;
   --color-vault-accent-hover: #C8A66B;
+  --color-vault-accent-light: #D8B478;
   --color-vault-text: #E8E6E0;
   --color-vault-muted: #8B8F99;
   --color-vault-success: #6FA88A;
   --color-vault-danger: #C0654F;
   --color-vault-sky: #38BDF8;
+
+  /* Landing-specific backgrounds (intentionally darker than app interior) */
+  --color-vault-landing-bg: #0C0D10;
+  --color-vault-section-alt: #0E0F13;
+  --color-vault-footer-bg: #0A0B0E;
+  --color-vault-faq-card: #111216;
+  --color-vault-muted-light: #C4C8D0;
 
   /* Typography */
   --font-sans: "Inter", system-ui, sans-serif;
@@ -55,7 +63,7 @@ body {
 
 /* ─── Selection ─────────────────────────────────────────────────────────────── */
 ::selection {
-  background-color: rgba(184, 147, 90, 0.25);
+  background-color: color-mix(in srgb, var(--color-vault-accent) 25%, transparent);
   color: var(--color-vault-text);
 }
 
@@ -126,8 +134,8 @@ body {
 /* ─── Zero-Lag Clean Utilities ───────────────────────────────────────────── */
 .bg-grid-pattern {
   background-image: 
-    linear-gradient(rgba(42, 46, 55, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(42, 46, 55, 0.15) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--color-vault-border) 15%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-vault-border) 15%, transparent) 1px, transparent 1px);
   background-size: 48px 48px, 48px 48px;
 }
 
@@ -146,8 +154,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #14161A inset !important;
-  -webkit-text-fill-color: #E8E6E0 !important;
-  caret-color: #E8E6E0 !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--color-vault-bg) inset !important;
+  -webkit-text-fill-color: var(--color-vault-text) !important;
+  caret-color: var(--color-vault-text) !important;
   transition: background-color 50000s ease-in-out 0s !important;
 }

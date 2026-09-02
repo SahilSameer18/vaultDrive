@@ -293,13 +293,12 @@ export default function StoragePage() {
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="#10B981"
                     strokeWidth="14"
                     fill="transparent"
                     strokeDasharray={`${imgDash} ${circumference}`}
                     strokeDashoffset={-imgOffset}
                     strokeLinecap="round"
-                    className="transition-all duration-700"
+                    className="stroke-emerald-500 transition-all duration-700"
                   />
                 )}
 
@@ -309,13 +308,12 @@ export default function StoragePage() {
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="#F59E0B"
                     strokeWidth="14"
                     fill="transparent"
                     strokeDasharray={`${mediaDash} ${circumference}`}
                     strokeDashoffset={-mediaOffset}
                     strokeLinecap="round"
-                    className="transition-all duration-700"
+                    className="stroke-amber-500 transition-all duration-700"
                   />
                 )}
 
@@ -325,13 +323,12 @@ export default function StoragePage() {
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="#38BDF8"
                     strokeWidth="14"
                     fill="transparent"
                     strokeDasharray={`${docDash} ${circumference}`}
                     strokeDashoffset={-docOffset}
                     strokeLinecap="round"
-                    className="transition-all duration-700"
+                    className="stroke-sky-400 transition-all duration-700"
                   />
                 )}
 
@@ -341,13 +338,12 @@ export default function StoragePage() {
                     cx="90"
                     cy="90"
                     r={radius}
-                    stroke="#A855F7"
                     strokeWidth="14"
                     fill="transparent"
                     strokeDasharray={`${archiveDash} ${circumference}`}
                     strokeDashoffset={-archiveOffset}
                     strokeLinecap="round"
-                    className="transition-all duration-700"
+                    className="stroke-purple-500 transition-all duration-700"
                   />
                 )}
               </svg>

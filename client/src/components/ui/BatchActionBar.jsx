@@ -16,7 +16,7 @@ export default function BatchActionBar({
 
   return (
     <aside aria-label="Batch actions toolbar" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-2xl animate-slide-up">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-vault-accent/40 bg-[#181A20]/95 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_20px_rgba(230,175,46,0.15)] text-vault-text select-none">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-vault-accent/40 bg-vault-surface/95 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_20px_rgba(230,175,46,0.15)] text-vault-text select-none">
         
         {/* Left: Selected Counter & Size */}
         <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function BatchActionBar({
               type="button"
               disabled={isProcessing}
               onClick={onBatchTrash}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono text-[#14161A] bg-vault-danger hover:bg-vault-danger/90 transition-all cursor-pointer shadow-md disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono text-vault-bg bg-vault-danger hover:bg-vault-danger/90 transition-all cursor-pointer shadow-md disabled:opacity-50"
               title="Move Selected Items to Trash"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">

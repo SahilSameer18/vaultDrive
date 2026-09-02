@@ -330,7 +330,7 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
                 type="button"
                 onClick={handleStartUpload}
                 disabled={queue.length === 0 || uploading}
-                className="px-5 py-2 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 disabled:opacity-50 transition-all shadow-md cursor-pointer"
+                className="px-5 py-2 rounded-xl text-xs font-semibold text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 disabled:opacity-50 transition-all shadow-md cursor-pointer"
               >
                 Upload {queue.length > 0 ? `(${queue.length})` : ""}
               </button>

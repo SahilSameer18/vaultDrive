@@ -67,13 +67,7 @@ export default function NotFoundPage() {
     <div className="min-h-screen w-full bg-vault-bg text-vault-text font-sans flex flex-col relative overflow-hidden selection:bg-vault-accent/30">
       {/* Background grid + vignette, matching Landing/Login treatment */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage: `linear-gradient(#2A2E37 1px, transparent 1px), linear-gradient(90deg, #2A2E37 1px, transparent 1px)`,
-            backgroundSize: "44px 44px",
-          }}
-        />
+        <div className="absolute inset-0 opacity-[0.12] bg-grid-pattern" />
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-vault-danger/[0.035] blur-[150px]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,var(--color-vault-bg)_90%)]" />
       </div>
@@ -140,7 +134,7 @@ export default function NotFoundPage() {
             <div className="flex flex-col sm:flex-row items-center lg:items-stretch justify-center lg:justify-start gap-3 mt-7">
               <Link
                 to="/dashboard"
-                className="px-6 py-3 rounded-xl text-xs font-mono font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-lg shadow-vault-accent/15 transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 rounded-xl text-xs font-mono font-semibold text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-lg shadow-vault-accent/15 transition-all flex items-center justify-center gap-2"
               >
                 RETURN TO VAULT
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">

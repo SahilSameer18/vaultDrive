@@ -414,7 +414,7 @@ export default function ProfilePage() {
             type="button"
             onClick={handleSaveUsername}
             disabled={!usernameChanged || !usernameValid || savingUsername}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-vault-accent to-vault-accent-hover text-[#14161A] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-vault-accent to-vault-accent-hover text-vault-bg hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md cursor-pointer"
           >
             {savingUsername ? "Saving…" : "Save Changes"}
           </button>
@@ -506,7 +506,7 @@ export default function ProfilePage() {
             type="button"
             onClick={handleSavePassword}
             disabled={savingPw || newPw.length < 6 || newPw !== confirmPw || (user?.hasPassword && !currentPw)}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-vault-accent to-vault-accent-hover text-[#14161A] hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-vault-accent to-vault-accent-hover text-vault-bg hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md cursor-pointer"
           >
             {savingPw ? "Saving…" : user?.hasPassword ? "Change Password" : "Set Password"}
           </button>

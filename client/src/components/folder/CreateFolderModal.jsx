@@ -88,7 +88,7 @@ export default function CreateFolderModal({ isOpen, onClose, onCreateFolder }) {
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 disabled:opacity-50 transition-all shadow-md"
+              className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 disabled:opacity-50 transition-all shadow-md"
             >
               {loading ? "Creating..." : "Create Directory"}
             </button>

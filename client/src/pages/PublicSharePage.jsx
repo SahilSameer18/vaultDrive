@@ -70,13 +70,7 @@ export default function PublicSharePage() {
     <div className="min-h-screen bg-vault-bg text-vault-text font-sans flex flex-col justify-between relative selection:bg-vault-accent/30">
       
       {/* Background Grid */}
-      <div 
-        className="fixed inset-0 pointer-events-none opacity-15 z-0"
-        style={{
-          backgroundImage: `linear-gradient(#2A2E37 1px, transparent 1px), linear-gradient(90deg, #2A2E37 1px, transparent 1px)`,
-          backgroundSize: '48px 48px'
-        }}
-      />
+      <div className="fixed inset-0 pointer-events-none opacity-60 z-0 bg-grid-pattern" />
 
       {/* Top Header Bar */}
       <header className="relative z-10 border-b border-vault-border bg-vault-bg/80 backdrop-blur-xl">
@@ -114,7 +108,7 @@ export default function PublicSharePage() {
               <p className="text-xs text-vault-muted leading-relaxed max-w-sm mx-auto">{error}</p>
               <Link
                 to="/"
-                className="inline-block mt-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
+                className="inline-block mt-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
               >
                 Return to Home
               </Link>
@@ -153,7 +147,7 @@ export default function PublicSharePage() {
                 <button
                   type="button"
                   onClick={() => handleFileDownload(contentUrl, file.name)}
-                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-[#14161A] bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-3 px-4 rounded-xl text-xs font-semibold text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all text-center flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Download
                 </button>

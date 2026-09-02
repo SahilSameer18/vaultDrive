@@ -40,21 +40,21 @@ export default function FaqSection() {
   const [openFaq, setOpenFaq] = useState(null);
 
   return (
-    <section className="border-t border-[#2A2E37]/80 bg-[#0E0F13] relative z-10">
+    <section className="border-t border-vault-border/80 bg-vault-section-alt relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-24 text-left">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-          
+
           {/* Left Column (5 Cols): Title & Context (Sticky on Desktop) */}
           <div className="lg:col-span-5 lg:sticky lg:top-28 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md border border-[#2A2E37] bg-[#14161A] text-[10px] font-mono text-[#8B8F99] mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#B8935A]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md border border-vault-border bg-vault-bg text-[10px] font-mono text-vault-muted mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
               <span>FREQUENTLY ASKED QUESTIONS</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[#E8E6E0] leading-tight">
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-vault-text leading-tight">
               Your questions, <br className="hidden sm:inline" />
               our answers.
             </h2>
-            <p className="mt-4 text-xs sm:text-sm text-[#8B8F99] leading-relaxed max-w-md">
+            <p className="mt-4 text-xs sm:text-sm text-vault-muted leading-relaxed max-w-md">
               Everything you need to know about getting started, organizing files, and keeping your data safe in VaultDrive.
             </p>
           </div>
@@ -68,8 +68,8 @@ export default function FaqSection() {
                   key={faq.id}
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                     isOpen
-                      ? "bg-[#14161A] border-[#B8935A]/50 shadow-[0_4px_30px_rgba(184,147,90,0.08)]"
-                      : "bg-[#111216] border-[#2A2E37]/70 hover:border-[#B8935A]/30 hover:bg-[#14161A]/80"
+                      ? "bg-vault-bg border-vault-accent/50 shadow-[0_4px_30px_rgba(184,147,90,0.08)]"
+                      : "bg-vault-faq-card border-vault-border/70 hover:border-vault-accent/30 hover:bg-vault-bg/80"
                   }`}
                 >
                   <button
@@ -78,17 +78,17 @@ export default function FaqSection() {
                     className="w-full p-4 sm:p-5 flex items-center justify-between text-left gap-4 cursor-pointer select-none"
                   >
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <span className={`font-mono text-xs font-bold transition-colors shrink-0 ${isOpen ? "text-[#B8935A]" : "text-[#8B8F99]/50"}`}>
+                      <span className={`font-mono text-xs font-bold transition-colors shrink-0 ${isOpen ? "text-vault-accent" : "text-vault-muted/50"}`}>
                         {faq.id}
                       </span>
-                      <span className={`text-xs sm:text-sm font-semibold transition-colors ${isOpen ? "text-[#E8E6E0]" : "text-[#C4C8D0] hover:text-[#E8E6E0]"}`}>
+                      <span className={`text-xs sm:text-sm font-semibold transition-colors ${isOpen ? "text-vault-text" : "text-vault-muted-light hover:text-vault-text"}`}>
                         {faq.q}
                       </span>
                     </div>
                     <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl border flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isOpen
-                        ? "bg-[#B8935A]/15 border-[#B8935A]/50 text-[#B8935A] rotate-180 shadow-[0_0_12px_rgba(184,147,90,0.2)]"
-                        : "bg-[#181B21] border-[#2A2E37] text-[#8B8F99]"
+                        ? "bg-vault-accent/15 border-vault-accent/50 text-vault-accent rotate-180 shadow-[0_0_12px_rgba(184,147,90,0.2)]"
+                        : "bg-vault-surface border-vault-border text-vault-muted"
                     }`}>
                       <ChevronDownIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
@@ -99,7 +99,7 @@ export default function FaqSection() {
                     }`}
                   >
                     <div className="overflow-hidden">
-                      <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 text-xs sm:text-sm text-[#8B8F99] leading-relaxed border-t border-[#2A2E37]/40 pl-9 sm:pl-12">
+                      <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-3 text-xs sm:text-sm text-vault-muted leading-relaxed border-t border-vault-border/40 pl-9 sm:pl-12">
                         {faq.a}
                       </div>
                     </div>

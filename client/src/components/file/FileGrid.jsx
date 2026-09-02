@@ -56,7 +56,7 @@ function FolderItem({
             <div
               className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
                 isFolderSelected
-                  ? "bg-vault-accent border-vault-accent text-[#14161A]"
+                  ? "bg-vault-accent border-vault-accent text-vault-bg"
                   : "border-vault-muted/70 bg-vault-surface hover:border-vault-accent"
               }`}
             >
@@ -78,7 +78,7 @@ function FolderItem({
           }}
           className="flex items-center gap-2.5 min-w-0 flex-1"
         >
-          <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-accent/30 flex items-center justify-center text-vault-accent group-hover:bg-vault-accent group-hover:text-[#14161A] transition-colors shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-accent/30 flex items-center justify-center text-vault-accent group-hover:bg-vault-accent group-hover:text-vault-bg transition-colors shrink-0">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
             </svg>

@@ -235,7 +235,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
                   type="button"
                   onClick={handleGenerateLink}
                   disabled={loading}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md"
                 >
                   {loading ? "Generating..." : "Generate Public Link"}
                 </button>
@@ -264,7 +264,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
                   <button
                     type="submit"
                     disabled={loading || !targetIdentifier.trim()}
-                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-[#14161A] bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md shrink-0"
+                    className="px-4 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover disabled:opacity-50 transition-colors shadow-md shrink-0"
                   >
                     {loading ? "Sharing..." : "Grant Access"}
                   </button>
