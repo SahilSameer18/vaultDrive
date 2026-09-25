@@ -12,27 +12,27 @@ const faqs = [
   {
     id: "01",
     q: "Is VaultDrive completely free to get started?",
-    a: "Yes. Every new account receives free high-speed cloud storage immediately. You can organize nested directories, upload large payloads, and distribute passcode-protected links without providing a payment card."
+    a: "Yes. Every new account gets free storage right away, no payment card needed. You can organize files into nested folders, upload large files, and share password-protected links from day one."
   },
   {
     id: "02",
-    q: "How does passcode-gated link authorization work?",
-    a: "When generating a share URL, you can enable Passcode Gate and assign a secret passphrase. The recipient's browser presents a cryptographic challenge; upon entering the correct passcode, the file decrypts and streams directly."
+    q: "How do passcode-protected share links work?",
+    a: "When you create a share link, you can turn on a passcode and set your own passphrase. Anyone who opens the link has to enter the correct passcode before the file starts downloading."
   },
   {
     id: "03",
     q: "How does safe trash recovery protect accidental deletions?",
-    a: "Deletions move into an isolated Trash container. Unlike generic storage providers that dump restored items into a flat root folder, VaultDrive reconstructs the exact nested folder hierarchy with permissions fully preserved."
+    a: "Deleted files and folders go to Trash first, not straight to permanent deletion. When you restore a folder, everything inside it comes back in the same place — you won't find your files dumped back into one root folder."
   },
   {
     id: "04",
-    q: "Are recursive, deeply nested folder structures supported?",
-    a: "Yes. VaultDrive supports infinite hierarchical nesting (e.g., Vault > Enterprise > Fiscal_2026 > Tax_Returns) with zero depth limit and instant breadcrumb navigation."
+    q: "Can I nest folders as deep as I want?",
+    a: "Yes. There's no depth limit — go as many folders deep as you like (e.g., Vault > Work > Fiscal_2026 > Tax_Returns) and get back up the tree instantly with breadcrumbs."
   },
   {
     id: "05",
     q: "Do link recipients need to create an account to download?",
-    a: "No. Authorized links permit direct browser-to-cloud downloads without signups, tracking cookies, or promotional interstitials."
+    a: "No. Anyone with the link can download the file directly — no signup, no account, no ads in the way."
   }
 ];
 
@@ -47,11 +47,10 @@ export default function FaqSection() {
           {/* Left Column (5 Cols): Editorial Title (Sticky) */}
           <div className="lg:col-span-5 lg:sticky lg:top-28 text-left">
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-              Questions. <br />
-              <span className="text-gold-gradient">Directly answered.</span>
+              <span className="text-silver-gradient">Frequently asked</span>
             </h2>
             <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[44ch]">
-              Technical transparency regarding encryption guarantees, access control, and account governance.
+              Straight answers about storage, sharing, and how your files are handled.
             </p>
           </div>
 
@@ -64,7 +63,7 @@ export default function FaqSection() {
                   key={faq.id}
                   className={`rounded-2xl border transition-all duration-300 overflow-hidden ${
                     isOpen
-                      ? "depth-vault-chassis border-vault-accent/40 shadow-[0_4px_32px_rgba(197,160,89,0.12)]"
+                      ? "depth-vault-chassis border-white/[0.16]"
                       : "bg-vault-surface/40 border-white/[0.06] hover:border-white/[0.14] hover:bg-vault-surface/70"
                   }`}
                 >
@@ -74,7 +73,7 @@ export default function FaqSection() {
                     className="tactile-btn w-full p-4 sm:p-5 flex items-center justify-between text-left gap-3.5 cursor-pointer select-none"
                   >
                     <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                      <span className={`font-mono text-xs font-semibold tracking-wider transition-colors shrink-0 ${isOpen ? "text-vault-accent" : "text-vault-muted/40"}`}>
+                      <span className={`text-xs font-semibold transition-colors shrink-0 ${isOpen ? "text-white/80" : "text-vault-muted/40"}`}>
                         {faq.id}
                       </span>
                       <span className={`text-xs sm:text-base font-semibold tracking-tight transition-colors ${isOpen ? "text-white" : "text-vault-text hover:text-white"}`}>
@@ -83,7 +82,7 @@ export default function FaqSection() {
                     </div>
                     <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-xl border flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isOpen
-                        ? "bg-vault-accent/20 border-vault-accent/50 text-vault-accent rotate-180 shadow-[0_0_12px_rgba(197,160,89,0.25)]"
+                        ? "bg-white/[0.1] border-white/[0.2] text-white rotate-180"
                         : "bg-white/[0.03] border-white/[0.08] text-vault-muted"
                     }`}>
                       <ChevronDownIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

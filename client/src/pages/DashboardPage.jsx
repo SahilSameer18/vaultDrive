@@ -171,10 +171,10 @@ export default function DashboardPage() {
   const handleCreateFolder = async (name) => {
     try {
       await createFolder(name, null);
-      addToast(`Directory "${name}" allocated`, "success");
+      addToast(`Folder "${name}" created`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Failed to create directory";
+      const msg = err.response?.data?.message || err.message || "Failed to create folder";
       addToast(msg, "error");
       throw err;
     }
@@ -183,10 +183,10 @@ export default function DashboardPage() {
   const handleRenameFolder = async (folderId, newName) => {
     try {
       await renameFolder(folderId, newName);
-      addToast(`Directory renamed to "${newName}"`, "success");
+      addToast(`Folder renamed to "${newName}"`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Failed to rename directory";
+      const msg = err.response?.data?.message || err.message || "Failed to rename folder";
       addToast(msg, "error");
       throw err;
     }
@@ -208,7 +208,7 @@ export default function DashboardPage() {
     try {
       const updated = await togglePrivacy(file.id, file.isPublic);
       addToast(
-        `File is now ${updated.isPublic ? "PUBLIC (Gateway active)" : "PRIVATE"}`,
+        `File is now ${updated.isPublic ? "Public" : "Private"}`,
         updated.isPublic ? "success" : "info"
       );
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
@@ -231,10 +231,10 @@ export default function DashboardPage() {
     } else if (deleteTarget.type === "folder") {
       try {
         await deleteFolder(deleteTarget.item.id);
-        addToast(`Directory "${deleteTarget.item.name}" moved to Trash`, "info");
+        addToast(`Folder "${deleteTarget.item.name}" moved to Trash`, "info");
         window.dispatchEvent(new CustomEvent("vault:files-changed"));
       } catch {
-        addToast("Failed to move directory to Trash", "error");
+        addToast("Failed to move folder to Trash", "error");
       }
     }
   };
@@ -253,10 +253,9 @@ export default function DashboardPage() {
       {/* ── Header & Path ────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--theme-border)]">
         <div>
-          <nav className="flex items-center gap-2 text-xs font-mono text-[var(--theme-text-muted)] mb-1">
-            <span className="text-[var(--theme-accent)] font-semibold flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-              ROOT
+          <nav className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] mb-1">
+            <span className="text-[var(--theme-text)] font-semibold">
+              Root
             </span>
             <span className="text-[var(--theme-border)]">/</span>
             <span className="text-[var(--theme-text)]">
@@ -275,8 +274,8 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                viewMode === "grid" ? "bg-[var(--theme-surface)] text-[var(--theme-accent)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
+              className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                viewMode === "grid" ? "bg-[var(--theme-surface)] text-[var(--theme-text)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
               }`}
               title="Grid View"
             >
@@ -290,8 +289,8 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                viewMode === "list" ? "bg-[var(--theme-surface)] text-[var(--theme-accent)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
+              className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+                viewMode === "list" ? "bg-[var(--theme-surface)] text-[var(--theme-text)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
               }`}
               title="List View"
             >
@@ -311,23 +310,23 @@ export default function DashboardPage() {
             }}
           />
 
-          {/* New Directory */}
+          {/* New folder button */}
           <button
             type="button"
             onClick={() => setIsFolderOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-xs font-semibold text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+            className="px-3.5 py-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-xs font-semibold text-[var(--theme-text)] hover:border-white/20 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
           >
-            <svg className="w-4 h-4 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 text-[var(--theme-text-muted)]" viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span>New Folder</span>
           </button>
 
-          {/* Ingest Payload File Button */}
+          {/* Upload button */}
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold font-mono text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl text-xs font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -372,13 +371,13 @@ export default function DashboardPage() {
           </div>
           <h3 className="text-lg font-bold text-[var(--theme-text)] mb-1">Your Vault is Empty</h3>
           <p className="text-xs text-[var(--theme-text-muted)] max-w-sm mb-6 leading-relaxed">
-            Ingest files or allocate directories to initialize your encrypted personal cloud repository.
+            Upload a file or create a folder to get started.
           </p>
 
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-5 py-2.5 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all shadow-md cursor-pointer"
           >
             Upload First File
           </button>

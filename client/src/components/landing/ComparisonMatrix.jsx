@@ -26,12 +26,12 @@ function CrossIcon({ className = "w-4 h-4" }) {
 
 const comparisonRows = [
   {
-    capability: "Upload Architecture",
-    spec: "Direct streaming pipeline",
-    vaultTitle: "Direct-to-Cloud HMAC",
-    vaultDesc: "Encrypted payload streams directly to object storage with zero memory buffering",
-    genericTitle: "Web Server Bottleneck",
-    genericDesc: "Files are held in intermediate application RAM before reaching disk"
+    capability: "File Uploads",
+    spec: "How files reach storage",
+    vaultTitle: "Straight to cloud storage",
+    vaultDesc: "Files upload directly from your browser to storage using a signed request, skipping our servers entirely",
+    genericTitle: "Routed through the server",
+    genericDesc: "Files are held in the app server's memory before being forwarded to storage"
   },
   {
     capability: "Session Invalidation",
@@ -42,20 +42,20 @@ const comparisonRows = [
     genericDesc: "Stolen sessions frequently persist until standard TTL expiration (often days)"
   },
   {
-    capability: "Folder Restoration",
-    spec: "Recovery protocol",
-    vaultTitle: "Deep Tree Preservation",
-    vaultDesc: "Restores deleted nested folder hierarchies with full permission integrity intact",
-    genericTitle: "Flat File Dump",
-    genericDesc: "Restores dump orphaned files into root directory, losing nested structure"
+    capability: "Restoring from Trash",
+    spec: "Undoing a delete",
+    vaultTitle: "Folder structure stays intact",
+    vaultDesc: "Restoring a deleted folder puts everything back exactly where it was, nested files included",
+    genericTitle: "Flattened restores",
+    genericDesc: "Restored files often land back in one root folder, so the original structure is lost"
   },
   {
-    capability: "External Distribution",
+    capability: "Sharing with Others",
     spec: "Guest file access",
-    vaultTitle: "Passcode Shielded Links",
-    vaultDesc: "Direct guest browser downloads protected by password without forced signups",
-    genericTitle: "Account Wall Required",
-    genericDesc: "Recipients are forced into account creation and aggressive email marketing"
+    vaultTitle: "Passcode-protected links",
+    vaultDesc: "Anyone with the link and passcode can download the file directly, no account needed",
+    genericTitle: "Account required to download",
+    genericDesc: "Recipients typically have to sign up for an account before they can download a shared file"
   }
 ];
 
@@ -67,11 +67,10 @@ export default function ComparisonMatrix() {
         {/* Section Header */}
         <div className="max-w-2xl mb-10 sm:mb-16 text-left">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-            Engineered differently. <br />
-            <span className="text-gold-gradient">The architectural benchmark.</span>
+            How we stack up against a typical cloud drive
           </h2>
           <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[54ch]">
-            How VaultDrive compares against legacy consumer cloud storage platforms when privacy, velocity, and ownership are uncompromising.
+            A few concrete differences in how uploads, restores, and sharing actually work.
           </p>
         </div>
 
@@ -80,7 +79,7 @@ export default function ComparisonMatrix() {
           {comparisonRows.map((row, idx) => (
             <div key={idx} className="depth-vault-card rounded-2xl p-5 border border-white/[0.08] space-y-4">
               <div>
-                <span className="text-[10px] font-mono tracking-widest text-vault-muted uppercase">
+                <span className="text-xs text-vault-muted">
                   {row.spec}
                 </span>
                 <h3 className="text-base font-bold text-white tracking-tight mt-0.5">
@@ -89,11 +88,11 @@ export default function ComparisonMatrix() {
               </div>
 
               {/* VaultDrive Spec */}
-              <div className="p-3.5 rounded-xl bg-vault-accent/[0.05] border border-vault-accent/25 space-y-1.5">
+              <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.12] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-vault-accent text-[11px] font-mono font-semibold">
+                  <div className="flex items-center gap-1.5 text-vault-accent text-xs font-semibold">
                     <LogoMark className="w-3.5 h-3.5 text-vault-accent" />
-                    <span>VAULTDRIVE</span>
+                    <span>VaultDrive</span>
                   </div>
                   <span className="w-4 h-4 rounded bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
                     <CheckIcon className="w-3 h-3" />
@@ -110,8 +109,8 @@ export default function ComparisonMatrix() {
               {/* Legacy Spec */}
               <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-vault-muted text-[10px] font-mono font-medium tracking-wider uppercase">
-                    Legacy Cloud
+                  <span className="text-vault-muted text-xs font-medium">
+                    Other Cloud Storage
                   </span>
                   <span className="w-4 h-4 rounded bg-rose-500/15 text-rose-400/80 flex items-center justify-center">
                     <CrossIcon className="w-3 h-3" />
@@ -133,20 +132,20 @@ export default function ComparisonMatrix() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
-                <tr className="border-b border-white/[0.08] bg-white/[0.02] font-mono text-[11px] text-vault-muted">
-                  <th className="py-4.5 px-6 font-semibold w-[30%] tracking-wider">
-                    SPECIFICATION
+                <tr className="border-b border-white/[0.08] bg-white/[0.02] text-xs text-vault-muted">
+                  <th className="py-4.5 px-6 font-semibold w-[30%]">
+                    Specification
                   </th>
-                  <th className="py-4.5 px-6 font-bold text-vault-accent bg-vault-accent/[0.05] border-x border-vault-accent/20 w-[38%]">
+                  <th className="py-4.5 px-6 font-bold text-vault-accent bg-white/[0.03] border-x border-white/[0.1] w-[38%]">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-lg bg-vault-accent/15 border border-vault-accent/40 flex items-center justify-center">
                         <LogoMark className="w-3.5 h-3.5 text-vault-accent" />
                       </div>
-                      <span className="tracking-widest">VAULTDRIVE SPEC</span>
+                      <span>VaultDrive Spec</span>
                     </div>
                   </th>
-                  <th className="py-4.5 px-6 font-semibold text-vault-muted/70 w-[32%] tracking-wider">
-                    LEGACY CONSUMER CLOUD
+                  <th className="py-4.5 px-6 font-semibold text-vault-muted/70 w-[32%]">
+                    Other Cloud Storage
                   </th>
                 </tr>
               </thead>
@@ -156,13 +155,13 @@ export default function ComparisonMatrix() {
                     {/* Capability Column */}
                     <td className="py-5 px-6 align-top">
                       <p className="font-semibold text-white tracking-tight">{row.capability}</p>
-                      <p className="text-[10px] font-mono text-vault-muted mt-1 uppercase tracking-wider">
+                      <p className="text-xs text-vault-muted mt-1">
                         {row.spec}
                       </p>
                     </td>
 
                     {/* VaultDrive Column (Prominent) */}
-                    <td className="py-5 px-6 bg-vault-accent/[0.03] border-x border-vault-accent/15 align-top">
+                    <td className="py-5 px-6 bg-white/[0.02] border-x border-white/[0.08] align-top">
                       <div className="flex items-start gap-2.5">
                         <span className="w-5 h-5 rounded-md bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 mt-0.5">
                           <CheckIcon className="w-3.5 h-3.5" />

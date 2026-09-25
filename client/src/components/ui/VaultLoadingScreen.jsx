@@ -1,7 +1,7 @@
 export default function VaultLoadingScreen({
-  message = "Verifying vault access...",
-  headerTag = "✦ VaultDrive Encrypted System ✦",
-  footerTag = "End-to-End Secure Storage",
+  message = "Loading...",
+  headerTag = "VaultDrive",
+  footerTag = "Secure Cloud Storage",
 }) {
   return (
     <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-between bg-vault-bg p-6 select-none font-sans overflow-hidden">

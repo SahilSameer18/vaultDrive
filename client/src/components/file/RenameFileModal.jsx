@@ -51,7 +51,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-4 mb-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-accent)]/40 flex items-center justify-center text-[var(--theme-accent)] shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] shadow-sm">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.75" />
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.75" />
@@ -63,7 +63,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer"
           >
             <span className="text-xs font-bold">✕</span>
           </button>
@@ -71,7 +71,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
 
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
-            [ERROR] {error}
+            {error}
           </div>
         )}
 
@@ -88,7 +88,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
               )}
             </div>
 
-            <div className="flex items-stretch rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] overflow-hidden focus-within:border-[var(--theme-accent)] shadow-inner transition-colors">
+            <div className="flex items-stretch rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] overflow-hidden focus-within:border-white/30 shadow-inner transition-colors">
               <input
                 type="text"
                 value={baseName}
@@ -100,8 +100,8 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
               />
               {extension && (
                 <span
-                  className="px-3.5 py-2.5 bg-[var(--theme-panel)]/80 border-l border-[var(--theme-border)] text-[var(--theme-accent)] font-mono text-xs font-semibold flex items-center select-none shrink-0"
-                  title="File extension is locked to preserve MIME type integrity"
+                  className="px-3.5 py-2.5 bg-[var(--theme-panel)]/80 border-l border-[var(--theme-border)] text-[var(--theme-text-muted)] font-mono text-xs font-semibold flex items-center select-none shrink-0"
+                  title="File extension can't be changed"
                 >
                   {extension}
                 </span>
@@ -109,7 +109,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
             </div>
 
             <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-2 truncate">
-              Output identifier: <span className="text-[var(--theme-accent)] font-semibold">{currentFullName || "—"}</span>
+              New name: <span className="text-[var(--theme-text)] font-semibold">{currentFullName || "—"}</span>
             </p>
           </div>
 
@@ -126,7 +126,7 @@ export default function RenameFileModal({ isOpen, onClose, file, onRenameFile })
               disabled={loading || !isChanged}
               className="px-5 py-2 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 disabled:opacity-50 transition-all shadow-md cursor-pointer"
             >
-              {loading ? "Writing..." : "Save Name"}
+              {loading ? "Saving..." : "Save Name"}
             </button>
           </div>
         </form>

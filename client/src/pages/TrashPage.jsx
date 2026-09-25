@@ -103,10 +103,9 @@ export default function TrashPage() {
       {/* ── Top Header ────────────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--theme-border)]">
         <div>
-          <nav className="flex items-center gap-2 text-xs font-mono text-[var(--theme-text-muted)] mb-1">
-            <Link to="/dashboard" className="text-[var(--theme-accent)] hover:underline flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-              ROOT
+          <nav className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] mb-1">
+            <Link to="/dashboard" className="text-[var(--theme-text)] hover:underline">
+              Root
             </Link>
             <span className="text-[var(--theme-border)]">/</span>
             {currentFolder ? (
@@ -114,7 +113,7 @@ export default function TrashPage() {
                 <button
                   type="button"
                   onClick={() => setCurrentFolder(null)}
-                  className="text-[var(--theme-accent)] hover:underline cursor-pointer"
+                  className="text-[var(--theme-text)] hover:underline cursor-pointer"
                 >
                   Trash Bin
                 </button>
@@ -184,7 +183,7 @@ export default function TrashPage() {
           <path d="M12 16v-4M12 8h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
         <span>
-          Trashed items are sequestered from active views. You can restore them to their original location or execute a permanent cryptographic purge.
+          Deleted items stay here until you restore them or delete them permanently.
         </span>
       </div>
 
@@ -209,7 +208,7 @@ export default function TrashPage() {
             <button
               type="button"
               onClick={() => setCurrentFolder(null)}
-              className="mt-4 px-4 py-2 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-accent)] text-xs font-mono font-semibold hover:border-[var(--theme-accent)]/50 cursor-pointer shadow-sm"
+              className="mt-4 px-4 py-2 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-xs font-semibold hover:border-white/20 cursor-pointer shadow-sm"
             >
               ← Return to Main Trash Bin
             </button>
@@ -221,9 +220,8 @@ export default function TrashPage() {
           {folders.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-                <h2 className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
-                  DIRECTORIES ({folders.length})
+                <h2 className="text-xs font-semibold text-[var(--theme-text-muted)]">
+                  Folders ({folders.length})
                 </h2>
               </div>
 
@@ -241,7 +239,7 @@ export default function TrashPage() {
                         onClick={() => setCurrentFolder(folder)}
                         className="cursor-pointer flex items-start gap-3"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-accent)]/30 flex items-center justify-center text-[var(--theme-accent)] shrink-0 shadow-inner">
+                        <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] shrink-0 shadow-inner">
                           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
                             <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
                           </svg>
@@ -297,9 +295,8 @@ export default function TrashPage() {
           {files.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-                <h2 className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[var(--theme-text-muted)]">
-                  ASSETS ({files.length})
+                <h2 className="text-xs font-semibold text-[var(--theme-text-muted)]">
+                  Files ({files.length})
                 </h2>
               </div>
 
@@ -314,7 +311,7 @@ export default function TrashPage() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shrink-0 shadow-inner">
-                          <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-accent)]" />
+                          <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-text-muted)]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-semibold text-[var(--theme-text)] truncate group-hover:text-[var(--theme-accent)] transition-colors" title={file.name}>
@@ -370,7 +367,7 @@ export default function TrashPage() {
         isOpen={!!permanentDeleteTarget}
         onClose={() => setPermanentDeleteTarget(null)}
         title="Permanent Purge"
-        description="This asset will be permanently erased from secure storage. This action is irreversible."
+        description="This file will be permanently deleted. This action is irreversible."
         itemName={permanentDeleteTarget?.name || ""}
         confirmText="Purge Forever"
         isPermanent={true}
@@ -382,8 +379,8 @@ export default function TrashPage() {
         isOpen={emptyModalOpen}
         onClose={() => setEmptyModalOpen(false)}
         title="Purge Entire Trash Bin"
-        description="All files and directories in Trash will be permanently erased. Encrypted storage blocks will be reclaimed immediately."
-        itemName={`All ${stats.totalItems} trashed payload(s)`}
+        description="All files and folders in Trash will be permanently deleted. Storage space will be freed immediately."
+        itemName={`All ${stats.totalItems} trashed item(s)`}
         confirmText="Purge All"
         isPermanent={true}
         onConfirm={handleEmptyTrash}

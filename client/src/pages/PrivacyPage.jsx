@@ -6,9 +6,9 @@ import LandingFooter from "../components/landing/LandingFooter";
 const SECTIONS = [
   { id: "principle", title: "1. Core Privacy Principle" },
   { id: "collection", title: "2. Information We Collect" },
-  { id: "handling", title: "3. Cryptographic Asset Transport" },
+  { id: "handling", title: "3. How Your Files Are Stored" },
   { id: "passcodes", title: "4. Passcode & Access Gates" },
-  { id: "rights", title: "5. User Rights & Data Purging" },
+  { id: "rights", title: "5. Your Data, Your Control" },
 ];
 
 export default function PrivacyPage() {
@@ -45,11 +45,8 @@ export default function PrivacyPage() {
         {/* Editorial Header */}
         <div className="mb-10 sm:mb-14 pb-8 border-b border-[var(--theme-border)]">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="px-2.5 py-1 rounded text-[10px] font-mono tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/25">
-              PRIVACY SPECIFICATION // DOC-PRIV-2026.8
-            </span>
-            <span className="px-2.5 py-1 rounded text-[10px] font-mono text-[var(--color-vault-muted)] bg-[var(--theme-surface)] border border-[var(--theme-border)]">
-              ZERO TELEMETRY MONETIZATION
+            <span className="px-2.5 py-1 rounded text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/25">
+              Privacy Policy
             </span>
           </div>
 
@@ -57,9 +54,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="mt-3 text-xs sm:text-sm font-mono text-[var(--color-vault-muted)] flex items-center gap-2">
-            <span>Effective: August 2026</span>
-            <span>•</span>
-            <span>Zero-Knowledge & User Sovereignty Standard</span>
+            <span>Last updated: August 2026</span>
           </p>
         </div>
 
@@ -68,8 +63,8 @@ export default function PrivacyPage() {
           
           {/* Sticky Quick Nav (Desktop) & Overflow Nav (Mobile) */}
           <aside className="lg:sticky lg:top-28 depth-vault-chassis rounded-xl p-4 sm:p-5 border border-[var(--theme-border)] bg-[var(--theme-surface)]/90 backdrop-blur-xl">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-vault-muted)] mb-3 pb-2 border-b border-[var(--theme-border)] flex items-center justify-between">
-              <span>INDEX CLAUSES</span>
+            <div className="text-xs text-[var(--color-vault-muted)] mb-3 pb-2 border-b border-[var(--theme-border)] flex items-center justify-between">
+              <span>Contents</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             </div>
             
@@ -108,7 +103,7 @@ export default function PrivacyPage() {
                 <span className="text-emerald-400 font-mono text-xs">§ 1.0</span> Core Privacy Principle
               </h2>
               <p>
-                At VaultDrive, our operational philosophy is strictly non-custodial: <strong className="text-[var(--color-vault-text)]">your data belongs exclusively to you</strong>. We do not monetize your file assets, sell metadata telemetry, run tracking trackers, or inspect personal vaults for targeted commercial advertising.
+                At VaultDrive, <strong className="text-[var(--color-vault-text)]">your data belongs to you</strong>. We don't sell your data or files, and we don't scan your files for advertising purposes.
               </p>
             </section>
 
@@ -117,25 +112,25 @@ export default function PrivacyPage() {
                 <span className="text-emerald-400 font-mono text-xs">§ 2.0</span> Information We Collect
               </h2>
               <p>
-                We collect only the bare minimum telemetry strictly necessary to execute high-performance cloud storage:
+                We collect only what we need to run the service:
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <div className="p-4 rounded-xl depth-vault-card border border-[var(--theme-border)] bg-[var(--theme-panel)] space-y-1">
-                  <div className="text-[10px] font-mono text-vault-accent uppercase tracking-wider font-semibold">
+                  <div className="text-xs text-[var(--color-vault-muted)] font-semibold">
                     Identity & Auth
                   </div>
                   <p className="text-xs text-[var(--color-vault-muted)]">
-                    Name, email address, and cryptographically salted password hashes (Bcrypt / Argon2). Plaintext passwords never touch our logs.
+                    Name, email address, and your password, which is hashed with bcrypt before storage. Plaintext passwords never touch our logs.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl depth-vault-card border border-[var(--theme-border)] bg-[var(--theme-panel)] space-y-1">
-                  <div className="text-[10px] font-mono text-vault-accent uppercase tracking-wider font-semibold">
-                    Structural Metadata
+                  <div className="text-xs text-[var(--color-vault-muted)] font-semibold">
+                    File Metadata
                   </div>
                   <p className="text-xs text-[var(--color-vault-muted)]">
-                    Byte sizes, MIME categories, and folder tree nodes required to render your directory hierarchy in the workspace console.
+                    File sizes, types, and folder structure — what we need to show your files and folders in the dashboard.
                   </p>
                 </div>
               </div>
@@ -143,22 +138,22 @@ export default function PrivacyPage() {
 
             <section id="handling" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-emerald-400 font-mono text-xs">§ 3.0</span> Cryptographic Asset Transport
+                <span className="text-emerald-400 font-mono text-xs">§ 3.0</span> How Your Files Are Stored
               </h2>
               <p>
-                Payload transfers are piped directly across encrypted HTTPS/TLS 1.3 tunnels to dedicated cloud storage buckets. Data payloads at rest are shielded under institutional grade AES-256 ciphers.
+                Files are uploaded directly over HTTPS to our cloud storage provider. Files are not end-to-end encrypted — this lets us provide previews, downloads, and sharing links — but access to a file is restricted to you and anyone you explicitly share it with.
               </p>
 
               {/* Callout box */}
               <div className="depth-vault-card rounded-xl p-4 sm:p-5 border border-emerald-500/30 bg-emerald-500/[0.03]">
-                <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-semibold mb-1 flex items-center gap-1.5">
+                <div className="text-xs text-emerald-400 font-semibold mb-1 flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                     <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                  STRICT ACCESS BOUNDARY ENFORCEMENT
+                  Access Control
                 </div>
                 <p className="text-xs text-[var(--color-vault-muted)] leading-relaxed">
-                  Only your authenticated identity or recipients granted valid, unrevoked share tokens can trigger pre-signed decryption URIs.
+                  Only you, or recipients with a valid, unrevoked share link, can access a file.
                 </p>
               </div>
             </section>
@@ -168,16 +163,16 @@ export default function PrivacyPage() {
                 <span className="text-emerald-400 font-mono text-xs">§ 4.0</span> Passcode & Access Gates
               </h2>
               <p>
-                When enabling passcode protection on shared documents, pre-signed stream URLs are withholding until the recipient supplies the cryptographic challenge passcode. Passcode checks are rate-limited to eliminate brute-force attack vectors.
+                When you enable passcode protection on a shared file, the file won't be accessible until the recipient enters the correct passcode. Passcode checks are rate-limited to prevent brute-force attempts.
               </p>
             </section>
 
             <section id="rights" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-emerald-400 font-mono text-xs">§ 5.0</span> User Rights & Data Purging
+                <span className="text-emerald-400 font-mono text-xs">§ 5.0</span> Your Data, Your Control
               </h2>
               <p>
-                You retain complete sovereign governance over your storage volume. You may selectively restore items, empty trash blocks, or permanently close your account. Purge operations issue hard delete signals that completely obliterate the binary data blocks from storage infrastructure.
+                You control your storage. You can restore items from trash, empty trash, or permanently close your account at any time. Permanently deleting a file removes it from our storage entirely.
               </p>
             </section>
 
@@ -187,13 +182,13 @@ export default function PrivacyPage() {
                 to="/"
                 className="text-xs sm:text-sm font-semibold text-vault-accent hover:underline flex items-center gap-1.5"
               >
-                ← Return to Portal Homepage
+                ← Back to Home
               </Link>
               <Link
                 to="/terms"
                 className="text-xs sm:text-sm font-semibold text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] flex items-center gap-1.5"
               >
-                Inspect Terms of Service →
+                View Terms of Service →
               </Link>
             </div>
 

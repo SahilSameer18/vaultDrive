@@ -70,9 +70,9 @@ export default function PublicSharePage() {
   if (loading) {
     return (
       <VaultLoadingScreen
-        message="Verifying cryptographic token & decrypting payload…"
-        headerTag="✦ SECURED GATEWAY ✦"
-        footerTag="Institutional Key Verification"
+        message="Loading file…"
+        headerTag="Shared File"
+        footerTag="Secure Link"
       />
     );
   }
@@ -100,14 +100,14 @@ export default function PublicSharePage() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
-              <span className="text-[9px] font-mono tracking-widest text-[var(--color-vault-muted)] uppercase">Public Handover</span>
+              <span className="text-xs text-[var(--color-vault-muted)]">Public Handover</span>
             </div>
           </Link>
 
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-md flex items-center gap-1.5 shadow-sm">
+            <span className="px-2.5 py-1 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 rounded-md flex items-center gap-1.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="hidden sm:inline">GATEWAY // </span>TLS 1.3 SECURED
+              Secure Link
             </span>
           </div>
         </div>
@@ -129,25 +129,12 @@ export default function PublicSharePage() {
               </div>
 
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-rose-400 font-semibold">
-                  GATEWAY EXCEPTION 404
-                </span>
                 <h2 className="text-xl sm:text-2xl font-bold text-[var(--color-vault-text)] mt-1">
-                  Access Restricted or Revoked
+                  Link Unavailable
                 </h2>
                 <p className="text-xs sm:text-sm text-[var(--color-vault-muted)] mt-2 leading-relaxed max-w-md mx-auto">
-                  {error}
+                  This link is invalid or has expired. Ask the sender for a new link.
                 </p>
-              </div>
-
-              {/* Monospace diagnostic panel */}
-              <div className="rounded-xl border border-[var(--theme-border)] bg-[var(--theme-bg)] p-3 text-left font-mono text-[10px] sm:text-[11px] space-y-1 text-[var(--color-vault-muted)]">
-                <div className="flex justify-between border-b border-[var(--theme-border)] pb-1.5 mb-1.5 text-[9px] tracking-wider text-[var(--color-vault-muted)]">
-                  <span>ERR_SECURITY_HANDSHAKE</span>
-                  <span className="text-rose-400">DENIED</span>
-                </div>
-                <div>TOKEN: {shareToken ? `${shareToken.substring(0, 12)}...` : "NONE"}</div>
-                <div>POLICY: ONE_TIME_OR_REVOKED</div>
               </div>
 
               <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
@@ -163,17 +150,6 @@ export default function PublicSharePage() {
             /* Verified File Payload Chassis */
             <div className="depth-vault-chassis rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-2xl overflow-hidden text-left relative">
               
-              {/* Header Telemetry Ribbon */}
-              <div className="px-5 sm:px-7 py-3 border-b border-[var(--theme-border)] bg-[var(--theme-panel)]/50 flex items-center justify-between text-[10px] font-mono">
-                <span className="flex items-center gap-1.5 text-emerald-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  AUTHENTICATED ASSET
-                </span>
-                <span className="text-[var(--color-vault-muted)]">
-                  ENCRYPTED REPOSITORY
-                </span>
-              </div>
-
               {/* Main Payload Card Body */}
               <div className="p-5 sm:p-7 space-y-6">
                 
@@ -185,8 +161,8 @@ export default function PublicSharePage() {
                   
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-wider bg-vault-accent/10 border border-vault-accent/30 text-vault-accent">
-                        {file.mimeType?.split("/")[1] || "FILE"}
+                      <span className="px-2 py-0.5 rounded text-xs bg-white/[0.04] border border-white/[0.08] text-[var(--color-vault-muted)]">
+                        {file.mimeType?.split("/")[1] || "File"}
                       </span>
                       <span className="text-[10px] font-mono text-[var(--color-vault-muted)]">
                         {formatBytes(file.size)}
@@ -196,32 +172,20 @@ export default function PublicSharePage() {
                       {file.name}
                     </h1>
                     <p className="text-xs text-[var(--color-vault-muted)] mt-0.5 font-mono">
-                      Timestamp: {formatDate(file.createdAt)}
+                      Uploaded: {formatDate(file.createdAt)}
                     </p>
                   </div>
                 </div>
 
-                {/* Sender & Security Attribute Box */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+                {/* Sender Attribute Box */}
+                <div className="grid grid-cols-1 gap-3 text-xs font-mono">
                   <div className="p-3 rounded-xl bg-[var(--theme-bg)] border border-[var(--theme-border)]">
-                    <div className="text-[9px] uppercase tracking-wider text-[var(--color-vault-muted)] mb-1">
-                      Origin Signer
+                    <div className="text-xs text-[var(--color-vault-muted)] mb-1">
+                      Shared By
                     </div>
                     <div className="text-[var(--color-vault-text)] font-semibold truncate flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
-                      {file.user?.name || file.user?.username ? `@${file.user.username || file.user.name}` : "Verified Vault Member"}
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[var(--theme-bg)] border border-[var(--theme-border)]">
-                    <div className="text-[9px] uppercase tracking-wider text-[var(--color-vault-muted)] mb-1">
-                      Transport Cipher
-                    </div>
-                    <div className="text-emerald-400 font-semibold truncate flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                      </svg>
-                      End-To-End Direct Stream
+                      <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
+                      {file.user?.name || file.user?.username ? `@${file.user.username || file.user.name}` : "A VaultDrive user"}
                     </div>
                   </div>
                 </div>
@@ -237,7 +201,7 @@ export default function PublicSharePage() {
                       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="2" />
                       <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
                     </svg>
-                    Preview Asset
+                    Preview
                   </button>
 
                   <button
@@ -256,7 +220,7 @@ export default function PublicSharePage() {
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                        <span>Download Encrypted File</span>
+                        <span>Download File</span>
                       </>
                     )}
                   </button>
@@ -264,11 +228,10 @@ export default function PublicSharePage() {
 
               </div>
 
-              {/* Institutional Assurance Footer */}
-              <div className="px-5 sm:px-7 py-3 bg-[var(--theme-bg)]/60 border-t border-[var(--theme-border)] flex items-center justify-between text-[9px] font-mono text-[var(--color-vault-muted)]">
-                <span>RECIPIENT_PROTOCOL // DIRECT_VERIFIED</span>
+              {/* Footer */}
+              <div className="px-5 sm:px-7 py-3 bg-[var(--theme-bg)]/60 border-t border-[var(--theme-border)] flex items-center justify-end text-xs text-[var(--color-vault-muted)]">
                 <Link to="/privacy" className="hover:text-[var(--color-vault-text)] underline">
-                  Security Disclosures
+                  Privacy Policy
                 </Link>
               </div>
 
@@ -279,10 +242,8 @@ export default function PublicSharePage() {
       </main>
 
       {/* Persistent Page Footer */}
-      <footer className="relative z-10 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] py-4 text-center text-[10px] font-mono text-[var(--color-vault-muted)] flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 px-4">
-        <span>VAULTDRIVE ENGINE © 2027</span>
-        <span className="hidden sm:inline opacity-30">•</span>
-        <span>END-TO-END ENCRYPTED</span>
+      <footer className="relative z-10 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] py-4 text-center text-xs text-[var(--color-vault-muted)] flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 px-4">
+        <span>© 2026 VaultDrive</span>
         <span className="hidden sm:inline opacity-30">•</span>
         <Link to="/" className="text-vault-accent hover:underline">
           Return to Portal

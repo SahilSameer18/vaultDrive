@@ -69,7 +69,7 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
   if (!tree.length) return null;
 
   const renderNodes = (nodes, depth = 0) => (
-    <div className={`space-y-0.5 text-xs font-mono ${depth > 0 ? "pl-2.5 border-l border-vault-border/60 ml-2.5 mt-0.5" : ""}`}>
+    <div className={`space-y-0.5 text-xs font-mono ${depth > 0 ? "pl-2.5 border-l border-[var(--theme-border)]/60 ml-2.5 mt-0.5" : ""}`}>
       {nodes.map((folder) => {
         const isActive = activeFolderId === folder.id;
         const isExpanded = !!expanded[folder.id];
@@ -80,8 +80,8 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
             <div
               className={`group flex items-center justify-between px-2.5 py-1.5 rounded-xl transition-all ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/40 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/60 border border-transparent"
+                  ? "bg-[var(--theme-panel)] text-[var(--theme-text)] border border-white/15 font-semibold shadow-sm"
+                  : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-panel)]/60 border border-transparent"
               }`}
             >
               <div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -92,11 +92,11 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
                     onClick={(e) => toggleExpand(folder.id, e)}
                     aria-expanded={isExpanded}
                     aria-label={isExpanded ? `Collapse ${folder.name}` : `Expand ${folder.name}`}
-                    className="p-0.5 rounded text-vault-muted hover:text-vault-accent transition-colors cursor-pointer shrink-0"
+                    className="p-0.5 rounded text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] transition-colors cursor-pointer shrink-0"
                   >
                     <svg
                       className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                        isExpanded ? "rotate-90 text-vault-accent" : "text-vault-muted"
+                        isExpanded ? "rotate-90 text-[var(--theme-text)]" : "text-[var(--theme-text-muted)]"
                       }`}
                       viewBox="0 0 24 24"
                       fill="none"
@@ -116,7 +116,7 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
                 >
                   <svg
                     className={`w-3.5 h-3.5 shrink-0 transition-colors ${
-                      isActive ? "text-vault-accent" : "text-amber-500/80"
+                      isActive ? "text-[var(--theme-text)]" : "text-[var(--theme-text-muted)]"
                     }`}
                     viewBox="0 0 24 24"
                     fill="none"
@@ -128,12 +128,12 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
               </div>
 
               {/* Hover Actions: Rename & Delete */}
-              <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">
+              <div className="flex items-center gap-0.5 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0 ml-1">
                 {onRenameFolder && (
                   <button
                     type="button"
                     onClick={(e) => handleRenameClick(folder, e)}
-                    className="p-1 rounded text-vault-muted hover:text-vault-accent hover:bg-vault-surface transition-colors cursor-pointer"
+                    className="p-1 rounded text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
                     title="Rename Folder"
                   >
                     <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
@@ -147,7 +147,7 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
                   <button
                     type="button"
                     onClick={(e) => handleDeleteClick(folder, e)}
-                    className="p-1 rounded text-vault-muted hover:text-vault-danger hover:bg-vault-surface transition-colors cursor-pointer"
+                    className="p-1 rounded text-[var(--theme-text-muted)] hover:text-[var(--theme-danger)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
                     title="Move Folder to Trash"
                   >
                     <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
@@ -172,7 +172,7 @@ export default function FolderSidebar({ folders = [], onSelectFolder, onRenameFo
 
   return (
     <div className="space-y-1.5">
-      <p className="px-2.5 text-[11px] font-medium text-vault-muted">
+      <p className="px-2.5 text-[11px] font-medium text-[var(--theme-text-muted)]">
         Folders
       </p>
       {renderNodes(tree)}

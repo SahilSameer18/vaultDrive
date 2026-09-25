@@ -181,16 +181,16 @@ export default function LoginPage() {
               Welcome back to <span className="text-gold-gradient">VaultDrive.</span>
             </h2>
             <p className="text-xs text-vault-muted leading-relaxed max-w-xs font-normal">
-              Sign in to decrypt and access your private cloud storage workspace.
+              Sign in to access your private cloud storage workspace.
             </p>
           </div>
 
-          {/* Telemetry Status Footer */}
-          <div className="text-xs font-mono text-vault-muted flex items-center justify-between">
-            <span className="tracking-wider text-[10.5px]">SYS // ENCRYPTED NODE</span>
-            <span className="flex items-center gap-1.5 text-emerald-400 text-[10.5px]">
+          {/* Status Footer */}
+          <div className="text-xs text-vault-muted flex items-center justify-between">
+            <span>Encrypted storage</span>
+            <span className="flex items-center gap-1.5 text-emerald-400">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-              ONLINE
+              Online
             </span>
           </div>
         </div>
@@ -207,9 +207,9 @@ export default function LoginPage() {
                 </div>
                 <span className="font-bold text-base tracking-tight text-white">VaultDrive</span>
               </Link>
-              <span className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-[9.5px] font-mono text-emerald-400 flex items-center gap-1.5">
+              <span className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-xs text-emerald-400 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-                ONLINE
+                Online
               </span>
             </div>
 
@@ -226,8 +226,8 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs font-mono">
-                  [AUTH ERROR] {error}
+                <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs">
+                  {error}
                 </div>
               )}
 
@@ -296,14 +296,14 @@ export default function LoginPage() {
                   disabled={formLoading}
                   className="tactile-btn w-full mt-1.5 py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm font-semibold text-vault-landing-bg bg-vault-accent hover:bg-vault-accent-hover shadow-[0_2px_14px_rgba(197,160,89,0.25)] hover:shadow-[0_4px_22px_rgba(197,160,89,0.35)] disabled:opacity-50 disabled:cursor-not-allowed transition-all cursor-pointer"
                 >
-                  {formLoading ? "Decrypting Vault..." : "Sign In to Vault"}
+                  {formLoading ? "Signing In..." : "Sign In to Vault"}
                 </button>
               </form>
 
               {/* Divider */}
               <div className="flex items-center gap-3 my-4">
                 <div className="flex-1 h-px bg-white/[0.08]" />
-                <span className="text-[10px] text-vault-muted font-mono tracking-wider">OR</span>
+                <span className="text-xs text-vault-muted">Or</span>
                 <div className="flex-1 h-px bg-white/[0.08]" />
               </div>
 
@@ -320,7 +320,7 @@ export default function LoginPage() {
               </div>
 
               {googleLoading && (
-                <div className="flex items-center justify-center gap-2 mt-2 text-xs font-mono text-vault-accent">
+                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-vault-muted">
                   <svg className="w-3.5 h-3.5 animate-spin shrink-0" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeOpacity="0.25" />
                     <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />

@@ -34,19 +34,18 @@ export default function RecentActivityPage() {
       
       {/* Header */}
       <div className="pb-4 border-b border-[var(--theme-border)]">
-        <nav className="flex items-center gap-2 text-xs font-mono text-[var(--theme-text-muted)] mb-1">
-          <Link to="/dashboard" className="text-[var(--theme-accent)] hover:underline flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-            ROOT
+        <nav className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] mb-1">
+          <Link to="/dashboard" className="text-[var(--theme-text)] hover:underline">
+            Root
           </Link>
           <span className="text-[var(--theme-border)]">/</span>
           <span className="text-[var(--theme-text)]">Recent Activity</span>
         </nav>
         <h1 className="text-2xl font-bold tracking-tight text-[var(--theme-text)]">
-          Audit Trail & Activity
+          Recent Activity
         </h1>
         <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
-          Chronological event feed of all payload ingests and modifications in your personal vault.
+          The latest uploads and changes across your Vault, newest first.
         </p>
       </div>
 
@@ -67,7 +66,7 @@ export default function RecentActivityPage() {
           </div>
           <h3 className="text-base font-bold text-[var(--theme-text)]">No Recent Activity Recorded</h3>
           <p className="text-xs text-[var(--theme-text-muted)] mt-1 max-w-sm leading-relaxed">
-            Ingest assets or create directories to build your chronological telemetry log.
+            Upload files or create folders and your activity will show up here.
           </p>
         </div>
       ) : (
@@ -79,12 +78,12 @@ export default function RecentActivityPage() {
             >
               <div className="flex items-center gap-3.5 min-w-0">
                 <div className="w-9 h-9 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shrink-0 shadow-inner">
-                  <FileCategoryIcon mimetype={file.mimeType} className="w-4 h-4 text-[var(--theme-accent)]" />
+                  <FileCategoryIcon mimetype={file.mimeType} className="w-4 h-4 text-[var(--theme-text-muted)]" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-[var(--theme-text)] truncate">{file.name}</p>
                   <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-0.5">
-                    Ingested on {formatDate(file.createdAt)} <span className="opacity-40">•</span> {formatBytes(file.size)}
+                    Uploaded {formatDate(file.createdAt)} <span className="opacity-40">•</span> {formatBytes(file.size)}
                   </p>
                 </div>
               </div>
@@ -93,9 +92,9 @@ export default function RecentActivityPage() {
                 <button
                   type="button"
                   onClick={() => setPreviewFile(file)}
-                  className="px-3 py-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[10px] font-mono text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] transition-colors cursor-pointer shadow-sm"
+                  className="px-3 py-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[10px] font-mono text-[var(--theme-text)] hover:border-white/20 transition-colors cursor-pointer shadow-sm"
                 >
-                  Inspect
+                  Preview
                 </button>
                 <a
                   href={file.url}

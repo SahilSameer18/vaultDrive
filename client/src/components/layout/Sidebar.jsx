@@ -108,7 +108,7 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             </div>
             <div>
               <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
-              <p className="text-[9px] font-mono text-[var(--color-vault-muted)] leading-none mt-0.5">Encrypted Cloud</p>
+              <p className="text-xs text-[var(--color-vault-muted)] leading-none mt-0.5">Cloud Storage</p>
             </div>
           </div>
 
@@ -130,12 +130,12 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
         <Link
           to="/profile"
           onClick={onCloseMobileMenu}
-          className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl depth-vault-card border border-[var(--theme-border)] hover:border-vault-accent/50 transition-colors"
+          className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl depth-vault-card border border-[var(--theme-border)] hover:border-white/20 transition-colors"
         >
           <UserAvatar user={user} size="sm" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-bold text-[var(--color-vault-text)] truncate">{user?.username || "Vault User"}</p>
-            <p className="text-[10px] font-mono text-[var(--color-vault-muted)] truncate">{user?.email}</p>
+            <p className="text-xs text-[var(--color-vault-muted)] truncate">{user?.email}</p>
           </div>
           <svg className="w-3.5 h-3.5 text-[var(--color-vault-muted)]" viewBox="0 0 24 24" fill="none">
             <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -146,15 +146,14 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
         {onToggleCollapse && (
           <div className="hidden lg:flex items-center justify-between px-1 pb-1">
             {!collapsed ? (
-              <span className="text-[10px] font-mono font-semibold tracking-wider text-[var(--color-vault-muted)] uppercase flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                NAVIGATION
+              <span className="text-xs font-semibold text-[var(--color-vault-muted)] flex items-center gap-1.5">
+                Navigation
               </span>
             ) : null}
             <button
               type="button"
               onClick={onToggleCollapse}
-              className={`p-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-vault-accent hover:border-vault-accent/40 transition-all cursor-pointer ${
+              className={`p-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-all cursor-pointer ${
                 collapsed ? "mx-auto" : ""
               }`}
               title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
@@ -318,8 +317,8 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
         {/* Directory Folder Tree (Visible when expanded) */}
         {!collapsed && allFolders.length > 0 && (
           <div className="pt-3 border-t border-[var(--theme-border)]">
-            <div className="px-1 pb-2 flex items-center justify-between text-[10px] font-mono text-[var(--color-vault-muted)] uppercase tracking-wider">
-              <span>DIRECTORIES</span>
+            <div className="px-1 pb-2 flex items-center justify-between text-xs text-[var(--color-vault-muted)]">
+              <span>Folders</span>
               <span>{allFolders.length}</span>
             </div>
             <FolderSidebar
@@ -339,12 +338,11 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
           to="/storage"
           onClick={onCloseMobileMenu}
           className="p-3.5 border-t border-[var(--theme-border)] bg-[var(--theme-panel)]/40 hover:bg-[var(--theme-panel)]/80 transition-colors shrink-0 space-y-2.5 block group cursor-pointer"
-          title="Inspect Storage Allocation"
+          title="View Storage Details"
         >
-          <div className="flex items-center justify-between text-[10px] font-mono">
-            <span className="text-[var(--color-vault-muted)] group-hover:text-[var(--color-vault-text)] transition-colors font-medium flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
-              STORAGE ALLOCATION
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-[var(--color-vault-muted)] group-hover:text-[var(--color-vault-text)] transition-colors font-medium">
+              Storage Used
             </span>
             <span className="text-vault-accent font-semibold px-1.5 py-0.5 rounded bg-vault-accent/10 border border-vault-accent/25">
               {usedPercentage}%
@@ -361,7 +359,7 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
 
           <div className="flex items-center justify-between text-[10px] font-mono text-[var(--color-vault-muted)]">
             <span>{formatBytes(totalStorageBytes)}</span>
-            <span className="text-[9px] opacity-70">1.00 GB LIMIT</span>
+            <span className="opacity-70">1.00 GB limit</span>
           </div>
         </Link>
       ) : (
@@ -371,12 +369,12 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
           className="p-3 border-t border-[var(--theme-border)] bg-[var(--theme-panel)]/40 hover:bg-[var(--theme-panel)] transition-colors shrink-0 flex flex-col items-center justify-center gap-1 group cursor-pointer"
           title={`Storage: ${formatBytes(totalStorageBytes)} / 1 GB (${usedPercentage}% used)`}
         >
-          <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-vault-accent group-hover:border-vault-accent/50 transition-colors shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--color-vault-muted)] group-hover:border-white/20 transition-colors shadow-sm">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2" />
             </svg>
           </div>
-          <span className="text-[9px] font-mono font-semibold text-[var(--color-vault-muted)] group-hover:text-vault-accent">
+          <span className="text-[9px] font-mono font-semibold text-[var(--color-vault-muted)] group-hover:text-[var(--color-vault-text)]">
             {usedPercentage}%
           </span>
         </Link>

@@ -139,16 +139,15 @@ export default function StoragePage() {
       {/* ── Top Header ────────────────────────────────────────────────────── */}
       <div className="border-b border-[var(--theme-border)] pb-5">
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-          <span className="text-[10px] font-mono font-semibold tracking-widest text-[var(--theme-accent)] uppercase">
-            STORAGE METRICS & TELEMETRY
+          <span className="text-xs font-semibold text-[var(--theme-text-muted)]">
+            Storage
           </span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--theme-text)] mt-1">
-          {user?.username ? `${user.username}’s Allocation Overview` : "Hardware Allocation Overview"}
+          {user?.username ? `${user.username}’s Storage` : "Storage Overview"}
         </h1>
         <p className="text-xs sm:text-sm text-[var(--theme-text-muted)] mt-1">
-          Real-time allocation breakdown for your 1.0 GB secure encrypted vault.
+          A breakdown of how your 1.0 GB vault is being used.
         </p>
       </div>
 
@@ -189,7 +188,7 @@ export default function StoragePage() {
             {/* 2. Images Card */}
             <div className="p-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] flex flex-col justify-between space-y-4 shadow-sm hover:border-[var(--theme-accent)]/40 transition-colors">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[var(--theme-accent)]/10 border border-[var(--theme-accent)]/30 flex items-center justify-center text-[var(--theme-accent)] shadow-sm">
+                <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-sm">
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.75" />
                     <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
@@ -206,7 +205,7 @@ export default function StoragePage() {
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-[var(--theme-surface)] overflow-hidden shadow-inner">
                   <div
-                    className="h-full bg-[var(--theme-accent)] rounded-full transition-all duration-500"
+                    className="h-full bg-indigo-400 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(100, Math.max(imgPct > 0 ? 3 : 0, imgPct))}%` }}
                   />
                 </div>
@@ -267,7 +266,7 @@ export default function StoragePage() {
 
           {/* ── Main Section: Storage Details (Donut Chart + Breakdown Cards) ─── */}
           <div className="space-y-4">
-            <h2 className="text-xl font-bold tracking-tight text-[var(--theme-text)]">Hardware Allocation Matrix</h2>
+            <h2 className="text-xl font-bold tracking-tight text-[var(--theme-text)]">Storage Breakdown</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
               
@@ -286,13 +285,13 @@ export default function StoragePage() {
                       className="text-[var(--theme-surface)]"
                     />
 
-                    {/* Images Segment (Champagne Gold) */}
+                    {/* Images Segment (Indigo) */}
                     {imgDash > 0 && (
                       <circle
                         cx="90"
                         cy="90"
                         r={radius}
-                        stroke="var(--color-vault-accent)"
+                        stroke="#818cf8"
                         strokeWidth="14"
                         fill="transparent"
                         strokeDasharray={`${imgDash} ${circumference}`}
@@ -363,7 +362,7 @@ export default function StoragePage() {
                 </div>
 
                 <p className="mt-4 text-xs font-mono text-[var(--theme-text-muted)] text-center">
-                  <span className="text-[var(--theme-accent)] font-semibold">{stats?.fileCount || 0} payloads</span> · {usedPercent}% consumed
+                  <span className="text-[var(--theme-text)] font-semibold">{stats?.fileCount || 0} files</span> · {usedPercent}% used
                 </p>
               </div>
 
@@ -391,7 +390,7 @@ export default function StoragePage() {
                   {/* Images Detail */}
                   <div className="p-4 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)]/70 flex items-center justify-between shadow-sm">
                     <div className="flex items-center gap-3">
-                      <span className="w-3 h-3 rounded-full bg-[var(--theme-accent)] shadow-sm" />
+                      <span className="w-3 h-3 rounded-full bg-indigo-400 shadow-sm" />
                       <div>
                         <p className="text-xs font-semibold text-[var(--theme-text)]">Images</p>
                         <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">{categories.image.count} files</p>
@@ -441,7 +440,7 @@ export default function StoragePage() {
                     <span className="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                     <div>
                       <p className="text-xs font-semibold text-[var(--theme-text)]">Available Free Storage</p>
-                      <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">{(100 - usedPercent).toFixed(1)}% unallocated</p>
+                      <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">{(100 - usedPercent).toFixed(1)}% free</p>
                     </div>
                   </div>
                   <span className="text-sm font-mono font-bold text-emerald-400">

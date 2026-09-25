@@ -68,12 +68,12 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
     try {
       await filesApi.revokeShareLink(file.id);
       setShareToken(null);
-      setSuccess("Public share link revoked!");
+      setSuccess("Public link removed!");
 
       const updatedFile = { ...file, shareToken: null, isPublic: false };
       onShareUpdate && onShareUpdate(updatedFile);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to revoke share link");
+      setError(err.response?.data?.message || "Failed to remove share link");
     } finally {
       setLoading(false);
     }
@@ -104,11 +104,11 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
     setSuccess("");
     try {
       await filesApi.unshareWithUser(file.id, targetUserId);
-      setSuccess(`Access revoked for ${username}`);
+      setSuccess(`Access removed for ${username}`);
       setSharedUsers((prev) => prev.filter((u) => u.userId !== targetUserId));
       window.dispatchEvent(new CustomEvent("vault:notifications-changed"));
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to revoke access");
+      setError(err.response?.data?.message || "Failed to remove access");
     }
   };
 
@@ -127,7 +127,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-4 mb-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-accent)]/40 flex items-center justify-center text-[var(--theme-accent)] shrink-0 shadow-sm">
+            <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] shrink-0 shadow-sm">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.75" />
                 <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
@@ -137,14 +137,14 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-base text-[var(--theme-text)] truncate">{file.name}</h3>
-              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] tracking-wider">SHARE & ACCESS DELEGATION</p>
+              <p className="text-xs text-[var(--theme-text-muted)]">Share this file</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer"
           >
             <span className="text-xs font-bold">✕</span>
           </button>
@@ -153,7 +153,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
         {/* Feedback Alerts */}
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
-            [ERROR] {error}
+            {error}
           </div>
         )}
         {success && (
@@ -168,24 +168,24 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
           <button
             type="button"
             onClick={() => setActiveTab("link")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
               activeTab === "link"
-                ? "bg-[var(--theme-panel)] text-[var(--theme-accent)] font-semibold shadow-sm border border-[var(--theme-border)]"
+                ? "bg-[var(--theme-panel)] text-[var(--theme-text)] font-semibold shadow-sm border border-[var(--theme-border)]"
                 : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
             }`}
           >
-            Public Gateway Link
+            <span className="block truncate">Public Link</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("user")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
               activeTab === "user"
-                ? "bg-[var(--theme-panel)] text-[var(--theme-accent)] font-semibold shadow-sm border border-[var(--theme-border)]"
+                ? "bg-[var(--theme-panel)] text-[var(--theme-text)] font-semibold shadow-sm border border-[var(--theme-border)]"
                 : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
             }`}
           >
-            User Delegation
+            <span className="block truncate">Share with People</span>
           </button>
         </div>
 
@@ -195,42 +195,42 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
             {publicUrl ? (
               <div className="space-y-3">
                 <label className="block text-xs font-medium text-[var(--theme-text)]">
-                  Active Share Gateway URL
+                  Share Link
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
                     value={publicUrl}
-                    className="flex-1 px-3 py-2.5 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-accent)] text-xs font-mono select-all focus:outline-none shadow-inner"
+                    className="flex-1 px-3 py-2.5 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-xs font-mono select-all focus:outline-none shadow-inner"
                   />
                   <button
                     type="button"
                     onClick={copyToClipboard}
-                    className="px-4 py-2.5 rounded-xl border border-[var(--theme-accent)]/40 bg-[var(--theme-accent)]/10 text-[var(--theme-accent)] text-xs font-mono font-semibold hover:bg-[var(--theme-accent)] hover:text-[#0d0f12] transition-all shrink-0 cursor-pointer shadow-sm"
+                    className="px-4 py-2.5 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text)] text-xs font-semibold hover:border-white/30 transition-all shrink-0 cursor-pointer shadow-sm"
                   >
                     Copy
                   </button>
                 </div>
 
                 <div className="pt-2 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> GATEWAY ACTIVE
+                  <span className="text-xs text-emerald-400 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Link Active
                   </span>
                   <button
                     type="button"
                     onClick={handleRevokeLink}
                     disabled={loading}
-                    className="text-xs font-mono text-rose-400 hover:underline cursor-pointer"
+                    className="text-xs text-rose-400 hover:underline cursor-pointer"
                   >
-                    Revoke Link
+                    Remove Link
                   </button>
                 </div>
               </div>
             ) : (
               <div className="text-center py-5 space-y-3">
                 <p className="text-xs text-[var(--theme-text-muted)] leading-relaxed">
-                  No public gateway token is currently active for this payload. Generating a link allows any recipient to stream and verify this file.
+                  Create a link anyone can use to view this file.
                 </p>
                 <button
                   type="button"
@@ -238,7 +238,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
                   disabled={loading}
                   className="px-5 py-2.5 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all shadow-md cursor-pointer"
                 >
-                  {loading ? "Generating..." : "Generate Public Gateway Link"}
+                  {loading ? "Generating..." : "Create Link"}
                 </button>
               </div>
             )}
@@ -251,23 +251,23 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
             <form onSubmit={handleShareWithUser} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-[var(--theme-text)] mb-2">
-                  Grant Explicit Access to Vault User
+                  Share with a specific person
                 </label>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <input
                     type="text"
                     value={targetIdentifier}
                     onChange={(e) => setTargetIdentifier(e.target.value)}
                     placeholder="User email or username..."
                     required
-                    className="flex-1 px-4 py-2.5 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-xs placeholder:text-[var(--theme-text-muted)]/40 focus:border-[var(--theme-accent)] focus:outline-none shadow-inner transition-colors"
+                    className="flex-1 min-w-0 px-4 py-2.5 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text)] text-xs placeholder:text-[var(--theme-text-muted)]/40 focus:border-white/30 focus:outline-none shadow-inner transition-colors"
                   />
                   <button
                     type="submit"
                     disabled={loading || !targetIdentifier.trim()}
                     className="px-4 py-2.5 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 disabled:opacity-50 transition-all shadow-md shrink-0 cursor-pointer"
                   >
-                    {loading ? "Granting..." : "Authorize"}
+                    {loading ? "Sharing..." : "Share"}
                   </button>
                 </div>
               </div>
@@ -277,16 +277,16 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
             <div className="border-t border-[var(--theme-border)] pt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-[var(--theme-text)]">
-                  Authorized Users ({sharedUsers.length})
+                  People with access ({sharedUsers.length})
                 </span>
                 {loadingUsers && (
-                  <span className="text-[10px] font-mono text-[var(--theme-text-muted)] animate-pulse">Syncing…</span>
+                  <span className="text-xs text-[var(--theme-text-muted)] animate-pulse">Syncing…</span>
                 )}
               </div>
 
               {sharedUsers.length === 0 ? (
                 <div className="p-4 rounded-xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-surface)]/40 text-center">
-                  <p className="text-xs text-[var(--theme-text-muted)]">No users have been granted explicit delegated access.</p>
+                  <p className="text-xs text-[var(--theme-text-muted)]">Not shared with anyone yet.</p>
                 </div>
               ) : (
                 <div className="max-h-48 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
@@ -296,7 +296,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
                       className="p-2.5 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] flex items-center justify-between gap-3 shadow-sm"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-7 h-7 rounded-lg bg-[var(--theme-accent)]/15 border border-[var(--theme-accent)]/40 flex items-center justify-center text-[var(--theme-accent)] font-mono font-bold text-xs shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] font-semibold text-xs shrink-0">
                           {user.username?.charAt(0)?.toUpperCase() || "U"}
                         </div>
                         <div className="min-w-0">
@@ -308,9 +308,9 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
                       <button
                         type="button"
                         onClick={() => handleUnshareUser(user.userId, user.username)}
-                        className="px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[11px] font-mono font-medium transition-colors shrink-0 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-xs font-medium transition-colors shrink-0 cursor-pointer"
                       >
-                        Revoke
+                        Remove
                       </button>
                     </div>
                   ))}

@@ -130,9 +130,9 @@ function ArchitecturalOfflineVault() {
       </svg>
 
       {/* Sub-label */}
-      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--theme-surface)] border border-rose-500/30 text-[9px] font-mono text-rose-400 whitespace-nowrap shadow-md">
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--theme-surface)] border border-rose-500/30 text-xs text-rose-400 whitespace-nowrap shadow-md">
         <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
-        NODE_OFFLINE // ROUTE_DISCONNECTED
+        Not Found
       </div>
     </div>
   );
@@ -162,13 +162,13 @@ export default function NotFoundPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
-              <span className="text-[9px] font-mono tracking-widest text-[var(--color-vault-muted)] uppercase">System Exception</span>
+              <span className="text-xs text-[var(--color-vault-muted)]">Page Not Found</span>
             </div>
           </Link>
 
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-md">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-md">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
-            HTTP 404 // NON_EXISTENT_SECTOR
+            404
           </span>
         </div>
       </header>
@@ -180,55 +180,31 @@ export default function NotFoundPage() {
           <ArchitecturalOfflineVault />
 
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md border border-rose-500/30 bg-rose-500/10 text-rose-400 text-[10px] font-mono tracking-wider font-semibold mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-              ENCRYPTED PATH UNRESOLVED
-            </div>
-
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[var(--color-vault-text)] leading-tight">
-              This vault door <br className="hidden sm:inline" /> does not exist.
+              Page not found.
             </h1>
 
             <p className="mt-3 text-xs sm:text-sm text-[var(--color-vault-muted)] leading-relaxed max-w-md mx-auto lg:mx-0">
-              The cryptographic sector or asset URI you requested is not mapped to any active repository block. It may have been expired, moved, or purged.
+              The page you're looking for doesn't exist or may have moved.
             </p>
-
-            {/* Diagnostic Console Box */}
-            <div className="mt-6 depth-vault-chassis rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] p-4 text-left font-mono text-[11px] shadow-xl">
-              <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-2 mb-2.5 text-[9px] tracking-wider text-[var(--color-vault-muted)]">
-                <span>SYSTEM_TELEMETRY // ROUTE_DISPATCHER</span>
-                <span className="text-rose-400 font-bold">STATUS: 404</span>
-              </div>
-              <div className="space-y-1.5">
-                <div className="flex gap-2 text-[var(--color-vault-muted)]">
-                  <span className="text-emerald-400 font-bold">$</span> lookup_sector --target requested_route
-                </div>
-                <div className="flex gap-2 text-rose-400 font-medium">
-                  <span>✕</span> SECTOR_NOT_PROVISIONED
-                </div>
-                <div className="flex gap-2 text-vault-accent">
-                  <span>→</span> RECOMMENDED_ACTION: redirect /dashboard
-                </div>
-              </div>
-            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mt-7">
               <Link
                 to="/dashboard"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-mono font-semibold text-white bg-vault-accent hover:bg-vault-accent-hover shadow-lg shadow-vault-accent/20 transition-all flex items-center justify-center gap-2 tactile-btn active:scale-98"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-semibold text-white bg-vault-accent hover:bg-vault-accent-hover shadow-lg shadow-vault-accent/20 transition-all flex items-center justify-center gap-2 tactile-btn active:scale-98"
               >
-                RETURN TO DASHBOARD
+                Back to Dashboard
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                   <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
-              
+
               <Link
                 to="/"
-                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-mono font-medium text-[var(--color-vault-muted)] bg-[var(--theme-surface)] border border-[var(--theme-border)] hover:border-vault-accent hover:text-[var(--color-vault-text)] transition-all flex items-center justify-center active:scale-98"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-medium text-[var(--color-vault-muted)] bg-[var(--theme-surface)] border border-[var(--theme-border)] hover:border-vault-accent hover:text-[var(--color-vault-text)] transition-all flex items-center justify-center active:scale-98"
               >
-                LANDING HOMEPAGE
+                Homepage
               </Link>
             </div>
 
@@ -238,8 +214,8 @@ export default function NotFoundPage() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] py-4 text-center text-[10px] font-mono tracking-wider text-[var(--color-vault-muted)]">
-        VAULTDRIVE ENGINE © 2027 · ENCRYPTED CLOUD ASSET REPOSITORY
+      <footer className="relative z-10 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] py-4 text-center text-xs text-[var(--color-vault-muted)]">
+        © 2026 VaultDrive
       </footer>
 
     </div>

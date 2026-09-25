@@ -44,11 +44,10 @@ export default function CoreBenefits() {
         {/* Section Headline */}
         <div className="max-w-2xl mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-            Architectural security. <br />
-            <span className="text-silver-gradient">Engineered for absolute privacy.</span>
+            What's actually different <span className="text-silver-gradient">under the hood</span>
           </h2>
           <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[54ch]">
-            Every layer is isolated to ensure zero-knowledge storage, cryptographic link authorization, and lightning-fast direct throughput.
+            Uploads go straight to storage, folders nest as deep as you want, and shared links can be locked behind a passcode.
           </p>
         </div>
 
@@ -57,36 +56,30 @@ export default function CoreBenefits() {
 
           {/* Tile 1 (8 Cols): Direct-to-Cloud Upload Stream */}
           <div className="md:col-span-8 depth-vault-card rounded-2xl p-5 sm:p-8 flex flex-col justify-between relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-vault-accent/[0.04] rounded-full blur-[70px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-white/[0.03] rounded-full blur-[70px] pointer-events-none" />
 
             <div>
               <div className="flex items-center justify-between mb-6">
-                <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-vault-accent shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-white/70 shadow-sm">
                   <ShieldCheckIcon className="w-5 h-5" />
                 </div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-[10px] font-mono tracking-wider text-emerald-400">
-                  <LightningIcon className="w-3.5 h-3.5" /> DIRECT HMAC PIPELINE
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-[11px] text-emerald-400">
+                  <LightningIcon className="w-3.5 h-3.5" /> Direct upload pipeline
                 </span>
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                Zero-Knowledge Direct Uploads
+                Uploads skip the middleman
               </h3>
               <p className="mt-3 text-xs sm:text-sm leading-relaxed text-vault-muted max-w-[55ch]">
-                Your files bypass web application servers entirely. Direct HMAC signatures stream your encrypted payload straight to hardened object storage clusters without RAM buffer bottlenecks.
+                Your files go straight from your browser to cloud storage using a signed upload request — they never sit in our server's memory waiting to be relayed.
               </p>
             </div>
 
-            {/* Visual Stream Telemetry Mock */}
-            <div className="mt-8 p-3.5 rounded-xl bg-vault-bg/90 border border-white/[0.06] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 text-xs font-mono">
-              <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-dot" />
-                <span className="text-vault-text text-[11px]">Browser Client ➔ Encrypted Storage Vault</span>
-              </div>
-              <div className="flex items-center gap-4 text-[10px] text-vault-muted">
-                <span>LATENCY: <strong className="text-white">0.08ms</strong></span>
-                <span>STATUS: <strong className="text-emerald-400">STREAM ACTIVE</strong></span>
-              </div>
+            {/* Upload flow indicator */}
+            <div className="mt-8 p-3.5 rounded-xl bg-vault-bg/90 border border-white/[0.06] flex items-center gap-3 text-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span className="text-vault-text text-xs font-mono">Browser → Cloud storage, direct</span>
             </div>
           </div>
 
@@ -98,16 +91,16 @@ export default function CoreBenefits() {
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                Deep Nested Trees
+                Folders inside folders, no limit
               </h3>
               <p className="mt-3 text-xs sm:text-sm leading-relaxed text-vault-muted">
-                Create recursive, unlimited folder depths with instant breadcrumb traversal and sub-millisecond search indexing.
+                Nest folders as deep as you need and jump back up the tree with breadcrumbs, or find what you need with search.
               </p>
             </div>
 
             {/* Visual Folder Tree Preview */}
             <div className="mt-8 p-3 rounded-xl bg-vault-bg/90 border border-white/[0.06] space-y-1.5 text-[11px] font-mono text-vault-muted">
-              <div className="flex items-center gap-2 text-vault-accent">
+              <div className="flex items-center gap-2 text-white/80">
                 <span>📁 Vault_Root</span>
               </div>
               <div className="flex items-center gap-2 pl-3 text-vault-text/80">
@@ -122,24 +115,23 @@ export default function CoreBenefits() {
           {/* Tile 3 (12 Cols): Passcode Shield & Link Gate */}
           <div className="md:col-span-12 depth-vault-card rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden group">
             <div className="max-w-2xl">
-              <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-vault-accent mb-5 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-white/70 mb-5 shadow-sm">
                 <LockPasscodeIcon className="w-5 h-5" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                Passcode-Gated File Sharing
+                Share a file without handing over your folder
               </h3>
               <p className="mt-2 text-xs sm:text-sm leading-relaxed text-vault-muted max-w-[60ch]">
-                Distribute direct download links with password challenges, time-decay expiration, and instant cryptographic kill switches. Recipients never need an account to retrieve authorized files.
+                Send a link, lock it with a passcode, set an expiry, and revoke it whenever you want. Whoever you send it to can download the file without creating an account.
               </p>
             </div>
 
             <div className="flex flex-col sm:items-end gap-2 shrink-0">
-              <div className="px-4 py-2 rounded-xl bg-vault-bg/90 border border-vault-accent/30 text-xs font-mono text-vault-accent flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-vault-accent animate-pulse-dot" />
-                <span>PBKDF2 PASSCODE SHIELD</span>
+              <div className="px-4 py-2 rounded-xl bg-vault-bg/90 border border-white/[0.12] text-xs text-white/80 flex items-center gap-2">
+                <span>Passcode protection</span>
               </div>
-              <span className="text-[11px] font-mono text-vault-muted/70">
-                Instant Revocation Guaranteed
+              <span className="text-[11px] text-vault-muted/70">
+                Revoke access anytime
               </span>
             </div>
           </div>

@@ -129,7 +129,7 @@ export default function NotificationDropdown() {
       <button
         type="button"
         onClick={handleToggle}
-        className="relative p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-vault-accent/60 transition-all cursor-pointer shadow-sm group"
+        className="relative p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-all cursor-pointer shadow-sm group"
         aria-label="Notifications"
         title="View Notifications"
       >
@@ -157,13 +157,12 @@ export default function NotificationDropdown() {
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-[var(--theme-border)] mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono tracking-wider uppercase text-[var(--color-vault-muted)] font-semibold flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
-                EVENT_STREAM
+              <span className="text-xs font-semibold text-[var(--color-vault-text)]">
+                Notifications
               </span>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 rounded-md bg-vault-accent/15 border border-vault-accent/30 text-vault-accent font-mono text-[9px] font-semibold">
-                  {unreadCount} NEW
+                <span className="px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/[0.08] text-[var(--color-vault-muted)] text-[10px] font-semibold">
+                  {unreadCount} New
                 </span>
               )}
             </div>
@@ -172,7 +171,7 @@ export default function NotificationDropdown() {
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="text-[10px] font-mono text-vault-accent hover:underline cursor-pointer"
+                className="text-[10px] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:underline cursor-pointer"
               >
                 Mark all read
               </button>
@@ -193,8 +192,8 @@ export default function NotificationDropdown() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-[var(--color-vault-text)]">Zero Pending Events</p>
-                  <p className="text-[10px] font-mono text-[var(--color-vault-muted)] mt-0.5">All security and transmission logs current</p>
+                  <p className="text-xs font-semibold text-[var(--color-vault-text)]">You're all caught up</p>
+                  <p className="text-[10px] font-mono text-[var(--color-vault-muted)] mt-0.5">New updates will show up here</p>
                 </div>
               </div>
             ) : (
@@ -205,13 +204,13 @@ export default function NotificationDropdown() {
                   className={`group p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 relative ${
                     n.isRead
                       ? "bg-[var(--theme-panel)]/40 border-[var(--theme-border)]/60 opacity-75 hover:opacity-100 hover:bg-[var(--theme-panel)]"
-                      : "depth-vault-card bg-[var(--theme-panel)] border-vault-accent/40 shadow-sm"
+                      : "depth-vault-card bg-[var(--theme-panel)] border-white/[0.12] shadow-sm"
                   }`}
                 >
                   {/* Category / Actor Icon */}
                   <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
                     {n.type === "FILE_SHARED" ? (
-                      <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                      <svg className="w-4 h-4 text-[var(--color-vault-muted)]" viewBox="0 0 24 24" fill="none">
                         <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="2" />
                         <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
                         <circle cx="18" cy="19" r="1.5" stroke="currentColor" strokeWidth="2" />
@@ -223,7 +222,7 @@ export default function NotificationDropdown() {
                         <path d="m15 9-6 6M9 9l6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
                     ) : (
-                      <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                      <svg className="w-4 h-4 text-[var(--color-vault-muted)]" viewBox="0 0 24 24" fill="none">
                         <path d="M12 9v4M12 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
                       </svg>
@@ -235,7 +234,7 @@ export default function NotificationDropdown() {
                     <div className="flex items-center justify-between gap-1 mb-0.5">
                       <p className="text-xs font-semibold text-[var(--color-vault-text)] truncate">{n.title}</p>
                       {!n.isRead && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-vault-accent shrink-0 animate-pulse" title="Unread" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-white/70 shrink-0" title="Unread" />
                       )}
                     </div>
                     <p className="text-xs text-[var(--color-vault-muted)] leading-relaxed line-clamp-2">{n.message}</p>

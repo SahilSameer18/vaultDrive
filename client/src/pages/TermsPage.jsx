@@ -47,11 +47,8 @@ export default function TermsPage() {
         {/* Editorial Header */}
         <div className="mb-10 sm:mb-14 pb-8 border-b border-[var(--theme-border)]">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="px-2.5 py-1 rounded text-[10px] font-mono tracking-wider text-vault-accent bg-vault-accent/10 border border-vault-accent/25">
-              LEGAL SPECIFICATION // DOC-TOS-2026.8
-            </span>
-            <span className="px-2.5 py-1 rounded text-[10px] font-mono text-[var(--color-vault-muted)] bg-[var(--theme-surface)] border border-[var(--theme-border)]">
-              ENCRYPTION PROTOCOL COMPLIANT
+            <span className="px-2.5 py-1 rounded text-xs text-[var(--color-vault-muted)] bg-white/[0.04] border border-white/[0.08]">
+              Terms of Service
             </span>
           </div>
 
@@ -59,9 +56,7 @@ export default function TermsPage() {
             Terms of Service
           </h1>
           <p className="mt-3 text-xs sm:text-sm font-mono text-[var(--color-vault-muted)] flex items-center gap-2">
-            <span>Effective: August 2026</span>
-            <span>•</span>
-            <span>Applicable to all VaultDrive clusters</span>
+            <span>Last updated: August 2026</span>
           </p>
         </div>
 
@@ -70,9 +65,9 @@ export default function TermsPage() {
           
           {/* Sticky Quick Nav (Desktop) & Overflow Nav (Mobile) */}
           <aside className="lg:sticky lg:top-28 depth-vault-chassis rounded-xl p-4 sm:p-5 border border-[var(--theme-border)] bg-[var(--theme-surface)]/90 backdrop-blur-xl">
-            <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--color-vault-muted)] mb-3 pb-2 border-b border-[var(--theme-border)] flex items-center justify-between">
-              <span>TABLE OF CONTENTS</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
+            <div className="text-xs text-[var(--color-vault-muted)] mb-3 pb-2 border-b border-[var(--theme-border)] flex items-center justify-between">
+              <span>Table of Contents</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
             </div>
             
             <nav className="flex flex-col space-y-1">
@@ -107,64 +102,64 @@ export default function TermsPage() {
             
             <section id="acceptance" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 1.0</span> Acceptance of Terms
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 1.0</span> Acceptance of Terms
               </h2>
               <p>
-                By provisioning a vault repository, authenticating via OAuth or credentials, or interacting with VaultDrive APIs, you irrevocably agree to comply with and be governed by these Terms of Service. If you do not accept these provisions without reservation, access to VaultDrive services is strictly unauthorized.
+                By creating an account, signing in via Google, or otherwise using VaultDrive, you agree to these Terms of Service. If you do not accept these terms, please do not use VaultDrive.
               </p>
             </section>
 
             <section id="security" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 2.0</span> Account Security & Credentials
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 2.0</span> Account Security & Credentials
               </h2>
               <p>
-                You maintain exclusive responsibility for preserving the confidential integrity of your credentials, multi-factor tokens, and session authorizations. Any activity originating from authenticated sessions associated with your cryptographic identifiers will be attributed to your account.
+                You're responsible for keeping your account credentials and active sessions confidential. Any activity from an authenticated session on your account will be attributed to you.
               </p>
-              
+
               {/* Callout box */}
-              <div className="depth-vault-card rounded-xl p-4 sm:p-5 border border-vault-accent/30 bg-vault-accent/[0.03]">
-                <div className="text-[10px] font-mono uppercase tracking-wider text-vault-accent font-semibold mb-1 flex items-center gap-1.5">
+              <div className="depth-vault-card rounded-xl p-4 sm:p-5 border border-white/[0.08] bg-white/[0.03]">
+                <div className="text-xs text-[var(--color-vault-muted)] font-semibold mb-1 flex items-center gap-1.5">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                     <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
-                  AUTOMATED MULTI-DEVICE SESSION INVALIDATION
+                  Session Security
                 </div>
                 <p className="text-xs text-[var(--color-vault-muted)] leading-relaxed">
-                  Upon executing a password modification or explicit security reset, VaultDrive triggers an instantaneous cryptographic revocation of all active JWT refresh pairs across every authorized device.
+                  Changing your password immediately signs you out of all other devices.
                 </p>
               </div>
             </section>
 
             <section id="ownership" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 3.0</span> File Ownership & Zero-Access
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 3.0</span> File Ownership & Zero-Access
               </h2>
               <p>
-                <strong className="text-[var(--color-vault-text)]">You retain 100% unilateral ownership of all encrypted binary assets</strong>, documents, media streams, and structural hierarchy data deposited into VaultDrive. VaultDrive claims zero copyright, licensing, or commercial distribution claims over user content.
+                <strong className="text-[var(--color-vault-text)]">You own the files you upload</strong> to VaultDrive, including documents, media, and folder structures. VaultDrive claims no ownership, licensing, or distribution rights over your content.
               </p>
               <p>
-                Under our architecture, VaultDrive systems never scan, parse, construct commercial profiles, or sell private data or metadata payloads for advertising or AI machine learning ingest.
+                We don't sell your data or files for advertising or AI training.
               </p>
             </section>
 
             <section id="storage" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 4.0</span> Storage Limits & Acceptable Use
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 4.0</span> Storage Limits & Acceptable Use
               </h2>
               <p>
-                Storage quotas are allocated according to your verified tier specification (such as 1GB quota baseline). Users agree not to abuse infrastructure, and strictly refrain from:
+                Every account gets 1GB of storage. You agree not to misuse the service, including:
               </p>
               <ul className="list-disc pl-5 space-y-2 text-[var(--color-vault-muted)]">
-                <li>Injecting malicious bytecode, ransomware payloads, trojans, or exploit toolkits.</li>
-                <li>Transmitting or hosting unlawful content or unauthorized distribution of third-party copyrighted intellectual property.</li>
-                <li>Executing Denial-of-Service attacks, automated endpoint crawling, or attempting to breach hardware security limits.</li>
+                <li>Uploading malware or malicious code.</li>
+                <li>Transmitting or hosting unlawful content or unauthorized copyrighted material.</li>
+                <li>Attempting denial-of-service attacks, automated scraping, or attempting to bypass storage or security limits.</li>
               </ul>
             </section>
 
             <section id="sharing" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 5.0</span> Link Sharing & Access Control
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 5.0</span> Link Sharing & Access Control
               </h2>
               <p>
                 VaultDrive grants you sovereign control over share tokens and secondary passcode protection barriers. You are exclusively responsible for controlling the distribution of generated links, setting expiration thresholds, and distributing passcodes to designated recipients.
@@ -173,19 +168,19 @@ export default function TermsPage() {
 
             <section id="deletion" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 6.0</span> Data Deletion & Trash Recovery
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 6.0</span> Data Deletion & Trash Recovery
               </h2>
               <p>
-                Deleted objects transition to an isolated Trash partition where they remain restorable at the user’s discretion. Upon initiating an explicit permanent purge or emptying Trash, the underlying storage blocks and database references are irreversibly destroyed.
+                Deleted files move to Trash, where you can restore them at your discretion. Once you permanently delete a file or empty Trash, the file and its records are permanently removed.
               </p>
             </section>
 
             <section id="modifications" className="scroll-mt-28 space-y-3">
               <h2 className="text-base sm:text-lg font-bold text-[var(--color-vault-text)] flex items-center gap-2">
-                <span className="text-vault-accent font-mono text-xs">§ 7.0</span> Modifications & Inquiries
+                <span className="text-[var(--color-vault-muted)] font-mono text-xs">§ 7.0</span> Modifications & Inquiries
               </h2>
               <p>
-                These legal parameters may be modified periodically to reflect protocol iterations or statutory regulations. Continued authorization of your account following revision broadcasts constitutes acceptance of amended policies.
+                We may update these terms from time to time. Continued use of your account after changes are published means you accept the updated terms.
               </p>
             </section>
 
@@ -195,13 +190,13 @@ export default function TermsPage() {
                 to="/"
                 className="text-xs sm:text-sm font-semibold text-vault-accent hover:underline flex items-center gap-1.5"
               >
-                ← Return to Portal Homepage
+                ← Back to Home
               </Link>
               <Link
                 to="/privacy"
                 className="text-xs sm:text-sm font-semibold text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] flex items-center gap-1.5"
               >
-                Inspect Privacy Policy →
+                View Privacy Policy →
               </Link>
             </div>
 

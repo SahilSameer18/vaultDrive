@@ -25,26 +25,26 @@ export default function LandingFooter() {
               <span className="font-bold text-base tracking-tight text-white">VaultDrive</span>
             </Link>
             <p className="text-xs text-vault-muted leading-relaxed max-w-sm">
-              High-performance private cloud storage featuring recursive folder trees, passcode-gated links, and cryptographic safety protocols.
+              Private cloud storage with nested folders, passcode-protected share links, and direct uploads to secure storage.
             </p>
           </div>
 
           {/* Architecture Column (3 Cols) */}
           <div className="md:col-span-3 space-y-3">
-            <p className="text-[11px] font-mono font-semibold tracking-[0.16em] text-vault-text uppercase">
+            <p className="text-xs font-semibold text-vault-text">
               Architecture
             </p>
             <ul className="space-y-2 text-xs text-vault-muted font-normal">
-              <li>Direct HMAC Pipeline</li>
-              <li>Passcode Shield Links</li>
-              <li>Deep Tree Recovery</li>
-              <li>Zero-Knowledge Client</li>
+              <li>Direct-to-Cloud Uploads</li>
+              <li>Passcode-Protected Links</li>
+              <li>Folder Trash & Restore</li>
+              <li>HTTPS Encrypted Transfer</li>
             </ul>
           </div>
 
           {/* Navigation Column (3 Cols) */}
           <div className="md:col-span-3 space-y-3">
-            <p className="text-[11px] font-mono font-semibold tracking-[0.16em] text-vault-text uppercase">
+            <p className="text-xs font-semibold text-vault-text">
               Access
             </p>
             <ul className="space-y-2 text-xs text-vault-muted font-normal">
@@ -63,12 +63,7 @@ export default function LandingFooter() {
         </div>
 
         {/* Bottom Metadata Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-vault-muted/60 text-center sm:text-left">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-            <span>GLOBAL NODE CLUSTER // OPERATIONAL</span>
-          </div>
-
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-center sm:justify-end gap-4 text-xs text-vault-muted/60 text-center sm:text-left">
           <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-4 text-[11px]">
             <Link to="/terms" className="hover:text-vault-text transition-colors">Terms of Service</Link>
             <span className="text-white/10">•</span>

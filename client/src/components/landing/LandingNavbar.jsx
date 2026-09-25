@@ -19,15 +19,9 @@ export default function LandingNavbar() {
           <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-b from-vault-panel to-vault-surface border border-vault-accent/35 flex items-center justify-center shadow-[0_2px_12px_rgba(0,0,0,0.6)] group-hover:border-vault-accent/70 group-hover:shadow-[0_0_20px_rgba(197,160,89,0.25)] transition-all duration-300">
             <LogoMark className="w-4 h-4 text-vault-accent transition-transform duration-300 group-hover:scale-105" />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-base sm:text-lg tracking-[-0.02em] text-vault-text group-hover:text-white transition-colors">
-              VaultDrive
-            </span>
-            <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-vault-success/25 bg-vault-success/[0.06] text-[9.5px] font-mono font-medium tracking-[0.14em] text-vault-success">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-success animate-pulse-dot" />
-              NODE ONLINE
-            </span>
-          </div>
+          <span className="font-bold text-base sm:text-lg tracking-[-0.02em] text-vault-text group-hover:text-white transition-colors">
+            VaultDrive
+          </span>
         </Link>
 
         {/* Action Controls */}

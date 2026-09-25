@@ -25,7 +25,7 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 export default function AppRoutes() {
   return (
-    <Suspense fallback={<VaultLoadingScreen message="Decrypting vault workspace..." />}>
+    <Suspense fallback={<VaultLoadingScreen message="Loading..." />}>
       <Routes>
         {/* ── Public Routes ────────────────────────────────────────────────── */}
         <Route path="/" element={<LandingPage />} />

@@ -132,20 +132,20 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
       <div className="relative w-full max-w-lg rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] p-6 shadow-2xl z-10 animate-scale-up">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-4 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-accent)]/40 flex items-center justify-center text-[var(--theme-accent)] shadow-sm">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-9 h-9 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] shadow-sm shrink-0">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
               <h3 className="font-bold text-base text-[var(--theme-text)]">
-                {uploading ? "Ingesting Payload Batch..." : "Upload Assets to Vault"}
+                {uploading ? "Uploading files..." : "Upload Files to Vault"}
               </h3>
-              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] tracking-wider">
+              <p className="text-xs text-[var(--theme-text-muted)] truncate">
                 {uploading
-                  ? `2 PARALLEL STREAMS (${completedCount}/${queue.length} COMPLETED)`
-                  : `UP TO ${MAX_BATCH_FILES} ASSETS · 100MB LIMIT PER FILE`}
+                  ? `${completedCount}/${queue.length} uploaded`
+                  : `Up to ${MAX_BATCH_FILES} files · 100MB max per file`}
               </p>
             </div>
           </div>
@@ -153,7 +153,7 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
           <button
             type="button"
             onClick={handleClose}
-            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer shrink-0"
           >
             <span className="text-xs font-bold">✕</span>
           </button>
@@ -161,7 +161,7 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
 
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
-            [ERROR] {error}
+            {error}
           </div>
         )}
 
@@ -171,7 +171,7 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-[var(--theme-border)] hover:border-[var(--theme-accent)] bg-[var(--theme-surface)]/50 p-6 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all mb-4 group shadow-inner"
+            className="border-2 border-dashed border-[var(--theme-border)] hover:border-white/30 bg-[var(--theme-surface)]/50 p-6 rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer transition-all mb-4 group shadow-inner"
           >
             <input
               ref={fileInputRef}
@@ -181,17 +181,17 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
               className="hidden"
             />
 
-            <div className="w-11 h-11 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-accent)]/30 flex items-center justify-center text-[var(--theme-accent)] mb-2.5 group-hover:scale-105 group-hover:border-[var(--theme-accent)] transition-all shadow-sm">
+            <div className="w-11 h-11 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] mb-2.5 group-hover:scale-105 group-hover:border-white/30 transition-all shadow-sm">
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
                 <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
-            <p className="text-xs font-semibold text-[var(--theme-text)] group-hover:text-[var(--theme-accent)] transition-colors">
-              {queue.length > 0 ? "Click or drop additional files to append" : "Drag & drop files or click to browse filesystem"}
+            <p className="text-xs font-semibold text-[var(--theme-text)] transition-colors">
+              {queue.length > 0 ? "Click or drop additional files to append" : "Drag and drop files, or click to browse"}
             </p>
             <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-1">
-              Select multiple assets ({MAX_BATCH_FILES - queue.length} slots available)
+              Select multiple files ({MAX_BATCH_FILES - queue.length} slots available)
             </p>
           </div>
         )}
@@ -208,14 +208,14 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
                 onDragEnd={handleItemDragEnd}
                 className={`p-3 rounded-xl border bg-[var(--theme-surface)]/70 space-y-2 transition-all ${
                   draggedIndex === index
-                    ? "border-[var(--theme-accent)] bg-[var(--theme-accent)]/10 opacity-70 scale-[0.99]"
+                    ? "border-white/30 bg-white/5 opacity-70 scale-[0.99]"
                     : "border-[var(--theme-border)] hover:border-[var(--theme-border)]/80"
                 } ${!uploading ? "cursor-grab active:cursor-grabbing" : ""}`}
               >
                 <div className="flex items-center justify-between gap-3 text-xs">
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     {!uploading && queue.length > 1 && (
-                      <span className="text-[var(--theme-text-muted)] hover:text-[var(--theme-accent)] text-xs select-none cursor-grab font-mono" title="Drag to reorder">
+                      <span className="text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] text-xs select-none cursor-grab" title="Drag to reorder">
                         ⋮⋮
                       </span>
                     )}
@@ -242,20 +242,16 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
                     </span>
 
                     {/* Status Badges */}
-                    {item.status === "COMPLETED" && (
-                      <span className="text-[9px] font-mono font-semibold text-emerald-400 uppercase">Encrypted</span>
-                    )}
-
                     {item.status === "UPLOADING" && (
-                      <span className="text-[9px] font-mono font-semibold text-[var(--theme-accent)]">{item.progress}%</span>
+                      <span className="text-xs font-semibold text-[var(--theme-text-muted)]">{item.progress}%</span>
                     )}
 
                     {item.status === "FAILED" && (
-                      <span className="text-[9px] font-mono font-semibold text-rose-400">Failed</span>
+                      <span className="text-xs font-semibold text-rose-400">Failed</span>
                     )}
 
                     {item.status === "CANCELLED" && (
-                      <span className="text-[9px] font-mono font-semibold text-[var(--theme-text-muted)] uppercase">Aborted</span>
+                      <span className="text-xs font-semibold text-[var(--theme-text-muted)]">Aborted</span>
                     )}
 
                     {(item.status === "WAITING" || item.status === "UPLOADING") && (
@@ -290,11 +286,11 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
         )}
 
         {/* Footer Summary & Action Controls */}
-        <div className="flex items-center justify-between pt-3 border-t border-[var(--theme-border)]">
+        <div className="flex items-center flex-wrap justify-between gap-3 pt-3 border-t border-[var(--theme-border)]">
           <div className="text-[11px] font-mono text-[var(--theme-text-muted)]">
             {queue.length > 0 && (
               <span>
-                Total Payload: <strong className="text-[var(--theme-text)]">{formatBytes(totalBytes)}</strong> ({queue.length} {queue.length === 1 ? "item" : "items"})
+                Total size: <strong className="text-[var(--theme-text)]">{formatBytes(totalBytes)}</strong> ({queue.length} {queue.length === 1 ? "item" : "items"})
               </span>
             )}
           </div>
@@ -304,15 +300,15 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
               <button
                 type="button"
                 onClick={handleStopAllUploads}
-                className="px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 text-xs font-mono font-medium text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-rose-500/40 bg-rose-500/10 text-xs font-medium text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
               >
-                Abort Stream
+                Cancel
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 rounded-xl border border-[var(--theme-border)] text-xs font-mono text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-[var(--theme-border)] text-xs text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] transition-colors cursor-pointer"
               >
                 {isFinished ? "Dismiss" : "Cancel"}
               </button>
@@ -323,9 +319,9 @@ export default function UploadModal({ isOpen, onClose, folderId = null }) {
                 type="button"
                 onClick={handleStartUpload}
                 disabled={queue.length === 0 || uploading}
-                className="px-5 py-2 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 disabled:opacity-50 transition-all shadow-md cursor-pointer"
+                className="px-5 py-2 rounded-xl text-xs font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 disabled:opacity-50 transition-all shadow-md cursor-pointer"
               >
-                Ingest {queue.length > 0 ? `(${queue.length})` : ""}
+                Upload {queue.length > 0 ? `(${queue.length})` : ""}
               </button>
             )}
           </div>

@@ -36,7 +36,7 @@ function Card({ children, className = "" }) {
 function CardTitle({ icon, children }) {
   return (
     <div className="flex items-center gap-2.5 pb-2 border-b border-[var(--theme-border)]/50">
-      <span className="text-[var(--theme-accent)]">{icon}</span>
+      <span className="text-vault-muted">{icon}</span>
       <h3 className="text-sm font-bold text-[var(--theme-text)]">{children}</h3>
     </div>
   );
@@ -246,8 +246,8 @@ export default function ProfilePage() {
 
       {/* ── Breadcrumb ──────────────────────────────────────────────────── */}
       <div>
-        <nav className="flex items-center gap-2 text-xs font-mono text-vault-muted mb-1">
-          <Link to="/dashboard" className="text-vault-accent hover:underline">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-vault-muted mb-1">
+          <Link to="/dashboard" className="text-vault-text hover:underline">Home</Link>
           <span>/</span>
           <span className="text-vault-text font-semibold">Account Settings</span>
         </nav>
@@ -310,9 +310,9 @@ export default function ProfilePage() {
                 type="button"
                 disabled={uploadingAvatar}
                 onClick={() => fileInputRef.current?.click()}
-                className="px-3 py-1.5 rounded-xl border border-vault-border bg-vault-surface hover:border-vault-accent/50 text-vault-text hover:text-vault-accent text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                className="px-3 py-1.5 rounded-xl border border-vault-border bg-vault-surface hover:border-white/20 text-vault-text text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
               >
-                <svg className="w-3.5 h-3.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                <svg className="w-3.5 h-3.5 text-vault-muted" viewBox="0 0 24 24" fill="none">
                   <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
                   <circle cx="12" cy="13" r="4" stroke="currentColor" strokeWidth="1.75"/>
                 </svg>
@@ -382,7 +382,7 @@ export default function ProfilePage() {
               <button
                 type="button"
                 onClick={copyEmail}
-                className="p-2.5 rounded-xl border border-vault-border hover:border-vault-accent/50 text-vault-muted hover:text-vault-accent transition-colors cursor-pointer"
+                className="p-2.5 rounded-xl border border-vault-border hover:border-white/20 text-vault-muted hover:text-vault-text transition-colors cursor-pointer"
                 title="Copy email"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -563,7 +563,7 @@ export default function ProfilePage() {
 
               <Link
                 to="/storage"
-                className="inline-flex items-center gap-1.5 text-[11px] font-mono text-vault-accent hover:underline"
+                className="inline-flex items-center gap-1.5 text-[11px] font-mono text-vault-text hover:underline"
               >
                 View full breakdown
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">

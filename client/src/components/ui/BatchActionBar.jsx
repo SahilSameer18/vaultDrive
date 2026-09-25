@@ -16,17 +16,16 @@ export default function BatchActionBar({
 
   return (
     <aside aria-label="Batch actions toolbar" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-2xl animate-slide-up select-none">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-[var(--theme-accent)]/50 bg-[var(--theme-panel)]/95 backdrop-blur-xl shadow-[0_16px_50px_rgba(0,0,0,0.8),0_0_25px_rgba(197,160,89,0.18)] text-[var(--theme-text)]">
-        
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl shadow-[0_16px_50px_rgba(0,0,0,0.8)] text-[var(--theme-text)]">
+
         {/* Left: Selected Counter & Payload Telemetry */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--theme-accent)] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--theme-accent)]"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white/40"></span>
             </span>
-            <span className="text-xs sm:text-sm font-bold font-mono text-[var(--theme-accent)]">
-              {totalCount} {totalCount === 1 ? "PAYLOAD" : "PAYLOADS"} SELECTED
+            <span className="text-xs sm:text-sm font-bold text-[var(--theme-text)]">
+              {totalCount} selected
             </span>
           </div>
 
@@ -38,13 +37,13 @@ export default function BatchActionBar({
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center flex-wrap justify-end gap-1.5 sm:gap-2 shrink-0">
           {/* Select / Deselect All Toggle */}
           {onSelectAll && (
             <button
               type="button"
               onClick={onSelectAll}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-medium border border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-accent)]/50 text-[var(--theme-text)] transition-colors cursor-pointer shadow-sm"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-medium border border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-white/30 text-[var(--theme-text)] transition-colors cursor-pointer shadow-sm"
               title={isAllSelected ? "Deselect All Items" : "Select All Items"}
             >
               {isAllSelected ? "Deselect All" : "Select All"}
@@ -99,7 +98,7 @@ export default function BatchActionBar({
           <button
             type="button"
             onClick={onClearSelection}
-            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)] flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer"
             title="Clear Selection (Esc)"
           >
             <span className="text-xs font-bold">✕</span>

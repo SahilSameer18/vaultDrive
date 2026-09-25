@@ -70,9 +70,9 @@ export default function Topbar({ onToggleMobileMenu }) {
       {loggingOut &&
         createPortal(
           <VaultLoadingScreen
-            message="Locking cryptographic vault keys…"
-            headerTag="✦ SESSION TERMINATION ✦"
-            footerTag="Encrypted Session Successfully Terminated"
+            message="Signing out…"
+            headerTag="Signing Out"
+            footerTag="You've been signed out."
           />,
           document.body
         )}
@@ -130,7 +130,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                 <button
                   type="button"
                   onClick={onToggleMobileMenu}
-                  className="lg:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-vault-accent transition-colors cursor-pointer"
+                  className="lg:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-colors cursor-pointer"
                   aria-label="Toggle Navigation Menu"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -149,7 +149,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                   </div>
                   <div className="hidden lg:flex flex-col">
                     <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
-                    <span className="text-[9px] font-mono tracking-widest text-[var(--color-vault-muted)] uppercase">Encrypted Repository</span>
+                    <span className="text-xs text-[var(--color-vault-muted)]">Cloud Storage</span>
                   </div>
                 </Link>
               </div>
@@ -169,7 +169,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search repository files and folders..."
-                  className="w-full pl-10 pr-12 py-2 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--color-vault-text)] text-xs placeholder:text-[var(--color-vault-muted)]/50 focus:border-vault-accent/70 focus:outline-none focus:ring-1 focus:ring-vault-accent/30 transition-all shadow-inner"
+                  className="w-full pl-10 pr-12 py-2 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--color-vault-text)] text-xs placeholder:text-[var(--color-vault-muted)]/50 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all shadow-inner"
                 />
                 {searchQuery ? (
                   <button
@@ -196,7 +196,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                     setMobileSearchOpen(true);
                     setTimeout(() => mobileSearchRef.current?.focus(), 60);
                   }}
-                  className="md:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-vault-accent transition-colors cursor-pointer"
+                  className="md:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-colors cursor-pointer"
                   aria-label="Search files"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -213,7 +213,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                   <button
                     type="button"
                     onClick={() => setProfileOpen((prev) => !prev)}
-                    className="flex items-center gap-1.5 p-1 pl-1 pr-1.5 sm:pr-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-vault-accent/60 transition-all cursor-pointer group"
+                    className="flex items-center gap-1.5 p-1 pl-1 pr-1.5 sm:pr-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-white/20 transition-all cursor-pointer group"
                     aria-label="User Account Menu"
                   >
                     {/* User Avatar Circle */}
@@ -222,7 +222,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                     {/* Subtle Dropdown Chevron */}
                     <svg
                       className={`w-3.5 h-3.5 text-[var(--color-vault-muted)] group-hover:text-[var(--color-vault-text)] transition-transform duration-200 ${
-                        profileOpen ? "rotate-180 text-vault-accent" : ""
+                        profileOpen ? "rotate-180" : ""
                       }`}
                       viewBox="0 0 24 24"
                       fill="none"
@@ -239,10 +239,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                         <UserAvatar user={user} size="md" />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-[var(--color-vault-text)] truncate">{user?.username}</p>
-                          <p className="text-[10px] font-mono text-[var(--color-vault-muted)] truncate mt-0.5">{user?.email}</p>
-                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded text-[8px] font-mono tracking-wider uppercase text-emerald-400 bg-emerald-500/10 border border-emerald-500/25">
-                            VERIFIED VAULT MEMBER
-                          </span>
+                          <p className="text-[10px] text-[var(--color-vault-muted)] truncate mt-0.5">{user?.email}</p>
                         </div>
                       </div>
 
@@ -251,9 +248,9 @@ export default function Topbar({ onToggleMobileMenu }) {
                         <Link
                           to="/profile"
                           onClick={() => setProfileOpen(false)}
-                          className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] hover:text-vault-accent transition-colors flex items-center gap-2.5 cursor-pointer"
+                          className="w-full text-left px-3 py-2 rounded-xl text-xs font-medium text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] transition-colors flex items-center gap-2.5 cursor-pointer"
                         >
-                          <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                          <svg className="w-4 h-4 text-[var(--color-vault-muted)]" viewBox="0 0 24 24" fill="none">
                             <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="2" />
                             <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" stroke="currentColor" strokeWidth="2" />
                           </svg>
@@ -268,7 +265,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
-                          Terminate Session
+                          Sign Out
                         </button>
                       </div>
                     </div>

@@ -77,10 +77,10 @@ function CloudUploadIcon({ className = "w-4 h-4" }) {
 }
 
 const sampleFiles = [
-  { id: "1", name: "Tax_Return_2026.pdf", size: "4.2 MB", folder: "financial", type: "doc", date: "Updated 2h ago", status: "ENCRYPTED", statusClass: "border-vault-success/40 bg-vault-success/[0.08] text-vault-success" },
-  { id: "2", name: "Executive_Vault_Keys.png", size: "8.4 MB", folder: "media", type: "image", date: "Updated Yesterday", status: "PASSCODE LINK", statusClass: "border-vault-accent/40 bg-vault-accent/[0.08] text-vault-accent" },
-  { id: "3", name: "Q3_Strategic_Roadmap.pdf", size: "1.8 MB", folder: "work", type: "doc", date: "Updated 1d ago", status: "PRIVATE", statusClass: "border-vault-success/40 bg-vault-success/[0.08] text-vault-success" },
-  { id: "4", name: "Architecture_Archive.zip", size: "128 MB", folder: "work", type: "archive", date: "Updated 3d ago", status: "HMAC SHARE", statusClass: "border-vault-sky/40 bg-vault-sky/[0.08] text-vault-sky" }
+  { id: "1", name: "Tax_Return_2026.pdf", size: "4.2 MB", folder: "financial", type: "doc", date: "Updated 2h ago", status: "Encrypted", statusClass: "border-vault-success/40 bg-vault-success/[0.08] text-vault-success" },
+  { id: "2", name: "Executive_Vault_Keys.png", size: "8.4 MB", folder: "media", type: "image", date: "Updated Yesterday", status: "Passcode Link", statusClass: "border-white/[0.14] bg-white/[0.05] text-white/80" },
+  { id: "3", name: "Q3_Strategic_Roadmap.pdf", size: "1.8 MB", folder: "work", type: "doc", date: "Updated 1d ago", status: "Private", statusClass: "border-vault-success/40 bg-vault-success/[0.08] text-vault-success" },
+  { id: "4", name: "Architecture_Archive.zip", size: "128 MB", folder: "work", type: "archive", date: "Updated 3d ago", status: "Shared Link", statusClass: "border-vault-sky/40 bg-vault-sky/[0.08] text-vault-sky" }
 ];
 
 export default function HeroSection() {
@@ -102,9 +102,9 @@ export default function HeroSection() {
         <div className="lg:col-span-5 flex flex-col items-start text-left">
 
           {/* Cryptographic Telemetry Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-vault-accent/25 bg-vault-accent/[0.05] text-[10px] font-mono tracking-[0.16em] uppercase text-vault-accent mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/[0.1] bg-white/[0.04] text-xs text-white/80 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-vault-accent animate-pulse-dot" />
-            <span>ENCRYPTED VAULT ARCHITECTURE</span>
+            <span>Encrypted Vault Architecture</span>
           </div>
 
           {/* Display Headline */}
@@ -117,7 +117,7 @@ export default function HeroSection() {
 
           {/* Subtitle */}
           <p className="mt-4 sm:mt-5 text-sm sm:text-base leading-relaxed text-vault-muted font-normal max-w-[46ch]">
-            Client-side encryption, hierarchical folder nesting, and passcode-gated file distribution with zero server surveillance.
+            Nest folders as deep as you need, upload straight to secure cloud storage, and share files behind a passcode — all encrypted in transit.
           </p>
 
           {/* Action CTAs: Clean Swiss Buttons */}
@@ -138,17 +138,17 @@ export default function HeroSection() {
           </div>
 
           {/* Trust Specs Strip */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-6 text-[10.5px] sm:text-[11px] font-mono tracking-wider text-vault-muted">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-6 text-xs text-vault-muted">
             <span className="inline-flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" /> 1GB High-Speed Storage
+              <span className="w-1.5 h-1.5 rounded-full bg-white/30" /> 1GB High-Speed Storage
             </span>
             <span className="hidden sm:inline text-white/10">•</span>
             <span className="inline-flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" /> Passcode Protection
+              <span className="w-1.5 h-1.5 rounded-full bg-white/30" /> Passcode Protection
             </span>
             <span className="hidden sm:inline text-white/10">•</span>
             <span className="inline-flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" /> Direct HMAC Pipeline
+              <span className="w-1.5 h-1.5 rounded-full bg-white/30" /> Direct HMAC Pipeline
             </span>
           </div>
 
@@ -167,15 +167,15 @@ export default function HeroSection() {
             {/* Institutional Security Terminal Header (No fake Apple traffic lights) */}
             <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between pb-4 mb-4 border-b border-white/[0.06] gap-3">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-6 h-6 rounded-md bg-vault-accent/15 border border-vault-accent/30 flex items-center justify-center text-vault-accent shrink-0">
+                <div className="w-6 h-6 rounded-md bg-white/[0.06] border border-white/[0.12] flex items-center justify-center text-white/70 shrink-0">
                   <LockClosedIcon className="w-3.5 h-3.5" />
                 </div>
                 <div className="flex items-center gap-2 truncate">
-                  <span className="text-xs font-mono font-medium tracking-wider text-vault-text">
-                    VAULT_TERMINAL
+                  <span className="text-xs font-medium text-vault-text">
+                    Vault Terminal
                   </span>
-                  <span className="px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/[0.08] text-[9px] font-mono text-emerald-400">
-                    AES-256 ACTIVE
+                  <span className="px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/[0.08] text-xs text-emerald-400">
+                    AES-256 Active
                   </span>
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function HeroSection() {
                   key={tab.id}
                   type="button"
                   onClick={() => setSelectedFolder(tab.id)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all whitespace-nowrap cursor-pointer tactile-btn ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap cursor-pointer tactile-btn ${
                     selectedFolder === tab.id
                       ? "bg-vault-accent text-vault-landing-bg font-semibold shadow-[0_2px_10px_rgba(197,160,89,0.3)]"
                       : "bg-white/[0.03] border border-white/[0.06] text-vault-muted hover:text-vault-text hover:bg-white/[0.06]"
@@ -234,7 +234,7 @@ export default function HeroSection() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-vault-panel border border-white/[0.06] flex items-center justify-center shrink-0 shadow-sm">
                         {file.type === "image" ? (
-                          <ImageIcon className="w-4 h-4 text-vault-accent" />
+                          <ImageIcon className="w-4 h-4 text-white/70" />
                         ) : file.type === "archive" ? (
                           <ShareIcon className="w-4 h-4 text-vault-sky" />
                         ) : (
@@ -251,7 +251,7 @@ export default function HeroSection() {
                       </div>
                     </div>
                     <span
-                      className={`px-2.5 py-0.5 rounded-full border text-[9px] font-mono tracking-wider shrink-0 ${file.statusClass}`}
+                      className={`px-2.5 py-0.5 rounded-full border text-xs shrink-0 ${file.statusClass}`}
                     >
                       {file.status}
                     </span>
@@ -262,15 +262,15 @@ export default function HeroSection() {
 
             {/* Selected File Security Inspection Drawer */}
             {selectedFile && (
-              <div className="p-3.5 rounded-xl bg-vault-accent/[0.05] border border-vault-accent/35 mb-4 animate-fade-in-up flex items-center justify-between text-xs font-mono">
+              <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/[0.12] mb-4 animate-fade-in-up flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 min-w-0">
                   <ShieldCheckIcon className="w-4 h-4 text-vault-accent shrink-0" />
                   <span className="text-vault-text truncate">
                     Payload: <strong className="text-white">{selectedFile.name}</strong>
                   </span>
                 </div>
-                <span className="text-vault-success text-[11px] shrink-0 font-medium ml-2">
-                  PASSCODE VERIFIED
+                <span className="text-vault-success text-xs shrink-0 font-medium ml-2">
+                  Passcode Verified
                 </span>
               </div>
             )}
@@ -278,7 +278,7 @@ export default function HeroSection() {
             {/* Storage Quota Telemetry Strip */}
             <div className="p-3 rounded-xl bg-vault-bg/80 border border-white/[0.06] flex items-center justify-between text-xs font-mono text-vault-muted">
               <div className="flex items-center gap-2">
-                <CloudUploadIcon className="w-4 h-4 text-vault-accent" />
+                <CloudUploadIcon className="w-4 h-4 text-white/70" />
                 <span>Cloud Node Sync</span>
               </div>
               <div className="flex items-center gap-2">

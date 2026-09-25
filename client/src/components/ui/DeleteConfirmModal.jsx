@@ -41,8 +41,8 @@ export default function DeleteConfirmModal({
           </div>
           <div>
             <h3 className="font-bold text-base text-[var(--theme-text)]">{title}</h3>
-            <p className="text-[9px] font-mono tracking-wider text-[var(--theme-text-muted)] uppercase">
-              {isPermanent ? "PERMANENT IRREVERSIBLE ACTION" : "REVERSIBLE · CAN BE RESTORED FROM TRASH"}
+            <p className="text-xs text-[var(--theme-text-muted)]">
+              {isPermanent ? "This can't be undone." : "You can restore this from Trash later."}
             </p>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function DeleteConfirmModal({
         <div className="space-y-3 mb-6">
           <p className="text-xs text-[var(--theme-text-muted)] leading-relaxed">{description}</p>
           {itemName && (
-            <div className="p-3 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-xs font-mono text-[var(--theme-accent)] truncate shadow-inner">
+            <div className="p-3 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] text-xs font-mono text-[var(--theme-text)] truncate shadow-inner">
               {itemName}
             </div>
           )}
@@ -71,7 +71,7 @@ export default function DeleteConfirmModal({
             disabled={processing}
             className="px-5 py-2 rounded-xl text-xs font-semibold font-mono text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition-colors shadow-md flex items-center gap-2 cursor-pointer"
           >
-            {processing ? "Executing…" : confirmText}
+            {processing ? (isPermanent ? "Deleting..." : "Moving to Trash...") : confirmText}
           </button>
         </div>
       </div>

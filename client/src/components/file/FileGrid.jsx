@@ -39,7 +39,7 @@ function FolderItem({
       className={`group relative flex items-center justify-between p-3 sm:p-3.5 rounded-xl border transition-all duration-200 select-none ${
         isFolderSelected
           ? "border-[var(--theme-accent)] ring-1 ring-[var(--theme-accent)]/40 bg-[var(--theme-accent)]/[0.05] shadow-[0_0_16px_rgba(197,160,89,0.08)]"
-          : "border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-[var(--theme-accent)]/50 hover:bg-[var(--theme-surface)]/60 shadow-sm"
+          : "border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-white/20 hover:bg-[var(--theme-surface)]/60 shadow-sm"
       } ${isSelectionMode ? "cursor-pointer" : ""} ${menuOpen ? "z-40" : "z-0"}`}
     >
       {/* Left: Checkbox + Link & Info */}
@@ -53,13 +53,13 @@ function FolderItem({
               onToggleSelectFolder(folder.id);
             }}
             className="p-1 rounded-lg transition-transform shrink-0 cursor-pointer animate-scale-up"
-            title={isFolderSelected ? "Deselect Directory" : "Select Directory"}
+            title={isFolderSelected ? "Deselect Folder" : "Select Folder"}
           >
             <div
               className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
                 isFolderSelected
                   ? "bg-[var(--theme-accent)] border-[var(--theme-accent)] text-[#0d0f12] shadow-[0_0_8px_rgba(197,160,89,0.5)]"
-                  : "border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-accent)]"
+                  : "border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-white/30"
               }`}
             >
               {isFolderSelected && (
@@ -80,17 +80,17 @@ function FolderItem({
           }}
           className="flex items-center gap-3 min-w-0 flex-1"
         >
-          <div className="w-9 h-9 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-accent)]/30 flex items-center justify-center text-[var(--theme-accent)] group-hover:bg-[var(--theme-accent)] group-hover:text-[#0d0f12] transition-all shrink-0 shadow-inner">
+          <div className="w-9 h-9 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-[var(--theme-text-muted)] group-hover:border-white/20 transition-all shrink-0 shadow-inner">
             <svg className="w-4 h-4 transition-transform group-hover:scale-105" viewBox="0 0 24 24" fill="none">
               <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
             </svg>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-[var(--theme-text)] truncate group-hover:text-[var(--theme-accent)] transition-colors">
+            <p className="text-xs font-semibold text-[var(--theme-text)] truncate">
               {folder.name}
             </p>
             <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-0.5">
-              {fileCount} {fileCount === 1 ? "payload" : "payloads"}
+              {fileCount} {fileCount === 1 ? "file" : "files"}
             </p>
           </div>
         </Link>
@@ -117,7 +117,7 @@ function FolderItem({
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
+            <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 text-xs animate-scale-up">
               {onToggleSelectFolder && (
                 <button
                   type="button"
@@ -127,7 +127,7 @@ function FolderItem({
                     setMenuOpen(false);
                     onToggleSelectFolder(folder.id);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer font-medium"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer font-medium"
                 >
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                     <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="2" />
@@ -182,8 +182,8 @@ function FolderItem({
         {!isSelectionMode && (
           <Link
             to={`/folder/${folder.id}`}
-            className="text-[var(--theme-text-muted)] group-hover:text-[var(--theme-accent)] group-hover:translate-x-0.5 transition-all p-1"
-            title="Open Directory"
+            className="text-[var(--theme-text-muted)] group-hover:text-[var(--theme-text)] group-hover:translate-x-0.5 transition-all p-1"
+            title="Open Folder"
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
               <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -218,9 +218,9 @@ export default function FileGrid({
       {folders.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-            <p className="text-[10px] font-mono tracking-widest text-[var(--theme-text-muted)] uppercase">
-              DIRECTORIES ({folders.length})
+            <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+            <p className="text-xs text-[var(--theme-text-muted)]">
+              Folders ({folders.length})
             </p>
           </div>
 
@@ -250,9 +250,9 @@ export default function FileGrid({
       {files.length > 0 && (
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-            <p className="text-[10px] font-mono tracking-widest text-[var(--theme-text-muted)] uppercase">
-              ASSETS & PAYLOADS ({files.length})
+            <span className="w-1.5 h-1.5 rounded-full bg-white/20" />
+            <p className="text-xs text-[var(--theme-text-muted)]">
+              Files ({files.length})
             </p>
           </div>
 

@@ -33,19 +33,18 @@ export default function SharedWithMePage() {
       
       {/* Header */}
       <div className="pb-4 border-b border-[var(--theme-border)]">
-        <nav className="flex items-center gap-2 text-xs font-mono text-[var(--theme-text-muted)] mb-1">
-          <Link to="/dashboard" className="text-[var(--theme-accent)] hover:underline flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
-            ROOT
+        <nav className="flex items-center gap-2 text-xs text-[var(--theme-text-muted)] mb-1">
+          <Link to="/dashboard" className="text-[var(--theme-text)] hover:underline">
+            Root
           </Link>
           <span className="text-[var(--theme-border)]">/</span>
           <span className="text-[var(--theme-text)]">Shared With Me</span>
         </nav>
         <h1 className="text-2xl font-bold tracking-tight text-[var(--theme-text)]">
-          Delegated Payloads
+          Shared with Me
         </h1>
         <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
-          Assets and files explicitly shared with your cryptographic account by other VaultDrive users.
+          Files other VaultDrive users have shared with your account.
         </p>
       </div>
 
@@ -66,9 +65,9 @@ export default function SharedWithMePage() {
               <path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5" stroke="currentColor" strokeWidth="1.75" />
             </svg>
           </div>
-          <h3 className="text-base font-bold text-[var(--theme-text)]">No Delegated Files</h3>
+          <h3 className="text-base font-bold text-[var(--theme-text)]">Nothing Shared with You Yet</h3>
           <p className="text-xs text-[var(--theme-text-muted)] mt-1 max-w-sm leading-relaxed">
-            When another user grants your username or email authorization to a payload, it will stream here automatically.
+            When someone shares a file with your username or email, it'll show up here automatically.
           </p>
         </div>
       ) : (
@@ -79,23 +78,23 @@ export default function SharedWithMePage() {
               className="p-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-[var(--theme-accent)]/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:-translate-y-0.5"
             >
               <div className="flex items-start justify-between gap-2 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shadow-inner group-hover:border-[var(--theme-accent)]/40 transition-colors">
-                  <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-accent)] group-hover:scale-110 transition-transform" />
+                <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shadow-inner group-hover:border-white/20 transition-colors">
+                  <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-text-muted)] group-hover:scale-110 transition-transform" />
                 </div>
-                <span className="px-2 py-0.5 rounded-md border border-sky-500/30 bg-sky-500/10 text-[9px] font-mono text-sky-400 font-semibold tracking-wider">
-                  DELEGATED
+                <span className="px-2 py-0.5 rounded-md border border-sky-500/30 bg-sky-500/10 text-xs text-sky-400 font-semibold">
+                  Shared
                 </span>
               </div>
 
               <div className="mb-4">
-                <p className="text-xs font-semibold text-[var(--theme-text)] truncate mb-1 group-hover:text-[var(--theme-accent)] transition-colors" title={file.name}>
+                <p className="text-xs font-semibold text-[var(--theme-text)] truncate mb-1" title={file.name}>
                   {file.name}
                 </p>
                 <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">
                   {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.createdAt)}
                 </p>
                 {file.user && (
-                  <p className="text-[10px] font-mono text-[var(--theme-accent)] mt-1">
+                  <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-1">
                     Owner: @{file.user.username}
                   </p>
                 )}
@@ -105,9 +104,9 @@ export default function SharedWithMePage() {
                 <button
                   type="button"
                   onClick={() => setPreviewFile(file)}
-                  className="px-3 py-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[10px] font-mono text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
+                  className="px-3 py-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[10px] font-mono text-[var(--theme-text)] hover:border-white/20 transition-colors flex items-center gap-1 cursor-pointer shadow-sm"
                 >
-                  Inspect
+                  Preview
                 </button>
                 <button
                   type="button"
