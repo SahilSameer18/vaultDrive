@@ -24,55 +24,62 @@
 
 ```mermaid
 flowchart TD
-    subgraph Client ["Frontend (React 19 + Vite + Tailwind CSS — Vercel)"]
-        UI["React SPA Views & Trash Page"]
-        AXIOS["Axios Interceptor\n(Token Refresh Queue)"]
-        GOOGLE_SDK["@react-oauth/google"]
-        STORE["Auth & Search Context"]
-        PORTAL["React Portals\n(Modals & Previews)"]
-        PAGINATION["Pagination Controls"]
-        SORT_DROPDOWN["Dynamic 6-Field Sort Dropdown"]
-        UI --> AXIOS
-        UI --> GOOGLE_SDK
-        AXIOS --> STORE
-        UI --> PORTAL
-        UI --> PAGINATION
-        UI --> SORT_DROPDOWN
+    %% ─── CLIENT TIER ───
+    subgraph Client ["🖥️ CLIENT TIER (React 19 · Vite · Tailwind CSS)"]
+        SPA["<b>VaultDrive SPA</b><br/>React 19 · Lazy Routes · Modals"]
+        AXIOS["<b>Resilient Network Client</b><br/>Axios Interceptor · 401 Mutex Queue"]
+        UPLOADER["<b>Direct Storage Client</b><br/>Chunked Streams · SHA-256 HMAC Uploads"]
     end
 
-    subgraph Server ["Backend (Node.js + Express REST API — Render)"]
-        HELMET["Helmet (Security Headers)"]
-        PROXY["Proxy Trust\n(trust proxy = 1)"]
-        AUTH_MW["Rate Limiters\n(login, register, general)"]
-        GOOGLE_VERIFIER["Google Token Verifier\n(google-auth-library)"]
-        VALIDATOR["Zod Payload Validator"]
-        CONTROLLER["Controllers\n(Auth, File, Folder, Trash)"]
-        TRASH_ENGINE["Soft-Delete & Trash Engine\n(Recursive Trashing & Smart Parent Fallback)"]
-        NOTIF_SVC["Notification Engine"]
-        CYCLE_GUARD["Folder Cycle Guard"]
-
-        HELMET --> PROXY
-        PROXY --> AUTH_MW
-        AUTH_MW --> GOOGLE_VERIFIER
-        GOOGLE_VERIFIER --> VALIDATOR
-        VALIDATOR --> CONTROLLER
-        CONTROLLER --> TRASH_ENGINE
-        CONTROLLER --> NOTIF_SVC
-        CONTROLLER --> CYCLE_GUARD
+    %% ─── API GATEKEEPER TIER ───
+    subgraph Server ["⚙️ API & GATEKEEPER TIER (Node.js · Express 5)"]
+        SEC["<b>Security & Traffic Control</b><br/>Helmet CSP · CORS · Rate Limiters"]
+        AUTH_SVC["<b>Auth & Session Engine</b><br/>Dual JWTs · O(1) Token Lookup · Google OAuth"]
+        TREE_SVC["<b>Folder Hierarchy Engine</b><br/>DAG Cycle Guard · O(H) Breadcrumbs"]
+        GATEKEEPER["<b>Gatekeeper Streaming Proxy</b><br/>1h Time-Decay JWT · HTTP 206 Byte Ranges"]
+        VERIFIER["<b>Zero-Trust Confirm Guard</b><br/>Namespace Isolation · Cloudinary Admin Probe"]
     end
 
-    subgraph Infrastructure ["Cloud Infrastructure"]
-        PRISMA["Prisma 7 ORM"]
-        NEON[("Neon PostgreSQL\n(User, OAuthAccount, File, Folder, SharedFile, Notification)")]
-        CLOUDINARY[("Cloudinary Asset Storage")]
-
-        PRISMA --> NEON
-        CONTROLLER --> PRISMA
-        CONTROLLER --> CLOUDINARY
+    %% ─── STORAGE & DATA TIER ───
+    subgraph DataTier ["🗄️ PERSISTENCE & STORAGE TIER"]
+        PRISMA["<b>Prisma 7 ORM</b><br/>ACID Transactions · Connection Pooler"]
+        POSTGRES[("<b>Neon PostgreSQL</b><br/>Adjacency Lists · Soft-Deletes · Bcrypt Hashes")]
+        CLOUDINARY[("<b>Cloudinary Object Store</b><br/>Global Edge CDN · Raw Assets & Delivery")]
     end
 
-    GOOGLE_SDK -->|ID Token Auth| GOOGLE_VERIFIER
-    AXIOS -->|HTTPS + JWT / HttpOnly Cookie| HELMET
+    %% ─── RELATIONSHIPS & FLOWS ───
+    SPA --> AXIOS
+    SPA --> UPLOADER
+
+    AXIOS -->|HTTPS API Requests| SEC
+    SEC --> AUTH_SVC
+    SEC --> TREE_SVC
+    SEC --> GATEKEEPER
+    SEC --> VERIFIER
+
+    UPLOADER -.->|Direct Binary Upload · 0 Server RAM| CLOUDINARY
+    VERIFIER -->|Verify Real File Bytes| CLOUDINARY
+
+    AUTH_SVC --> PRISMA
+    TREE_SVC --> PRISMA
+    VERIFIER --> PRISMA
+    GATEKEEPER -->|Live Access Check| PRISMA
+    GATEKEEPER -.->|Secure Pipe Stream| CLOUDINARY
+
+    PRISMA --> POSTGRES
+
+    %% ─── STYLING & PALETTE ───
+    classDef clientStyle fill:#0F172A,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC,rx:8px,ry:8px;
+    classDef serverStyle fill:#022C22,stroke:#10B981,stroke-width:2px,color:#F8FAFC,rx:8px,ry:8px;
+    classDef securityStyle fill:#2A0A18,stroke:#F43F5E,stroke-width:2px,color:#F8FAFC,rx:8px,ry:8px;
+    classDef storageStyle fill:#1C1917,stroke:#D97706,stroke-width:2px,color:#F8FAFC,rx:8px,ry:8px;
+    classDef dbStyle fill:#1E1B4B,stroke:#6366F1,stroke-width:2px,color:#F8FAFC,rx:8px,ry:8px;
+
+    class SPA,AXIOS,UPLOADER clientStyle;
+    class AUTH_SVC,TREE_SVC,VERIFIER serverStyle;
+    class SEC,GATEKEEPER securityStyle;
+    class CLOUDINARY storageStyle;
+    class PRISMA,POSTGRES dbStyle;
 ```
 
 ---
