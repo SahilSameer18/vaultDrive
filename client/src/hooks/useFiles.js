@@ -16,7 +16,7 @@ export function useFiles(folderId = null) {
     totalCount: 0,
     totalPages: 1,
   });
-  const { searchQuery, debouncedSearchQuery } = useSearch();
+  const { debouncedSearchQuery } = useSearch();
 
   // Fetch files inside current folder with server-side search, sorting, and pagination
   const fetchFiles = useCallback(async (targetFolderId = folderId) => {

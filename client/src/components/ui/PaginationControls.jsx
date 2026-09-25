@@ -6,30 +6,29 @@ export default function PaginationControls({
   onPageChange,
   onLimitChange,
 }) {
-  // Hide entirely if there is only 1 page or no items
   if (totalCount === 0 || totalPages <= 1) return null;
 
   const startItem = (page - 1) * limit + 1;
   const endItem   = Math.min(page * limit, totalCount);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-12 mb-4 pt-4 border-t border-vault-border/30 text-xs text-vault-muted select-none">
-      {/* Summary Text */}
-      <div className="text-xs text-vault-muted">
-        Showing <span className="font-mono text-vault-text font-semibold">{startItem}</span>–
-        <span className="font-mono text-vault-text font-semibold">{endItem}</span> of{" "}
-        <span className="font-mono text-vault-text font-semibold">{totalCount}</span> files
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-10 mb-4 pt-4 border-t border-[var(--theme-border)]/40 text-xs text-[var(--theme-text-muted)] select-none">
+      {/* Summary Telemetry */}
+      <div className="text-xs text-[var(--theme-text-muted)] font-mono">
+        Telemetry: showing <span className="text-[var(--theme-text)] font-semibold">{startItem}</span>–
+        <span className="text-[var(--theme-text)] font-semibold">{endItem}</span> of{" "}
+        <span className="text-[var(--theme-accent)] font-semibold">{totalCount}</span> assets
       </div>
 
       {/* Controls Group */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Page Size Selector */}
         <div className="flex items-center gap-2">
-          <span className="text-xs text-vault-muted">Per page:</span>
+          <span className="text-xs text-[var(--theme-text-muted)] font-mono">Per page:</span>
           <select
             value={limit}
             onChange={(e) => onLimitChange(Number(e.target.value))}
-            className="px-2 py-1 rounded-lg border border-vault-border bg-vault-panel text-vault-text font-mono text-xs focus:border-vault-accent focus:outline-none cursor-pointer"
+            className="px-2.5 py-1 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text)] font-mono text-xs focus:border-[var(--theme-accent)] focus:outline-none cursor-pointer shadow-sm"
           >
             <option value={10}>10</option>
             <option value={20}>20</option>
@@ -39,25 +38,25 @@ export default function PaginationControls({
         </div>
 
         {/* Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 font-mono">
           <button
             type="button"
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
-            className="px-3 py-1 rounded-lg border border-vault-border bg-vault-panel text-xs text-vault-text hover:border-vault-accent hover:text-vault-accent disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="px-3 py-1 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-xs text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
           >
             ← Prev
           </button>
 
-          <span className="px-2 font-mono text-xs text-vault-muted">
-            <span className="text-vault-accent font-semibold">{page}</span> / {totalPages || 1}
+          <span className="px-2 text-xs text-[var(--theme-text-muted)]">
+            <span className="text-[var(--theme-accent)] font-semibold">{page}</span> / {totalPages || 1}
           </span>
 
           <button
             type="button"
             disabled={page >= totalPages}
             onClick={() => onPageChange(page + 1)}
-            className="px-3 py-1 rounded-lg border border-vault-border bg-vault-panel text-xs text-vault-text hover:border-vault-accent hover:text-vault-accent disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+            className="px-3 py-1 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-xs text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm"
           >
             Next →
           </button>

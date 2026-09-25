@@ -12,7 +12,6 @@ const SIZE_CLASSES = {
 export default function UserAvatar({ user, size = "sm", className = "", showBorder = true }) {
   const [imageError, setImageError] = useState(false);
 
-  // Reset error state if avatar URL changes
   useEffect(() => {
     setImageError(false);
   }, [user?.avatarUrl]);
@@ -27,8 +26,8 @@ export default function UserAvatar({ user, size = "sm", className = "", showBord
 
   return (
     <div
-      className={`relative shrink-0 rounded-full flex items-center justify-center overflow-hidden select-none bg-vault-surface ${sizeClass} ${
-        showBorder ? "border border-vault-accent/40" : ""
+      className={`relative shrink-0 rounded-full flex items-center justify-center overflow-hidden select-none bg-[var(--theme-surface)] ${sizeClass} ${
+        showBorder ? "border border-[var(--theme-accent)]/40 shadow-sm" : ""
       } ${className}`}
     >
       {showImage ? (
@@ -41,7 +40,7 @@ export default function UserAvatar({ user, size = "sm", className = "", showBord
           className="w-full h-full object-cover rounded-full"
         />
       ) : (
-        <div className="w-full h-full bg-gradient-to-br from-vault-surface via-vault-panel to-vault-bg text-vault-accent font-mono font-bold flex items-center justify-center shadow-inner">
+        <div className="w-full h-full bg-gradient-to-br from-[var(--theme-surface)] via-[var(--theme-panel)] to-[var(--theme-bg)] text-[var(--theme-accent)] font-mono font-bold flex items-center justify-center shadow-inner">
           {initial}
         </div>
       )}

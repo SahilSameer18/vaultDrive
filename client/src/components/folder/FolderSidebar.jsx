@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 // Helper function to build folder hierarchy tree from flat array
-export function buildFolderTree(flatFolders = []) {
+function buildFolderTree(flatFolders = []) {
   const map = {};
   const roots = [];
 

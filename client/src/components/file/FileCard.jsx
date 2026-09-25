@@ -36,7 +36,6 @@ export default function FileCard({
   };
 
   const handleCardClick = (e) => {
-    // In selection mode, clicking the card toggles selection
     if (isSelectionMode && onToggleSelect) {
       e.preventDefault();
       e.stopPropagation();
@@ -48,19 +47,23 @@ export default function FileCard({
     }
   };
 
+  const fileExt = file?.name?.includes(".")
+    ? file.name.split(".").pop().toUpperCase().slice(0, 4)
+    : "FILE";
+
+  // ── List View Representation ──────────────────────────────────────────────
   if (viewMode === "list") {
     return (
       <div
         onClick={handleCardClick}
-        className={`group relative flex items-center justify-between gap-3 sm:gap-4 p-3 rounded-xl border transition-all duration-150 select-none ${
+        className={`group relative flex items-center justify-between gap-3 sm:gap-4 p-3 rounded-xl border transition-all duration-200 select-none ${
           isSelected
-            ? "border-vault-accent ring-1 ring-vault-accent/40 bg-vault-accent/5 shadow-sm"
-            : "border-vault-border bg-vault-panel hover:border-vault-accent/40 hover:bg-vault-panel/80"
+            ? "border-[var(--theme-accent)] ring-1 ring-[var(--theme-accent)]/40 bg-[var(--theme-accent)]/[0.05] shadow-[0_0_16px_rgba(197,160,89,0.08)]"
+            : "border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-[var(--theme-accent)]/40 hover:bg-[var(--theme-surface)]/60 shadow-sm"
         } ${isSelectionMode ? "cursor-pointer" : ""} ${menuOpen ? "z-40" : "z-0"}`}
       >
-        {/* Left: Auto Checkbox (when in selection mode) + Icon & File Info */}
+        {/* Left: Checkbox + Icon & File Metadata */}
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          {/* Checkbox ONLY appears when selection mode is active */}
           {isSelectionMode && onToggleSelect && (
             <button
               type="button"
@@ -73,10 +76,10 @@ export default function FileCard({
               title={isSelected ? "Deselect File" : "Select File"}
             >
               <div
-                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
                   isSelected
-                    ? "bg-vault-accent border-vault-accent text-vault-bg"
-                    : "border-vault-muted/70 bg-vault-surface hover:border-vault-accent"
+                    ? "bg-[var(--theme-accent)] border-[var(--theme-accent)] text-[#0d0f12] shadow-[0_0_8px_rgba(197,160,89,0.5)]"
+                    : "border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-accent)]"
                 }`}
               >
                 {isSelected && (
@@ -90,24 +93,35 @@ export default function FileCard({
 
           <div
             onClick={(e) => {
-              if (isSelectionMode) return; // let card handler toggle selection
+              if (isSelectionMode) return;
+              e.stopPropagation();
               onPreview && onPreview(file);
             }}
             className="flex items-center gap-3 min-w-0 flex-1 cursor-pointer"
             title="Click to Preview Asset"
           >
-            <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 shrink-0 text-vault-accent group-hover:scale-110 transition-transform" />
+            <div className="w-9 h-9 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent)]/40 transition-colors shrink-0 shadow-inner">
+              <FileCategoryIcon mimetype={file.mimeType} className="w-4 h-4 text-[var(--theme-accent)] group-hover:scale-110 transition-transform" />
+            </div>
+
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-vault-text truncate group-hover:text-vault-accent transition-colors">{file.name}</p>
-              <p className="text-[10px] font-mono text-vault-muted mt-0.5">
-                {formatBytes(file.size)} • {formatDate(file.createdAt)}
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold text-[var(--theme-text)] truncate group-hover:text-[var(--theme-accent)] transition-colors">
+                  {file.name}
+                </p>
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)]">
+                  {fileExt}
+                </span>
+              </div>
+              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-0.5">
+                {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.createdAt)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-2.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+        {/* Right Actions: Latch + Download + Preview + 3-Dots Menu */}
+        <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
           <VaultToggle
             isPublic={file.isPublic}
             onToggle={() => onTogglePrivacy && onTogglePrivacy(file)}
@@ -117,8 +131,8 @@ export default function FileCard({
           <button
             type="button"
             onClick={() => onPreview && onPreview(file)}
-            className="p-1.5 rounded-lg text-vault-muted hover:text-vault-accent hover:bg-vault-surface transition-colors cursor-pointer"
-            title="Preview Asset"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+            title="Inspect Asset"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.75" />
@@ -130,8 +144,8 @@ export default function FileCard({
           <button
             type="button"
             onClick={onDownloadClick}
-            className="p-1.5 rounded-lg text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
-            title="Download File"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+            title="Download Payload"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
@@ -143,7 +157,8 @@ export default function FileCard({
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-1.5 rounded-lg text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+              title="Asset Options"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="5" r="1.5" fill="currentColor" />
@@ -153,8 +168,7 @@ export default function FileCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
-                {/* Select Option in Dropdown */}
+              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
                 {onToggleSelect && (
                   <button
                     type="button"
@@ -162,7 +176,7 @@ export default function FileCard({
                       setMenuOpen(false);
                       onToggleSelect(file.id);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-vault-accent hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer font-medium"
+                    className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer font-medium"
                   >
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                       <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="2" />
@@ -178,9 +192,13 @@ export default function FileCard({
                     setMenuOpen(false);
                     onPreview && onPreview(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  Preview Asset
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                  </svg>
+                  Inspect Asset
                 </button>
                 <button
                   type="button"
@@ -188,8 +206,11 @@ export default function FileCard({
                     setMenuOpen(false);
                     onDownloadClick(e);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-text-muted)]" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                   Download File
                 </button>
                 <button
@@ -198,8 +219,14 @@ export default function FileCard({
                     setMenuOpen(false);
                     onOpenShare && onOpenShare(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
+                    <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="18" cy="19" r="1.5" stroke="currentColor" strokeWidth="1.75" />
+                    <path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5" stroke="currentColor" strokeWidth="1.75" />
+                  </svg>
                   Share Options
                 </button>
                 {onRename && (
@@ -209,20 +236,28 @@ export default function FileCard({
                       setMenuOpen(false);
                       onRename(file);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer"
+                    className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                   >
+                    <svg className="w-3.5 h-3.5 text-[var(--theme-text-muted)]" viewBox="0 0 24 24" fill="none">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.75" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.75" />
+                    </svg>
                     Rename File
                   </button>
                 )}
+                <div className="h-px bg-[var(--theme-border)]/60 my-1" />
                 <button
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     onDelete && onDelete(file.id);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  Delete File
+                  <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Move to Trash
                 </button>
               </div>
             )}
@@ -232,20 +267,19 @@ export default function FileCard({
     );
   }
 
-  // Grid View
+  // ── Grid View Representation ──────────────────────────────────────────────
   return (
     <div
       onClick={handleCardClick}
-      className={`group relative p-4 rounded-2xl border transition-all duration-150 flex flex-col justify-between select-none ${
+      className={`group relative p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between select-none ${
         isSelected
-          ? "border-vault-accent ring-1 ring-vault-accent/40 bg-vault-accent/5 shadow-md -translate-y-0.5"
-          : "border-vault-border bg-vault-panel hover:border-vault-accent/50 hover:-translate-y-1 hover:shadow-xl"
+          ? "border-[var(--theme-accent)] ring-1 ring-[var(--theme-accent)]/40 bg-[var(--theme-accent)]/[0.05] shadow-[0_4px_24px_rgba(197,160,89,0.12)] -translate-y-0.5"
+          : "border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-[var(--theme-accent)]/50 hover:-translate-y-1 hover:shadow-xl shadow-sm"
       } ${isSelectionMode ? "cursor-pointer" : ""} ${menuOpen ? "z-40" : "z-0"}`}
     >
-      {/* Top Bar: Auto Checkbox (when in selection mode) + Category Icon + Eye Preview + Options Menu */}
-      <div className="flex items-start justify-between gap-2 mb-3">
+      {/* Top Bar: Checkbox + Icon + Badge + Quick Actions */}
+      <div className="flex items-start justify-between gap-2 mb-3.5">
         <div className="flex items-center gap-2">
-          {/* Checkbox ONLY appears when selection mode is active */}
           {isSelectionMode && onToggleSelect && (
             <button
               type="button"
@@ -258,10 +292,10 @@ export default function FileCard({
               title={isSelected ? "Deselect File" : "Select File"}
             >
               <div
-                className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
+                className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
                   isSelected
-                    ? "bg-vault-accent border-vault-accent text-vault-bg"
-                    : "border-vault-muted/70 bg-vault-surface hover:border-vault-accent"
+                    ? "bg-[var(--theme-accent)] border-[var(--theme-accent)] text-[#0d0f12] shadow-[0_0_8px_rgba(197,160,89,0.5)]"
+                    : "border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-accent)]"
                 }`}
               >
                 {isSelected && (
@@ -275,24 +309,24 @@ export default function FileCard({
 
           <div
             onClick={(e) => {
-              if (isSelectionMode) return; // let card handler toggle selection
+              if (isSelectionMode) return;
               e.stopPropagation();
               onPreview && onPreview(file);
             }}
-            className="w-10 h-10 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center group-hover:border-vault-accent/40 transition-colors cursor-pointer"
-            title="Preview Asset"
+            className="w-11 h-11 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center group-hover:border-[var(--theme-accent)]/40 transition-colors cursor-pointer shadow-inner"
+            title="Inspect Asset"
           >
-            <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-accent)] group-hover:scale-110 transition-transform" />
           </div>
         </div>
 
+        {/* Top-Right Quick Inspection & Overflow Menu */}
         <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          {/* Quick Preview Button */}
           <button
             type="button"
             onClick={() => onPreview && onPreview(file)}
-            className="p-1.5 rounded-lg text-vault-muted hover:text-vault-accent hover:bg-vault-surface transition-colors cursor-pointer"
-            title="Preview Asset"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer opacity-70 group-hover:opacity-100"
+            title="Inspect Asset"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.75" />
@@ -304,7 +338,8 @@ export default function FileCard({
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-1.5 rounded-lg text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+              title="Options"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <circle cx="12" cy="5" r="1.5" fill="currentColor" />
@@ -314,8 +349,7 @@ export default function FileCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-vault-border bg-vault-panel p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
-                {/* Select Option in Dropdown */}
+              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
                 {onToggleSelect && (
                   <button
                     type="button"
@@ -323,7 +357,7 @@ export default function FileCard({
                       setMenuOpen(false);
                       onToggleSelect(file.id);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-vault-accent hover:bg-vault-surface transition-colors flex items-center gap-2 cursor-pointer font-medium"
+                    className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer font-medium"
                   >
                     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                       <rect x="3" y="3" width="18" height="18" rx="4" stroke="currentColor" strokeWidth="2" />
@@ -339,9 +373,13 @@ export default function FileCard({
                     setMenuOpen(false);
                     onPreview && onPreview(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  Preview Asset
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                  </svg>
+                  Inspect Asset
                 </button>
                 <button
                   type="button"
@@ -349,8 +387,11 @@ export default function FileCard({
                     setMenuOpen(false);
                     onDownloadClick(e);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-text-muted)]" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                   Download File
                 </button>
                 <button
@@ -359,8 +400,14 @@ export default function FileCard({
                     setMenuOpen(false);
                     onOpenShare && onOpenShare(file);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                 >
+                  <svg className="w-3.5 h-3.5 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
+                    <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
+                    <circle cx="18" cy="19" r="1.5" stroke="currentColor" strokeWidth="1.75" />
+                    <path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5" stroke="currentColor" strokeWidth="1.75" />
+                  </svg>
                   Share Options
                 </button>
                 {onRename && (
@@ -370,20 +417,28 @@ export default function FileCard({
                       setMenuOpen(false);
                       onRename(file);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+                    className="w-full text-left px-3 py-2 rounded-lg text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors flex items-center gap-2 cursor-pointer"
                   >
+                    <svg className="w-3.5 h-3.5 text-[var(--theme-text-muted)]" viewBox="0 0 24 24" fill="none">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" strokeWidth="1.75" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth="1.75" />
+                    </svg>
                     Rename File
                   </button>
                 )}
+                <div className="h-px bg-[var(--theme-border)]/60 my-1" />
                 <button
                   type="button"
                   onClick={() => {
                     setMenuOpen(false);
                     onDelete && onDelete(file.id);
                   }}
-                  className="w-full text-left px-3 py-2 rounded-lg text-vault-danger hover:bg-vault-danger/10 transition-colors flex items-center gap-2 cursor-pointer"
+                  className="w-full text-left px-3 py-2 rounded-lg text-rose-400 hover:bg-rose-500/10 transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  Delete File
+                  <svg className="w-3.5 h-3.5 text-rose-400" viewBox="0 0 24 24" fill="none">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  Move to Trash
                 </button>
               </div>
             )}
@@ -391,23 +446,38 @@ export default function FileCard({
         </div>
       </div>
 
-      {/* Middle: File Name */}
+      {/* Middle: File Name + Extension Badge + Size/Date */}
       <div className="mb-4">
-        <h4 className="text-xs font-semibold text-vault-text truncate group-hover:text-vault-accent transition-colors" title={file.name}>
-          {file.name}
-        </h4>
-        <p className="text-[10px] font-mono text-vault-muted mt-1">
-          {formatBytes(file.size)} • {formatDate(file.createdAt)}
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <h4 className="text-xs font-semibold text-[var(--theme-text)] truncate group-hover:text-[var(--theme-accent)] transition-colors" title={file.name}>
+            {file.name}
+          </h4>
+          <span className="shrink-0 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)]">
+            {fileExt}
+          </span>
+        </div>
+        <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">
+          {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.createdAt)}
         </p>
       </div>
 
-      {/* Bottom Bar: Privacy Pill */}
-      <div className="flex items-center justify-between pt-3 border-t border-vault-border/50 text-[10px] font-mono" onClick={(e) => e.stopPropagation()}>
-        <span className="text-vault-muted">Visibility:</span>
+      {/* Bottom Bar: Privacy Pill + Quick Download */}
+      <div className="flex items-center justify-between pt-3 border-t border-[var(--theme-border)]/60 text-[10px] font-mono" onClick={(e) => e.stopPropagation()}>
         <VaultToggle
           isPublic={file.isPublic}
           onToggle={() => onTogglePrivacy && onTogglePrivacy(file)}
         />
+
+        <button
+          type="button"
+          onClick={onDownloadClick}
+          className="p-1 rounded-md text-[var(--theme-text-muted)] hover:text-[var(--theme-accent)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+          title="Download Asset"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
+            <path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
   );

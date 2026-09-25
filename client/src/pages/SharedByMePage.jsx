@@ -46,12 +46,11 @@ export default function SharedByMePage() {
     const origin = window.location.origin;
     const url = `${origin}/share/${shareToken}`;
     navigator.clipboard.writeText(url);
-    addToast("Public share link copied to clipboard!", "success");
+    addToast("Public share gateway link copied to clipboard!", "success");
   };
 
   const handleShareUpdate = (updatedFile) => {
     setManageFile(updatedFile);
-    // If access was completely revoked, update list or re-fetch
     fetchSharedByMe();
   };
 
@@ -59,30 +58,37 @@ export default function SharedByMePage() {
   const userSharedCount = sharedFiles.filter((f) => f.sharedWith && f.sharedWith.length > 0).length;
 
   return (
-    <div className="space-y-6 fade-in select-none">
+    <div className="space-y-6 fade-in select-none pb-12">
       
       {/* ── Header ────────────────────────────────────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vault-border">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--theme-border)]">
         <div>
-          <nav className="flex items-center gap-2 text-xs font-mono text-vault-muted mb-1">
-            <Link to="/dashboard" className="text-vault-accent hover:underline">Repository</Link>
-            <span>/</span>
-            <span className="text-vault-text font-semibold">Shared by Me</span>
+          <nav className="flex items-center gap-2 text-xs font-mono text-[var(--theme-text-muted)] mb-1">
+            <Link to="/dashboard" className="text-[var(--theme-accent)] hover:underline flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--theme-accent)]" />
+              ROOT
+            </Link>
+            <span className="text-[var(--theme-border)]">/</span>
+            <span className="text-[var(--theme-text)] font-semibold">Shared by Me</span>
           </nav>
-          <h1 className="text-2xl font-bold tracking-tight text-vault-text">
-            Files Shared by You
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--theme-text)]">
+            Distribution Channels
           </h1>
-          <p className="text-xs text-vault-muted mt-0.5">
-            Monitor and manage all files you have shared publicly or with specific users.
+          <p className="text-xs text-[var(--theme-text-muted)] mt-0.5">
+            Monitor and administer all active public links and delegated user authorizations.
           </p>
         </div>
 
         {/* Quick summary metrics */}
         {!loading && sharedFiles.length > 0 && (
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="px-3 py-1.5 rounded-xl border border-vault-border bg-vault-panel text-xs font-mono text-vault-muted flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-vault-accent" />
-              {sharedFiles.length} {sharedFiles.length === 1 ? "File" : "Files"} Shared
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap font-mono">
+            <span className="px-3 py-1.5 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-xs text-[var(--theme-text-muted)] flex items-center gap-1.5 shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-[var(--theme-accent)]" />
+              <strong className="text-[var(--theme-text)]">{sharedFiles.length}</strong> Total
+              <span className="opacity-40">·</span>
+              <span className="text-emerald-400 font-semibold">{publicFilesCount} Public</span>
+              <span className="opacity-40">·</span>
+              <span className="text-sky-400 font-semibold">{userSharedCount} Delegated</span>
             </span>
           </div>
         )}
@@ -92,26 +98,26 @@ export default function SharedByMePage() {
       {loading ? (
         <FileSkeleton count={4} viewMode="grid" />
       ) : error ? (
-        <div className="p-4 rounded-xl bg-vault-danger/10 border border-vault-danger/30 text-vault-danger text-xs font-mono">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
           [ERROR] {error}
         </div>
       ) : sharedFiles.length === 0 ? (
-        <div className="min-h-[300px] rounded-2xl border border-dashed border-vault-border bg-vault-panel/20 flex flex-col items-center justify-center p-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-vault-panel border border-vault-accent/30 flex items-center justify-center mb-4 shadow-xl">
-            <svg className="w-7 h-7 text-vault-accent" viewBox="0 0 24 24" fill="none">
+        <div className="min-h-[300px] rounded-2xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-panel)]/30 flex flex-col items-center justify-center p-6 text-center shadow-inner">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--theme-surface)] border border-[var(--theme-accent)]/30 flex items-center justify-center mb-4 shadow-xl">
+            <svg className="w-7 h-7 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               <polyline points="16 6 12 2 8 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
             </svg>
           </div>
-          <h3 className="text-base font-bold text-vault-text mb-1">No Shared Files</h3>
-          <p className="text-xs text-vault-muted max-w-sm mb-6">
-            You haven't shared any files yet. You can create public links or invite users directly from your Vault.
+          <h3 className="text-base font-bold text-[var(--theme-text)] mb-1">No Distributed Assets</h3>
+          <p className="text-xs text-[var(--theme-text-muted)] max-w-sm mb-6 leading-relaxed">
+            You haven't issued any public links or delegated access to other users yet. You can activate sharing directly on any asset in your Vault.
           </p>
 
           <Link
             to="/dashboard"
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all shadow-md cursor-pointer"
           >
             Go to My Vault
           </Link>
@@ -124,25 +130,24 @@ export default function SharedByMePage() {
             return (
               <div
                 key={file.id}
-                className="p-4 rounded-2xl border border-vault-border bg-vault-panel hover:border-vault-accent/40 transition-[border-color,box-shadow] duration-150 flex flex-col justify-between group shadow-sm"
+                className="p-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] hover:border-[var(--theme-accent)]/50 transition-all flex flex-col justify-between group shadow-sm hover:shadow-xl hover:-translate-y-0.5"
               >
-                {/* Top Info */}
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <div className="w-10 h-10 rounded-xl bg-vault-surface border border-vault-border flex items-center justify-center">
-                      <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5" />
+                    <div className="w-10 h-10 rounded-xl bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center shadow-inner group-hover:border-[var(--theme-accent)]/40 transition-colors">
+                      <FileCategoryIcon mimetype={file.mimeType} className="w-5 h-5 text-[var(--theme-accent)] group-hover:scale-110 transition-transform" />
                     </div>
 
                     {/* Status Badges */}
                     <div className="flex flex-col items-end gap-1">
                       {file.isPublic && (
-                        <span className="px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 text-[9px] font-mono text-emerald-400 flex items-center gap-1 font-medium">
+                        <span className="px-2 py-0.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[9px] font-mono text-emerald-400 flex items-center gap-1 font-semibold">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                           PUBLIC LINK
                         </span>
                       )}
                       {hasUsers && (
-                        <span className="px-2 py-0.5 rounded border border-sky-500/30 bg-sky-500/10 text-[9px] font-mono text-sky-400 font-medium">
+                        <span className="px-2 py-0.5 rounded-md border border-sky-500/30 bg-sky-500/10 text-[9px] font-mono text-sky-400 font-semibold">
                           {file.sharedWith.length} {file.sharedWith.length === 1 ? "USER" : "USERS"}
                         </span>
                       )}
@@ -150,29 +155,29 @@ export default function SharedByMePage() {
                   </div>
 
                   <div className="mb-4">
-                    <p className="text-xs font-semibold text-vault-text truncate mb-1" title={file.name}>
+                    <p className="text-xs font-semibold text-[var(--theme-text)] truncate mb-1 group-hover:text-[var(--theme-accent)] transition-colors" title={file.name}>
                       {file.name}
                     </p>
-                    <p className="text-[10px] font-mono text-vault-muted">
-                      {formatBytes(file.size)} • {formatDate(file.updatedAt || file.createdAt)}
+                    <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">
+                      {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.updatedAt || file.createdAt)}
                     </p>
 
                     {/* Shared users avatars / pills */}
                     {hasUsers && (
-                      <div className="mt-2 pt-2 border-t border-vault-border/50">
-                        <span className="text-[9px] font-mono text-vault-muted block mb-1">Shared with:</span>
+                      <div className="mt-2.5 pt-2 border-t border-[var(--theme-border)]/50">
+                        <span className="text-[9px] font-mono text-[var(--theme-text-muted)] block mb-1">Delegated:</span>
                         <div className="flex flex-wrap gap-1">
                           {file.sharedWith.slice(0, 3).map((s) => (
                             <span
                               key={s.id}
-                              className="px-1.5 py-0.5 rounded bg-vault-surface text-[9px] font-mono text-vault-text/80 border border-vault-border truncate max-w-[120px]"
+                              className="px-1.5 py-0.5 rounded bg-[var(--theme-surface)] text-[9px] font-mono text-[var(--theme-text)] border border-[var(--theme-border)] truncate max-w-[120px]"
                               title={s.user?.email || s.user?.username}
                             >
                               @{s.user?.username || "user"}
                             </span>
                           ))}
                           {file.sharedWith.length > 3 && (
-                            <span className="px-1.5 py-0.5 rounded bg-vault-surface text-[9px] font-mono text-vault-muted border border-vault-border">
+                            <span className="px-1.5 py-0.5 rounded bg-[var(--theme-surface)] text-[9px] font-mono text-[var(--theme-text-muted)] border border-[var(--theme-border)]">
                               +{file.sharedWith.length - 3} more
                             </span>
                           )}
@@ -183,33 +188,30 @@ export default function SharedByMePage() {
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-3 border-t border-vault-border space-y-2">
+                <div className="pt-3 border-t border-[var(--theme-border)]/60 space-y-2">
                   <div className="flex items-center justify-between gap-1.5">
-                    {/* Preview Button */}
                     <button
                       type="button"
                       onClick={() => setPreviewFile(file)}
-                      className="px-2.5 py-1.5 rounded-lg border border-vault-border bg-vault-surface text-[10px] font-mono text-vault-text hover:border-vault-accent transition-colors flex-1 text-center cursor-pointer"
+                      className="px-2.5 py-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[10px] font-mono text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] transition-colors flex-1 text-center cursor-pointer shadow-sm"
                     >
-                      Preview
+                      Inspect
                     </button>
 
-                    {/* Manage Share / Access */}
                     <button
                       type="button"
                       onClick={() => setManageFile(file)}
-                      className="px-2.5 py-1.5 rounded-lg border border-vault-accent/40 bg-vault-accent/10 text-[10px] font-mono text-vault-accent hover:bg-vault-accent/20 transition-colors flex-1 text-center font-medium cursor-pointer"
+                      className="px-2.5 py-1.5 rounded-lg border border-[var(--theme-accent)]/40 bg-[var(--theme-accent)]/10 text-[10px] font-mono text-[var(--theme-accent)] hover:bg-[var(--theme-accent)] hover:text-[#0d0f12] transition-all flex-1 text-center font-medium cursor-pointer shadow-sm"
                     >
                       Manage
                     </button>
 
-                    {/* Download */}
                     <a
                       href={file.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       download
-                      className="p-1.5 text-vault-muted hover:text-vault-accent transition-colors"
+                      className="p-1.5 text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] rounded-lg transition-colors cursor-pointer"
                       title="Download File"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -223,13 +225,13 @@ export default function SharedByMePage() {
                     <button
                       type="button"
                       onClick={() => copyShareLink(file.shareToken)}
-                      className="w-full py-1 px-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 text-[10px] font-mono text-emerald-400 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="w-full py-1 px-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hover:border-emerald-500/40 text-[10px] font-mono text-emerald-400 transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
                     >
                       <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none">
                         <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                         <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                       </svg>
-                      Copy Public Link
+                      <span>Copy Gateway URL</span>
                     </button>
                   )}
                 </div>

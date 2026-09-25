@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useFolders } from "../hooks/useFolders";
 import { useFiles } from "../hooks/useFiles";
 import { useToast } from "../components/ui/Toast";
@@ -22,7 +22,6 @@ import BatchActionBar from "../components/ui/BatchActionBar";
 
 export default function FolderPage() {
   const { folderId } = useParams();
-  const navigate = useNavigate();
   const { addToast } = useToast();
 
   const [viewMode, setViewMode]                     = useState("grid");
@@ -40,8 +39,8 @@ export default function FolderPage() {
   const [isBatchTrashOpen, setIsBatchTrashOpen]     = useState(false);
   const [isBatchProcessing, setIsBatchProcessing]   = useState(false);
 
-  const { folders, breadcrumbs, loading: foldersLoading, error: foldersError, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
-  const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, uploadFile, togglePrivacy, deleteFile, renameFile, updateFileInState } = useFiles(folderId);
+  const { folders, breadcrumbs, loading: foldersLoading, fetchFolders, createFolder, renameFolder, deleteFolder } = useFolders(folderId);
+  const { files, loading: filesLoading, sortBy, sortOrder, page, limit, pagination, setSortBy, setSortOrder, setPage, setLimit, fetchFiles, togglePrivacy, deleteFile, renameFile, updateFileInState } = useFiles(folderId);
 
   useEffect(() => {
     const handleUploadEvent = () => {
@@ -89,11 +88,11 @@ export default function FolderPage() {
     });
   }, []);
 
-  const handleToggleSelectFolder = useCallback((folderId) => {
+  const handleToggleSelectFolder = useCallback((targetFolderId) => {
     setSelectedFolderIds((prev) => {
       const next = new Set(prev);
-      if (next.has(folderId)) next.delete(folderId);
-      else next.add(folderId);
+      if (next.has(targetFolderId)) next.delete(targetFolderId);
+      else next.add(targetFolderId);
       return next;
     });
   }, []);
@@ -161,7 +160,7 @@ export default function FolderPage() {
       await filesApi.batchTrash(fileIdsArray, folderIdsArray);
       const totalCount = fileIdsArray.length + folderIdsArray.length;
       addToast(`Moved ${totalCount} item(s) to Trash`, "info");
-
+      
       handleClearSelection();
       setIsBatchTrashOpen(false);
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
@@ -177,22 +176,22 @@ export default function FolderPage() {
   const handleCreateFolder = async (name) => {
     try {
       await createFolder(name, folderId);
-      addToast(`Subfolder "${name}" created`, "success");
+      addToast(`Directory "${name}" allocated`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Failed to create subfolder";
+      const msg = err.response?.data?.message || err.message || "Failed to create directory";
       addToast(msg, "error");
       throw err;
     }
   };
 
-  const handleRenameFolder = async (targetFolderId, newName) => {
+  const handleRenameFolder = async (targetId, newName) => {
     try {
-      await renameFolder(targetFolderId, newName);
-      addToast(`Folder renamed to "${newName}"`, "success");
+      await renameFolder(targetId, newName);
+      addToast(`Directory renamed to "${newName}"`, "success");
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
     } catch (err) {
-      const msg = err.response?.data?.message || err.message || "Failed to rename folder";
+      const msg = err.response?.data?.message || err.message || "Failed to rename directory";
       addToast(msg, "error");
       throw err;
     }
@@ -210,22 +209,11 @@ export default function FolderPage() {
     }
   };
 
-  const handleUploadFile = async (file, onProgress) => {
-    try {
-      await uploadFile(file, folderId, onProgress);
-      addToast(`File "${file.name}" uploaded successfully`, "success");
-      window.dispatchEvent(new CustomEvent("vault:files-changed"));
-    } catch {
-      addToast("File upload failed", "error");
-      throw new Error("Upload failed");
-    }
-  };
-
   const handleTogglePrivacy = async (file) => {
     try {
       const updated = await togglePrivacy(file.id, file.isPublic);
       addToast(
-        `File is now ${updated.isPublic ? "PUBLIC (Share link active)" : "PRIVATE"}`,
+        `File is now ${updated.isPublic ? "PUBLIC (Gateway active)" : "PRIVATE"}`,
         updated.isPublic ? "success" : "info"
       );
       window.dispatchEvent(new CustomEvent("vault:files-changed"));
@@ -248,10 +236,10 @@ export default function FolderPage() {
     } else if (deleteTarget.type === "folder") {
       try {
         await deleteFolder(deleteTarget.item.id);
-        addToast(`Folder "${deleteTarget.item.name}" moved to Trash`, "info");
+        addToast(`Directory "${deleteTarget.item.name}" moved to Trash`, "info");
         window.dispatchEvent(new CustomEvent("vault:files-changed"));
       } catch {
-        addToast("Failed to move folder to Trash", "error");
+        addToast("Failed to move directory to Trash", "error");
       }
     }
   };
@@ -263,28 +251,29 @@ export default function FolderPage() {
 
   const isLoading = foldersLoading || filesLoading;
   const hasItems  = folders.length > 0 || files.length > 0;
+  const currentFolderName = breadcrumbs?.[breadcrumbs.length - 1]?.name || "Directory";
 
   return (
     <div className="space-y-6 fade-in select-none pb-20">
       
-      {/* ── Breadcrumb Header & Action Toolbar ───────────────────────────── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-vault-border">
+      {/* ── Header & Path ────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--theme-border)]">
         <div>
           <FolderBreadcrumb breadcrumbs={breadcrumbs} />
-          <h1 className="text-xl font-bold tracking-tight text-vault-text mt-1">
-            {breadcrumbs[breadcrumbs.length - 1]?.name || "Folder"}
+          <h1 className="text-2xl font-bold tracking-tight text-[var(--theme-text)] mt-2">
+            {currentFolderName}
           </h1>
         </div>
 
-        {/* Action Controls */}
+        {/* Action Controls Deck */}
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* View Toggle */}
-          <div className="flex items-center p-1 rounded-xl border border-vault-border bg-vault-panel">
+          <div className="flex items-center p-1 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] shadow-sm">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-colors ${
-                viewMode === "grid" ? "bg-vault-surface text-vault-accent shadow-sm" : "text-vault-muted hover:text-vault-text"
+              className={`p-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                viewMode === "grid" ? "bg-[var(--theme-surface)] text-[var(--theme-accent)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
               }`}
               title="Grid View"
             >
@@ -298,8 +287,8 @@ export default function FolderPage() {
             <button
               type="button"
               onClick={() => setViewMode("list")}
-              className={`p-1.5 rounded-lg text-xs font-mono transition-colors ${
-                viewMode === "list" ? "bg-vault-surface text-vault-accent shadow-sm" : "text-vault-muted hover:text-vault-text"
+              className={`p-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                viewMode === "list" ? "bg-[var(--theme-surface)] text-[var(--theme-accent)] shadow-sm border border-[var(--theme-border)]" : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
               }`}
               title="List View"
             >
@@ -319,35 +308,35 @@ export default function FolderPage() {
             }}
           />
 
-          {/* New Subfolder */}
+          {/* New Subdirectory */}
           <button
             type="button"
             onClick={() => setIsFolderOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-vault-border bg-vault-panel text-xs font-semibold text-vault-text hover:border-vault-accent hover:text-vault-accent transition-all flex items-center gap-2 cursor-pointer"
+            className="px-3.5 py-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-xs font-semibold text-[var(--theme-text)] hover:border-[var(--theme-accent)]/50 hover:text-[var(--theme-accent)] transition-all flex items-center gap-2 cursor-pointer shadow-sm"
           >
-            <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+            <svg className="w-4 h-4 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
-            New Subfolder
+            <span>New Folder</span>
           </button>
 
-          {/* Upload to this Folder */}
+          {/* Ingest Payload File Button */}
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold font-mono text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 rounded-xl text-xs font-semibold font-mono text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 shadow-md transition-all flex items-center gap-2 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-              <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12 15V3m0 0l-4 4m4-4l4 4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            Upload File
+            <span>Upload File</span>
           </button>
         </div>
       </div>
 
-      {/* ── Directory Content List ───────────────────────────────────────── */}
+      {/* ── Main View State ──────────────────────────────────────────────── */}
       {isLoading ? (
-        <FileSkeleton count={8} viewMode={viewMode} />
+        <FileSkeleton count={limit || 8} viewMode={viewMode} />
       ) : hasItems ? (
         <FileGrid
           folders={folders}
@@ -360,31 +349,33 @@ export default function FolderPage() {
           onToggleSelectFolder={handleToggleSelectFolder}
           onTogglePrivacy={handleTogglePrivacy}
           onOpenShare={(file) => setShareFile(file)}
-          onPreviewFile={(file) => setPreviewFile(file)}
           onRenameFile={(file) => setRenameFileTarget(file)}
-          onDeleteFile={(fileId) => {
-            const f = files.find((item) => item.id === fileId);
-            setDeleteTarget({ type: "file", item: f || { id: fileId, name: "File" } });
+          onDeleteFile={(id) => {
+            const target = files.find((f) => f.id === id);
+            setDeleteTarget({ type: "file", item: target });
           }}
           onRenameFolder={(folder) => setRenameFolderTarget(folder)}
           onDeleteFolder={(folder) => setDeleteTarget({ type: "folder", item: folder })}
+          onPreviewFile={(file) => setPreviewFile(file)}
         />
       ) : (
-        <div className="min-h-[300px] rounded-2xl border border-dashed border-vault-border bg-vault-panel/20 flex flex-col items-center justify-center p-8 text-center">
-          <div className="w-12 h-12 rounded-xl bg-vault-panel border border-vault-accent/30 flex items-center justify-center mb-3">
-            <svg className="w-6 h-6 text-vault-accent" viewBox="0 0 24 24" fill="none">
+        <div className="min-h-[400px] rounded-2xl border border-dashed border-[var(--theme-border)] bg-[var(--theme-panel)]/30 flex flex-col items-center justify-center p-8 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--theme-surface)] border border-[var(--theme-accent)]/30 shadow-[0_0_40px_rgba(197,160,89,0.15)] flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-[var(--theme-accent)]" viewBox="0 0 24 24" fill="none">
               <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
             </svg>
           </div>
-          <h3 className="text-sm font-semibold text-vault-text">This folder is empty</h3>
-          <p className="text-xs text-vault-muted mt-1 mb-4">Upload files or create subfolders to populate this directory.</p>
+          <h3 className="text-lg font-bold text-[var(--theme-text)] mb-1">Directory is Empty</h3>
+          <p className="text-xs text-[var(--theme-text-muted)] max-w-sm mb-6 leading-relaxed">
+            Ingest assets or create nested subdirectories inside this encrypted enclave.
+          </p>
 
           <button
             type="button"
             onClick={() => setIsUploadOpen(true)}
-            className="px-4 py-2 rounded-xl text-xs font-semibold text-vault-bg bg-vault-accent hover:bg-vault-accent-hover transition-colors shadow-md cursor-pointer"
+            className="px-5 py-2.5 rounded-xl text-xs font-mono font-semibold text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all shadow-md cursor-pointer"
           >
-            Upload File Here
+            Upload File
           </button>
         </div>
       )}

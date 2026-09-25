@@ -15,23 +15,23 @@ export default function BatchActionBar({
   if (totalCount === 0) return null;
 
   return (
-    <aside aria-label="Batch actions toolbar" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-2xl animate-slide-up">
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-vault-accent/40 bg-vault-surface/95 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_20px_rgba(230,175,46,0.15)] text-vault-text select-none">
+    <aside aria-label="Batch actions toolbar" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-2xl animate-slide-up select-none">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-5 py-3 rounded-2xl border border-[var(--theme-accent)]/50 bg-[var(--theme-panel)]/95 backdrop-blur-xl shadow-[0_16px_50px_rgba(0,0,0,0.8),0_0_25px_rgba(197,160,89,0.18)] text-[var(--theme-text)]">
         
-        {/* Left: Selected Counter & Size */}
+        {/* Left: Selected Counter & Payload Telemetry */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vault-accent opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-vault-accent"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--theme-accent)] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--theme-accent)]"></span>
             </span>
-            <span className="text-xs sm:text-sm font-bold font-mono text-vault-accent">
-              {totalCount} {totalCount === 1 ? "item" : "items"} selected
+            <span className="text-xs sm:text-sm font-bold font-mono text-[var(--theme-accent)]">
+              {totalCount} {totalCount === 1 ? "PAYLOAD" : "PAYLOADS"} SELECTED
             </span>
           </div>
 
           {totalSizeBytes > 0 && (
-            <span className="hidden sm:inline-block text-[11px] font-mono text-vault-muted bg-vault-surface px-2.5 py-0.5 rounded-full border border-vault-border">
+            <span className="hidden sm:inline-block text-[11px] font-mono text-[var(--theme-text-muted)] bg-[var(--theme-surface)] px-2.5 py-0.5 rounded-full border border-[var(--theme-border)] shadow-inner">
               {formatBytes(totalSizeBytes)}
             </span>
           )}
@@ -44,7 +44,7 @@ export default function BatchActionBar({
             <button
               type="button"
               onClick={onSelectAll}
-              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-medium border border-vault-border bg-vault-surface hover:border-vault-accent/50 text-vault-text transition-colors cursor-pointer"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-medium border border-[var(--theme-border)] bg-[var(--theme-surface)] hover:border-[var(--theme-accent)]/50 text-[var(--theme-text)] transition-colors cursor-pointer shadow-sm"
               title={isAllSelected ? "Deselect All Items" : "Select All Items"}
             >
               {isAllSelected ? "Deselect All" : "Select All"}
@@ -57,7 +57,7 @@ export default function BatchActionBar({
               type="button"
               disabled={isProcessing}
               onClick={onBatchDownload}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold font-mono text-vault-text bg-vault-surface border border-vault-border hover:border-vault-accent hover:text-vault-accent transition-all cursor-pointer shadow-sm disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold font-mono text-[#0d0f12] bg-[var(--theme-accent)] hover:brightness-110 transition-all cursor-pointer shadow-md disabled:opacity-50"
               title={`Download ${selectedFilesCount} File(s)`}
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
@@ -79,7 +79,7 @@ export default function BatchActionBar({
               type="button"
               disabled={isProcessing}
               onClick={onBatchTrash}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold font-mono text-vault-bg bg-vault-danger hover:bg-vault-danger/90 transition-all cursor-pointer shadow-md disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold font-mono text-white bg-rose-600 hover:bg-rose-500 transition-all cursor-pointer shadow-md disabled:opacity-50"
               title="Move Selected Items to Trash"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
@@ -99,12 +99,10 @@ export default function BatchActionBar({
           <button
             type="button"
             onClick={onClearSelection}
-            className="p-1.5 rounded-xl text-vault-muted hover:text-vault-text hover:bg-vault-surface transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-[var(--theme-accent)] flex items-center justify-center transition-colors cursor-pointer"
             title="Clear Selection (Esc)"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <span className="text-xs font-bold">✕</span>
           </button>
         </div>
 

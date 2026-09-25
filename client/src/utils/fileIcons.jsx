@@ -2,6 +2,7 @@
  * File icon mapper component based on mimetype / category
  */
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getFileCategory(mimetype = "") {
   const type = mimetype.toLowerCase();
   if (type.startsWith("image/")) return "image";

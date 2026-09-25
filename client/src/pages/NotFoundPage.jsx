@@ -1,62 +1,138 @@
 import { Link } from "react-router-dom";
 
-function BrokenVaultIllustration() {
+function ArchitecturalOfflineVault() {
+  // Generate crisp radial ticks mathematically in SVG coordinates (cx=130, cy=130)
+  const ticks = [];
+  const totalTicks = 24;
+  for (let i = 0; i < totalTicks; i++) {
+    // Intentionally omit ticks 5, 6, 17, 18 to visually symbolize a severed/broken circuit
+    if (i === 5 || i === 6 || i === 17 || i === 18) continue;
+    const angle = (i * 360) / totalTicks;
+    const rad = (angle * Math.PI) / 180;
+    const rInner = 104;
+    const rOuter = 114;
+    const x1 = 130 + rInner * Math.cos(rad);
+    const y1 = 130 + rInner * Math.sin(rad);
+    const x2 = 130 + rOuter * Math.cos(rad);
+    const y2 = 130 + rOuter * Math.sin(rad);
+    ticks.push({ x1, y1, x2, y2, id: i });
+  }
+
   return (
-    <div className="relative w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] mx-auto">
-      {/* Ambient warning glow */}
-      <div className="absolute inset-6 rounded-full bg-vault-danger/[0.06] blur-[50px]" />
+    <div className="relative w-[240px] h-[240px] sm:w-[280px] sm:h-[280px] mx-auto select-none">
+      {/* Ambient warning photon glow */}
+      <div className="absolute inset-4 rounded-full bg-rose-500/[0.08] blur-[40px] pointer-events-none" />
 
-      {/* Outer ring — stalled, off-axis */}
-      <div
-        className="absolute inset-1 rounded-full border border-vault-danger/25"
-        style={{ transform: "rotate(12deg)" }}
+      <svg
+        viewBox="0 0 260 260"
+        className="w-full h-full relative z-10 drop-shadow-[0_12px_36px_rgba(0,0,0,0.5)]"
+        fill="none"
       >
-        <span className="absolute left-1/2 -top-1 w-2 h-2 -translate-x-1/2 rounded-full bg-vault-danger shadow-[0_0_12px_rgba(192,101,79,0.6)]" />
-        <span className="absolute left-1/2 -bottom-1 w-1.5 h-1.5 -translate-x-1/2 rounded-full bg-vault-border" />
-      </div>
+        <defs>
+          <radialGradient id="dialGrad404" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--theme-panel)" />
+            <stop offset="80%" stopColor="var(--theme-surface)" />
+            <stop offset="100%" stopColor="var(--theme-bg)" />
+          </radialGradient>
+          <linearGradient id="roseAccentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f43f5e" />
+            <stop offset="100%" stopColor="#e11d48" />
+          </linearGradient>
+        </defs>
 
-      {/* Tick ring, a few teeth missing to read as "damaged" */}
-      <div className="absolute inset-3">
-        {Array.from({ length: 20 }).map((_, i) => {
-          if (i % 7 === 0) return null;
-          return (
-            <span
-              key={i}
-              className="absolute left-1/2 top-1/2 w-px h-2.5 rounded-full bg-vault-border"
-              style={{
-                transform: `rotate(${i * 18}deg) translateY(-96px)`,
-                transformOrigin: "0 96px",
-              }}
-            />
-          );
-        })}
-      </div>
+        {/* Outer security perimeter ring */}
+        <circle
+          cx="130"
+          cy="130"
+          r="124"
+          stroke="var(--theme-border)"
+          strokeWidth="1"
+          strokeDasharray="3 6"
+        />
 
-      {/* Main plate */}
-      <div className="absolute inset-[42px] rounded-full bg-vault-surface border border-vault-border shadow-[inset_0_0_40px_rgba(0,0,0,0.6),0_20px_50px_rgba(0,0,0,0.4)]">
-        <div className="absolute inset-4 rounded-full border border-vault-danger/20" />
+        {/* Severed orbital ring segment */}
+        <path
+          d="M 130 10 A 120 120 0 0 1 250 130"
+          stroke="url(#roseAccentGrad)"
+          strokeWidth="1.5"
+          strokeOpacity="0.4"
+          strokeLinecap="round"
+        />
 
-        {/* Cracked dial + open shackle */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-[76px] h-[76px] rounded-2xl border border-vault-danger/50 bg-vault-bg flex items-center justify-center shadow-[0_0_28px_rgba(192,101,79,0.1)]">
-            {/* Shackle, sprung open */}
-            <div
-              className="absolute top-[14px] w-6 h-6 rounded-t-full border-[3px] border-b-0 border-vault-danger/70"
-              style={{ transform: "translateX(6px) rotate(18deg)" }}
-            />
-            <div className="relative mt-4 w-9 h-8 rounded-lg bg-vault-panel border border-vault-danger/50 flex items-center justify-center">
-              <span className="text-vault-danger text-[10px] font-mono font-bold">×</span>
-            </div>
-          </div>
-        </div>
-      </div>
+        {/* Ticks array */}
+        {ticks.map((t) => (
+          <line
+            key={t.id}
+            x1={t.x1}
+            y1={t.y1}
+            x2={t.x2}
+            y2={t.y2}
+            stroke="var(--theme-border)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        ))}
 
-      {/* Status pill */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-1.5 whitespace-nowrap">
-        <span className="w-1.5 h-1.5 rounded-full bg-vault-danger shadow-[0_0_6px_rgba(192,101,79,0.6)]" />
-        <span className="text-[8px] font-mono tracking-[0.15em] text-vault-danger">
-          MECHANISM OFFLINE
-        </span>
+        {/* Main Vault Plate */}
+        <circle
+          cx="130"
+          cy="130"
+          r="92"
+          fill="url(#dialGrad404)"
+          stroke="var(--theme-border)"
+          strokeWidth="1.5"
+        />
+
+        {/* Inner concentric warning ring */}
+        <circle
+          cx="130"
+          cy="130"
+          r="74"
+          stroke="#f43f5e"
+          strokeWidth="1"
+          strokeOpacity="0.25"
+          strokeDasharray="4 4"
+        />
+
+        {/* Central Escutcheon Housing */}
+        <rect
+          x="94"
+          y="94"
+          width="72"
+          height="72"
+          rx="18"
+          fill="var(--theme-bg)"
+          stroke="var(--theme-border)"
+          strokeWidth="1.5"
+        />
+
+        {/* Sprung / Fractured Shackle */}
+        <path
+          d="M 116 94 V 78 C 116 70 122 64 130 64 C 138 64 144 70 144 78"
+          stroke="#f43f5e"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeOpacity="0.8"
+        />
+
+        {/* Red Warning Isolation Icon */}
+        <circle cx="130" cy="130" r="14" fill="#f43f5e" fillOpacity="0.12" />
+        <path
+          d="M 124 124 L 136 136 M 136 124 L 124 136"
+          stroke="#f43f5e"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+
+        {/* Status Callout Nodes */}
+        <circle cx="130" cy="14" r="3" fill="#f43f5e" />
+        <circle cx="130" cy="246" r="2.5" fill="var(--color-vault-muted)" fillOpacity="0.4" />
+      </svg>
+
+      {/* Sub-label */}
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[var(--theme-surface)] border border-rose-500/30 text-[9px] font-mono text-rose-400 whitespace-nowrap shadow-md">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping" />
+        NODE_OFFLINE // ROUTE_DISCONNECTED
       </div>
     </div>
   );
@@ -64,98 +140,108 @@ function BrokenVaultIllustration() {
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen w-full bg-vault-bg text-vault-text font-sans flex flex-col relative overflow-hidden selection:bg-vault-accent/30">
-      {/* Background grid + vignette, matching Landing/Login treatment */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.12] bg-grid-pattern" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-vault-danger/[0.035] blur-[150px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,var(--color-vault-bg)_90%)]" />
+    <div className="min-h-screen w-full bg-[var(--theme-bg)] text-[var(--color-vault-text)] font-sans flex flex-col justify-between relative overflow-x-hidden selection:bg-vault-accent/30 selection:text-white">
+      
+      {/* Background Grid & Vignette */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-grid-pattern opacity-25" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-rose-500/[0.04] blur-[140px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,var(--theme-bg)_85%)]" />
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 border-b border-vault-border bg-vault-bg/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-lg bg-vault-surface border border-vault-accent/40 flex items-center justify-center shadow-lg transition-colors group-hover:border-vault-accent">
-              <svg className="w-5 h-5 text-vault-accent" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      {/* Header Bar */}
+      <header className="relative z-10 border-b border-[var(--theme-border)] bg-[var(--theme-surface)]/80 backdrop-blur-2xl">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-vault-accent rounded-lg p-1">
+            <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-vault-accent/40 flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+              <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <circle cx="12" cy="16" r="1.5" fill="currentColor" />
               </svg>
             </div>
-            <span className="font-semibold text-base tracking-tight text-vault-text">VaultDrive</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
+              <span className="text-[9px] font-mono tracking-widest text-[var(--color-vault-muted)] uppercase">System Exception</span>
+            </div>
           </Link>
 
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[10px] font-mono text-vault-danger bg-vault-danger/10 border border-vault-danger/30 rounded-full">
-            <span className="w-1 h-1 rounded-full bg-vault-danger" />
-            ERROR 404 / ROUTE_NOT_FOUND
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-medium text-rose-400 bg-rose-500/10 border border-rose-500/30 rounded-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
+            HTTP 404 // NON_EXISTENT_SECTOR
           </span>
         </div>
       </header>
 
-      {/* Main */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-5 sm:px-6 py-14">
-        <div className="w-full max-w-3xl grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 items-center fade-in">
-          <BrokenVaultIllustration />
+      {/* Main Exception Viewport */}
+      <main className="relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16">
+        <div className="w-full max-w-3xl grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-10 lg:gap-14 items-center">
+          
+          <ArchitecturalOfflineVault />
 
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-vault-danger/30 bg-vault-danger/10 text-vault-danger text-[10px] font-mono tracking-[0.12em] mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-vault-danger animate-pulse" />
-              ACCESS DENIED
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md border border-rose-500/30 bg-rose-500/10 text-rose-400 text-[10px] font-mono tracking-wider font-semibold mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+              ENCRYPTED PATH UNRESOLVED
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-[-0.02em] text-vault-text leading-tight">
-              This vault door<br className="hidden lg:block" /> doesn't exist.
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-[var(--color-vault-text)] leading-tight">
+              This vault door <br className="hidden sm:inline" /> does not exist.
             </h1>
 
-            <p className="mt-4 text-sm text-vault-muted leading-relaxed max-w-md mx-auto lg:mx-0">
-              The path you requested isn't registered in this repository. It may have been moved, deleted, or never provisioned.
+            <p className="mt-3 text-xs sm:text-sm text-[var(--color-vault-muted)] leading-relaxed max-w-md mx-auto lg:mx-0">
+              The cryptographic sector or asset URI you requested is not mapped to any active repository block. It may have been expired, moved, or purged.
             </p>
 
-            {/* Console diagnostic strip */}
-            <div className="mt-6 rounded-xl border border-vault-border bg-vault-panel p-4 text-left font-mono text-[11px] shadow-xl shadow-black/40">
-              <div className="flex items-center justify-between border-b border-vault-border pb-2.5 mb-2.5 text-vault-muted text-[10px] tracking-wider">
-                <span>VAULT_CONSOLE // DIAGNOSTIC</span>
-                <span className="text-vault-danger">FAIL_404</span>
+            {/* Diagnostic Console Box */}
+            <div className="mt-6 depth-vault-chassis rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] p-4 text-left font-mono text-[11px] shadow-xl">
+              <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-2 mb-2.5 text-[9px] tracking-wider text-[var(--color-vault-muted)]">
+                <span>SYSTEM_TELEMETRY // ROUTE_DISPATCHER</span>
+                <span className="text-rose-400 font-bold">STATUS: 404</span>
               </div>
               <div className="space-y-1.5">
-                <div className="flex gap-2 text-vault-muted">
-                  <span className="text-vault-success">$</span> lookup_route --target current_path
+                <div className="flex gap-2 text-[var(--color-vault-muted)]">
+                  <span className="text-emerald-400 font-bold">$</span> lookup_sector --target requested_route
                 </div>
-                <div className="flex gap-2 text-vault-danger">
-                  <span>✕</span> ERR_ROUTE_UNREGISTERED
+                <div className="flex gap-2 text-rose-400 font-medium">
+                  <span>✕</span> SECTOR_NOT_PROVISIONED
                 </div>
                 <div className="flex gap-2 text-vault-accent">
-                  <span>→</span> redirecting recommendation: /dashboard
+                  <span>→</span> RECOMMENDED_ACTION: redirect /dashboard
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center lg:items-stretch justify-center lg:justify-start gap-3 mt-7">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mt-7">
               <Link
                 to="/dashboard"
-                className="px-6 py-3 rounded-xl text-xs font-mono font-semibold text-vault-bg bg-gradient-to-r from-vault-accent to-vault-accent-hover hover:brightness-110 shadow-lg shadow-vault-accent/15 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-mono font-semibold text-white bg-vault-accent hover:bg-vault-accent-hover shadow-lg shadow-vault-accent/20 transition-all flex items-center justify-center gap-2 tactile-btn active:scale-98"
               >
-                RETURN TO VAULT
+                RETURN TO DASHBOARD
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </Link>
+              
               <Link
-                to="/login"
-                className="px-6 py-3 rounded-xl text-xs font-mono font-medium text-vault-muted bg-vault-surface border border-vault-border hover:border-vault-accent hover:text-vault-text transition-all flex items-center justify-center"
+                to="/"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-mono font-medium text-[var(--color-vault-muted)] bg-[var(--theme-surface)] border border-[var(--theme-border)] hover:border-vault-accent hover:text-[var(--color-vault-text)] transition-all flex items-center justify-center active:scale-98"
               >
-                LOGIN PORTAL
+                LANDING HOMEPAGE
               </Link>
             </div>
+
           </div>
+
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-vault-border bg-vault-bg py-4 text-center text-[10px] font-mono tracking-wider text-vault-muted">
+      <footer className="relative z-10 border-t border-[var(--theme-border)] bg-[var(--theme-bg)] py-4 text-center text-[10px] font-mono tracking-wider text-[var(--color-vault-muted)]">
         VAULTDRIVE ENGINE © 2027 · ENCRYPTED CLOUD ASSET REPOSITORY
       </footer>
+
     </div>
   );
 }

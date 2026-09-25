@@ -8,25 +8,10 @@ import { formatDate, formatBytes } from "../utils/formatters";
 import UserAvatar from "../components/ui/UserAvatar";
 import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 
-// ─── Deterministic avatar colour based on username ────────────────────────────
-const AVATAR_COLOURS = [
-  "from-amber-500 to-orange-600",
-  "from-violet-500 to-purple-600",
-  "from-sky-500 to-blue-600",
-  "from-emerald-500 to-teal-600",
-  "from-rose-500 to-pink-600",
-  "from-indigo-500 to-violet-600",
-];
-function avatarGradient(username = "") {
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) hash = username.charCodeAt(i) + ((hash << 5) - hash);
-  return AVATAR_COLOURS[Math.abs(hash) % AVATAR_COLOURS.length];
-}
-
 // ─── Password strength helper ─────────────────────────────────────────────────
 function passwordStrength(pw = "") {
   if (pw.length === 0) return null;
-  if (pw.length < 6) return { label: "Too short (min 6 characters)", colour: "bg-vault-danger", width: "w-1/4" };
+  if (pw.length < 6) return { label: "Too short (min 6 characters)", colour: "bg-rose-500", width: "w-1/4" };
   const hasUpper = /[A-Z]/.test(pw);
   const hasLower = /[a-z]/.test(pw);
   const hasNumber = /\d/.test(pw);
@@ -35,13 +20,13 @@ function passwordStrength(pw = "") {
   const score = [hasUpper, hasLower, hasNumber, hasSpecial, isLong].filter(Boolean).length;
   if (score <= 2) return { label: "Weak", colour: "bg-amber-500", width: "w-2/4" };
   if (score <= 4) return { label: "Good", colour: "bg-yellow-400", width: "w-3/4" };
-  return { label: "Strong", colour: "bg-vault-success", width: "w-full" };
+  return { label: "Strong", colour: "bg-emerald-400", width: "w-full" };
 }
 
 // ─── Reusable Card wrapper ────────────────────────────────────────────────────
 function Card({ children, className = "" }) {
   return (
-    <div className={`p-6 rounded-2xl border border-vault-border bg-vault-panel/70 space-y-5 ${className}`}>
+    <div className={`p-6 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] space-y-5 shadow-sm ${className}`}>
       {children}
     </div>
   );
@@ -50,9 +35,9 @@ function Card({ children, className = "" }) {
 // ─── Card section heading ─────────────────────────────────────────────────────
 function CardTitle({ icon, children }) {
   return (
-    <div className="flex items-center gap-2.5 pb-1 border-b border-vault-border/50">
-      <span className="text-vault-accent">{icon}</span>
-      <h3 className="text-sm font-bold text-vault-text">{children}</h3>
+    <div className="flex items-center gap-2.5 pb-2 border-b border-[var(--theme-border)]/50">
+      <span className="text-[var(--theme-accent)]">{icon}</span>
+      <h3 className="text-sm font-bold text-[var(--theme-text)]">{children}</h3>
     </div>
   );
 }
@@ -85,13 +70,12 @@ function PasswordInput({ id, value, onChange, placeholder, disabled, autoComplet
         placeholder={placeholder}
         disabled={disabled}
         autoComplete={autoComplete}
-        className="w-full bg-vault-surface border border-vault-border rounded-xl px-3.5 py-2.5 text-xs text-vault-text placeholder:text-vault-muted focus:outline-none focus:border-vault-accent/60 transition-colors pr-10 disabled:opacity-50"
+        className="w-full bg-[var(--theme-surface)] border border-[var(--theme-border)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--theme-text)] placeholder:text-[var(--theme-text-muted)] focus:outline-none focus:border-[var(--theme-accent)] transition-colors pr-10 disabled:opacity-50 shadow-inner"
       />
       <button
         type="button"
-        tabIndex={-1}
-        onClick={() => setShow((v) => !v)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-vault-muted hover:text-vault-text transition-colors cursor-pointer"
+        onClick={() => setShow((p) => !p)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] transition-colors cursor-pointer"
       >
         <EyeIcon visible={show} />
       </button>
@@ -147,7 +131,6 @@ export default function ProfilePage() {
   const usernameChanged = username.trim() !== (user?.username || "");
   const usernameValid = /^[a-zA-Z0-9_]{3,30}$/.test(username.trim());
   const strength = passwordStrength(newPw);
-  const gradient = avatarGradient(user?.username);
   const usedPct = storageStats
     ? Math.min(100, parseFloat(((storageStats.totalBytes / QUOTA) * 100).toFixed(1)))
     : 0;

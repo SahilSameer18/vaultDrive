@@ -23,26 +23,26 @@ export function ToastProvider({ children }) {
       {children}
       
       {/* Toast Notification Container */}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4">
+      <div className="fixed bottom-5 right-5 z-[999999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4 select-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-3.5 rounded-xl border shadow-xl flex items-center justify-between gap-3 text-xs font-mono fade-in ${
+            className={`pointer-events-auto p-3.5 rounded-xl border shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3 text-xs font-mono animate-scale-up ${
               toast.type === "error"
-                ? "bg-vault-panel border-vault-danger/40 text-vault-danger"
+                ? "bg-[var(--theme-panel)]/95 border-rose-500/40 text-rose-400 shadow-[0_8px_30px_rgba(244,63,94,0.15)]"
                 : toast.type === "success"
-                ? "bg-vault-panel border-vault-success/40 text-vault-success"
-                : "bg-vault-panel border-vault-accent/40 text-vault-text"
+                ? "bg-[var(--theme-panel)]/95 border-emerald-500/40 text-emerald-400 shadow-[0_8px_30px_rgba(16,185,129,0.15)]"
+                : "bg-[var(--theme-panel)]/95 border-[var(--theme-accent)]/40 text-[var(--theme-text)] shadow-[0_8px_30px_rgba(197,160,89,0.15)]"
             }`}
           >
             <div className="flex items-start gap-2.5 min-w-0 flex-1">
               <span
                 className={`w-2 h-2 rounded-full shrink-0 mt-1 ${
                   toast.type === "error"
-                    ? "bg-vault-danger"
+                    ? "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"
                     : toast.type === "success"
-                    ? "bg-vault-success"
-                    : "bg-vault-accent"
+                    ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+                    : "bg-[var(--theme-accent)] shadow-[0_0_8px_rgba(197,160,89,0.8)]"
                 }`}
               />
               <span className="break-words leading-relaxed flex-1">{toast.message}</span>
@@ -50,7 +50,7 @@ export function ToastProvider({ children }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="text-vault-muted hover:text-vault-text"
+              className="text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] p-1 cursor-pointer transition-colors"
             >
               ✕
             </button>

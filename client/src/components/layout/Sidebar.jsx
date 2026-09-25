@@ -91,24 +91,24 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
   );
 
   return (
-    <aside className="h-full w-full select-none flex flex-col justify-between border-r border-vault-border bg-vault-panel/30 overflow-hidden">
+    <aside className="h-full w-full select-none flex flex-col justify-between border-r border-[var(--theme-border)] bg-[var(--theme-surface)] overflow-hidden">
       
       {/* ── Top Section: Nav Links & Folder Tree ───────────────────────── */}
-      <div className={`space-y-4 overflow-y-auto flex-1 ${collapsed ? "p-2.5" : "p-3.5"}`}>
+      <div className={`space-y-4 overflow-y-auto flex-1 scrollbar-thin ${collapsed ? "p-2 sm:p-2.5" : "p-3 sm:p-4"}`}>
         
         {/* Mobile Drawer Header with Logo & Touch Close Target */}
-        <div className="flex items-center justify-between pb-3 border-b border-vault-border/60 lg:hidden">
+        <div className="flex items-center justify-between pb-3.5 border-b border-[var(--theme-border)] lg:hidden">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-vault-surface border border-vault-accent/40 flex items-center justify-center shadow-md">
-              <svg className="w-4.5 h-4.5 text-vault-accent" viewBox="0 0 24 24" fill="none">
-                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.75" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+            <div className="w-8 h-8 rounded-xl bg-[var(--theme-panel)] border border-vault-accent/40 flex items-center justify-center shadow-md">
+              <svg className="w-4 h-4 text-vault-accent" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                 <circle cx="12" cy="16" r="1.5" fill="currentColor" />
               </svg>
             </div>
             <div>
-              <span className="font-bold text-base tracking-tight text-vault-text">VaultDrive</span>
-              <p className="text-[10px] font-mono text-vault-muted leading-none mt-0.5">Personal Cloud</p>
+              <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
+              <p className="text-[9px] font-mono text-[var(--color-vault-muted)] leading-none mt-0.5">Encrypted Cloud</p>
             </div>
           </div>
 
@@ -116,11 +116,11 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             <button
               type="button"
               onClick={onCloseMobileMenu}
-              className="p-2 rounded-xl border border-vault-border bg-vault-surface text-vault-muted hover:text-vault-text transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] transition-colors cursor-pointer"
               aria-label="Close navigation menu"
             >
-              <svg className="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           )}
@@ -130,15 +130,15 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
         <Link
           to="/profile"
           onClick={onCloseMobileMenu}
-          className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl bg-vault-surface/60 border border-vault-border/60 hover:border-vault-accent/50 transition-colors"
+          className="flex lg:hidden items-center gap-2.5 p-2.5 rounded-xl depth-vault-card border border-[var(--theme-border)] hover:border-vault-accent/50 transition-colors"
         >
           <UserAvatar user={user} size="sm" />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-vault-text truncate">{user?.username || "Vault User"}</p>
-            <p className="text-[10px] font-mono text-vault-muted truncate">{user?.email}</p>
+            <p className="text-xs font-bold text-[var(--color-vault-text)] truncate">{user?.username || "Vault User"}</p>
+            <p className="text-[10px] font-mono text-[var(--color-vault-muted)] truncate">{user?.email}</p>
           </div>
-          <svg className="w-3.5 h-3.5 text-vault-muted" viewBox="0 0 24 24" fill="none">
-            <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+          <svg className="w-3.5 h-3.5 text-[var(--color-vault-muted)]" viewBox="0 0 24 24" fill="none">
+            <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </Link>
 
@@ -146,14 +146,15 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
         {onToggleCollapse && (
           <div className="hidden lg:flex items-center justify-between px-1 pb-1">
             {!collapsed ? (
-              <span className="text-[10px] font-mono font-semibold tracking-wider text-vault-muted/70 uppercase">
-                Menu
+              <span className="text-[10px] font-mono font-semibold tracking-wider text-[var(--color-vault-muted)] uppercase flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                NAVIGATION
               </span>
             ) : null}
             <button
               type="button"
               onClick={onToggleCollapse}
-              className={`p-1.5 rounded-lg border border-vault-border/60 bg-vault-surface/60 text-vault-muted hover:text-vault-accent hover:border-vault-accent/40 transition-all cursor-pointer ${
+              className={`p-1.5 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-vault-accent hover:border-vault-accent/40 transition-all cursor-pointer ${
                 collapsed ? "mx-auto" : ""
               }`}
               title={collapsed ? "Expand sidebar (Ctrl+B)" : "Collapse sidebar (Ctrl+B)"}
@@ -161,9 +162,9 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
                 {collapsed ? (
-                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M13 17l5-5-5-5M6 17l5-5-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 ) : (
-                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M11 17l-5-5 5-5M18 17l-5-5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 )}
               </svg>
             </button>
@@ -177,19 +178,26 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             onClick={onCloseMobileMenu}
             title={collapsed ? "My Vault" : undefined}
             className={({ isActive }) =>
-              `flex items-center rounded-xl text-xs font-medium transition-all ${
-                collapsed ? "justify-center p-2.5" : "gap-3 px-3.5 py-2.5"
+              `flex items-center rounded-xl text-xs font-medium transition-all group relative ${
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
+                  ? "bg-vault-accent/10 text-vault-accent border border-vault-accent/30 font-semibold shadow-sm depth-vault-card"
+                  : "text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] border border-transparent"
               }`
             }
           >
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="1.75" />
-            </svg>
-            {!collapsed && <span className="truncate">My Vault</span>}
+            {({ isActive }) => (
+              <>
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-vault-accent" />
+                )}
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 7h5l2 3h11v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                {!collapsed && <span className="truncate">My Vault</span>}
+              </>
+            )}
           </NavLink>
 
           <NavLink
@@ -197,22 +205,29 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             onClick={onCloseMobileMenu}
             title={collapsed ? "Shared with Me" : undefined}
             className={({ isActive }) =>
-              `flex items-center rounded-xl text-xs font-medium transition-all ${
-                collapsed ? "justify-center p-2.5" : "gap-3 px-3.5 py-2.5"
+              `flex items-center rounded-xl text-xs font-medium transition-all group relative ${
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
+                  ? "bg-vault-accent/10 text-vault-accent border border-vault-accent/30 font-semibold shadow-sm depth-vault-card"
+                  : "text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] border border-transparent"
               }`
             }
           >
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="1.75" />
-              <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="1.75" />
-              <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="1.75" />
-              <path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5" stroke="currentColor" strokeWidth="1.75" />
-            </svg>
-            {!collapsed && <span className="truncate">Shared with Me</span>}
+            {({ isActive }) => (
+              <>
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-vault-accent" />
+                )}
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none">
+                  <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="2" />
+                  <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                  <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="2" />
+                  <path d="m8.6 13.5 6.8 4M15.4 6.5 8.6 10.5" stroke="currentColor" strokeWidth="2" />
+                </svg>
+                {!collapsed && <span className="truncate">Shared with Me</span>}
+              </>
+            )}
           </NavLink>
 
           <NavLink
@@ -220,21 +235,28 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             onClick={onCloseMobileMenu}
             title={collapsed ? "Shared by Me" : undefined}
             className={({ isActive }) =>
-              `flex items-center rounded-xl text-xs font-medium transition-all ${
-                collapsed ? "justify-center p-2.5" : "gap-3 px-3.5 py-2.5"
+              `flex items-center rounded-xl text-xs font-medium transition-all group relative ${
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
+                  ? "bg-vault-accent/10 text-vault-accent border border-vault-accent/30 font-semibold shadow-sm depth-vault-card"
+                  : "text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] border border-transparent"
               }`
             }
           >
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              <polyline points="16 6 12 2 8 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-            </svg>
-            {!collapsed && <span className="truncate">Shared by Me</span>}
+            {({ isActive }) => (
+              <>
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-vault-accent" />
+                )}
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <polyline points="16 6 12 2 8 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                {!collapsed && <span className="truncate">Shared by Me</span>}
+              </>
+            )}
           </NavLink>
 
           <NavLink
@@ -242,20 +264,27 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             onClick={onCloseMobileMenu}
             title={collapsed ? "Recent Activity" : undefined}
             className={({ isActive }) =>
-              `flex items-center rounded-xl text-xs font-medium transition-all ${
-                collapsed ? "justify-center p-2.5" : "gap-3 px-3.5 py-2.5"
+              `flex items-center rounded-xl text-xs font-medium transition-all group relative ${
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
+                  ? "bg-vault-accent/10 text-vault-accent border border-vault-accent/30 font-semibold shadow-sm depth-vault-card"
+                  : "text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] border border-transparent"
               }`
             }
           >
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
-              <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-            </svg>
-            {!collapsed && <span className="truncate">Recent Activity</span>}
+            {({ isActive }) => (
+              <>
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-vault-accent" />
+                )}
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                  <path d="M12 7v5l3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                {!collapsed && <span className="truncate">Recent Activity</span>}
+              </>
+            )}
           </NavLink>
 
           <NavLink
@@ -263,25 +292,36 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
             onClick={onCloseMobileMenu}
             title={collapsed ? "Trash Bin" : undefined}
             className={({ isActive }) =>
-              `flex items-center rounded-xl text-xs font-medium transition-all ${
-                collapsed ? "justify-center p-2.5" : "gap-3 px-3.5 py-2.5"
+              `flex items-center rounded-xl text-xs font-medium transition-all group relative ${
+                collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5"
               } ${
                 isActive
-                  ? "bg-vault-panel text-vault-accent border border-vault-accent/30 font-semibold shadow-sm"
-                  : "text-vault-muted hover:text-vault-text hover:bg-vault-panel/50 border border-transparent"
+                  ? "bg-vault-accent/10 text-vault-accent border border-vault-accent/30 font-semibold shadow-sm depth-vault-card"
+                  : "text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:bg-[var(--theme-panel)] border border-transparent"
               }`
             }
           >
-            <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            {!collapsed && <span className="truncate">Trash Bin</span>}
+            {({ isActive }) => (
+              <>
+                {isActive && !collapsed && (
+                  <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-vault-accent" />
+                )}
+                <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                {!collapsed && <span className="truncate">Trash Bin</span>}
+              </>
+            )}
           </NavLink>
         </nav>
 
         {/* Directory Folder Tree (Visible when expanded) */}
         {!collapsed && allFolders.length > 0 && (
-          <div className="pt-3 border-t border-vault-border/50 animate-fade-in">
+          <div className="pt-3 border-t border-[var(--theme-border)]">
+            <div className="px-1 pb-2 flex items-center justify-between text-[10px] font-mono text-[var(--color-vault-muted)] uppercase tracking-wider">
+              <span>DIRECTORIES</span>
+              <span>{allFolders.length}</span>
+            </div>
             <FolderSidebar
               folders={allFolders}
               onSelectFolder={onCloseMobileMenu}
@@ -293,46 +333,50 @@ export default function Sidebar({ onCloseMobileMenu, collapsed = false, onToggle
 
       </div>
 
-      {/* ── Bottom Section: Storage Meter (Collapsible) ────────────────── */}
+      {/* ── Bottom Section: Swiss Telemetry Storage Gauge ────────────────── */}
       {!collapsed ? (
         <Link
           to="/storage"
           onClick={onCloseMobileMenu}
-          className="p-3.5 border-t border-vault-border bg-vault-panel/40 hover:bg-vault-panel/70 transition-colors shrink-0 space-y-2 block group cursor-pointer animate-fade-in"
-          title="View Storage Breakdown"
+          className="p-3.5 border-t border-[var(--theme-border)] bg-[var(--theme-panel)]/40 hover:bg-[var(--theme-panel)]/80 transition-colors shrink-0 space-y-2.5 block group cursor-pointer"
+          title="Inspect Storage Allocation"
         >
-          <div className="flex items-center justify-between text-[11px] font-mono">
-            <span className="text-vault-muted group-hover:text-vault-text transition-colors font-medium">Storage Used</span>
-            <span className="text-vault-accent font-semibold flex items-center gap-1">
-              {formatBytes(totalStorageBytes)} <span className="text-vault-muted font-normal">/ 1 GB</span>
-              <svg className="w-3 h-3 text-vault-muted group-hover:text-vault-accent group-hover:translate-x-0.5 transition-all" viewBox="0 0 24 24" fill="none">
-                <path d="m9 18 6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+          <div className="flex items-center justify-between text-[10px] font-mono">
+            <span className="text-[var(--color-vault-muted)] group-hover:text-[var(--color-vault-text)] transition-colors font-medium flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-vault-accent" />
+              STORAGE ALLOCATION
+            </span>
+            <span className="text-vault-accent font-semibold px-1.5 py-0.5 rounded bg-vault-accent/10 border border-vault-accent/25">
+              {usedPercentage}%
             </span>
           </div>
 
-          {/* Sleek Gradient Progress Bar */}
-          <div className="h-1.5 w-full rounded-full bg-vault-surface border border-vault-border overflow-hidden">
+          {/* Precision Architectural Progress Bar */}
+          <div className="h-1.5 w-full rounded-full bg-[var(--theme-surface)] border border-[var(--theme-border)] overflow-hidden p-[1px]">
             <div
-              className="h-full bg-gradient-to-r from-vault-accent to-amber-400 transition-all duration-300 rounded-full group-hover:brightness-110"
-              style={{ width: `${Math.max(1, usedPercentage)}%` }}
-              title={`${usedPercentage}% used`}
+              className="h-full bg-gradient-to-r from-vault-accent via-amber-400 to-vault-accent rounded-full transition-all duration-500 shadow-sm"
+              style={{ width: `${Math.max(2, usedPercentage)}%` }}
             />
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] font-mono text-[var(--color-vault-muted)]">
+            <span>{formatBytes(totalStorageBytes)}</span>
+            <span className="text-[9px] opacity-70">1.00 GB LIMIT</span>
           </div>
         </Link>
       ) : (
         <Link
           to="/storage"
           onClick={onCloseMobileMenu}
-          className="p-3 border-t border-vault-border bg-vault-panel/40 hover:bg-vault-panel/70 transition-colors shrink-0 flex flex-col items-center justify-center gap-1 group cursor-pointer"
+          className="p-3 border-t border-[var(--theme-border)] bg-[var(--theme-panel)]/40 hover:bg-[var(--theme-panel)] transition-colors shrink-0 flex flex-col items-center justify-center gap-1 group cursor-pointer"
           title={`Storage: ${formatBytes(totalStorageBytes)} / 1 GB (${usedPercentage}% used)`}
         >
-          <div className="w-8 h-8 rounded-lg bg-vault-surface border border-vault-border flex items-center justify-center text-vault-accent group-hover:border-vault-accent/50 transition-colors">
+          <div className="w-8 h-8 rounded-lg bg-[var(--theme-surface)] border border-[var(--theme-border)] flex items-center justify-center text-vault-accent group-hover:border-vault-accent/50 transition-colors shadow-sm">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="1.75" />
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="currentColor" strokeWidth="2" />
             </svg>
           </div>
-          <span className="text-[10px] font-mono font-semibold text-vault-muted group-hover:text-vault-accent">
+          <span className="text-[9px] font-mono font-semibold text-[var(--color-vault-muted)] group-hover:text-vault-accent">
             {usedPercentage}%
           </span>
         </Link>

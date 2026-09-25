@@ -86,24 +86,28 @@ export default function AppLayout() {
   };
 
   return (
-    <div className="h-screen w-screen bg-vault-bg text-vault-text flex flex-col overflow-hidden font-sans selection:bg-vault-accent/30">
+    <div className="h-screen w-screen bg-[var(--theme-bg)] text-[var(--color-vault-text)] flex flex-col overflow-hidden font-sans selection:bg-vault-accent/30 selection:text-white">
       
+      {/* Background Architectural Canvas for App Shell */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute inset-0 bg-grid-pattern opacity-15" />
+        <div className="absolute top-0 right-1/4 w-[600px] h-[350px] bg-vault-accent/[0.025] blur-3xl" />
+      </div>
+
       {/* Whole-page Drag & Drop Overlay */}
       <DropzoneOverlay onFileDropped={handleDroppedFiles} />
 
       {/* ── Top Navigation Bar ───────────────────────────────────────────── */}
       <Topbar
         onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
-        sidebarCollapsed={sidebarCollapsed}
-        onToggleSidebar={toggleSidebar}
       />
 
       {/* ── Body: Sidebar + Main Content Viewport ────────────────────────── */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex overflow-hidden relative z-10">
         
         {/* Desktop Sidebar (Permanent Collapsible) */}
         <div
-          className={`hidden lg:block h-full shrink-0 transition-[width] duration-200 ease-out overflow-hidden ${
+          className={`hidden lg:block h-full shrink-0 transition-[width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-hidden ${
             sidebarCollapsed ? "w-[72px]" : "w-64 xl:w-72"
           }`}
         >
@@ -121,13 +125,13 @@ export default function AppLayout() {
         >
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity duration-300"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
             onClick={() => setMobileMenuOpen(false)}
           />
 
           {/* Sliding Drawer */}
           <div
-            className={`relative w-72 sm:w-80 max-w-[85vw] h-full bg-vault-panel border-r border-vault-border shadow-2xl z-10 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+            className={`relative w-72 sm:w-80 max-w-[85vw] h-full bg-[var(--theme-surface)] border-r border-[var(--theme-border)] shadow-2xl z-10 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
               mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
             }`}
           >
@@ -136,7 +140,7 @@ export default function AppLayout() {
         </div>
 
         {/* Main Content Area */}
-        <main className="flex-1 h-full overflow-y-auto bg-vault-bg p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 h-full overflow-y-auto bg-[var(--theme-bg)] p-3.5 sm:p-5 lg:p-7">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
