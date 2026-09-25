@@ -20,11 +20,11 @@
    - [4.6 The Axios 401 Refresh Race Condition Mutex Queue](#46-the-axios-401-refresh-race-condition-mutex-queue)
 5. [Module 5: The "Why X Instead of Y?" Trade-Offs Matrix](#module-5-the-why-x-instead-of-y-trade-offs-matrix)
 6. [Module 6: Security, Auth & Tenant Isolation](#module-6-security-auth--tenant-isolation)
-7. [Module 7: The 4 Distributed Systems "Trap Questions" Deep-Dive](#module-7-the-4-distributed-systems-trap-questions-deep-dive)
-   - [7.1 The Ghost / Orphan Asset Problem (Network Drops Before Confirm)](#71-the-ghost--orphan-asset-problem-network-drops-before-confirm)
-   - [7.2 Content-Addressable Storage & File Deduplication](#72-content-addressable-storage--file-deduplication)
-   - [7.3 Automated 30-Day Trash Purging & Cloud Garbage Collection](#73-automated-30-day-trash-purging--cloud-garbage-collection)
-   - [7.4 The 10,000 File Bulk Deletion & Database Lock Contention](#74-the-10000-file-bulk-deletion--database-lock-contention)
+7. [Module 7: Enterprise System Design Extensions & Scaling Roadmap](#module-7-enterprise-system-design-extensions--scaling-roadmap)
+   - [7.1 Unconfirmed Uploads & Orphan Asset Reconciliation (V2 Architecture)](#71-unconfirmed-uploads--orphan-asset-reconciliation-v2-architecture)
+   - [7.2 Content-Addressable Storage & Deduplication (V2 Architecture)](#72-content-addressable-storage--deduplication-v2-architecture)
+   - [7.3 Automated 30-Day Trash Purging & Lifecycle Policies (V2 Architecture)](#73-automated-30-day-trash-purging--lifecycle-policies-v2-architecture)
+   - [7.4 Asynchronous Bulk Subtree Deletions & Queue Batching (V2 Architecture)](#74-asynchronous-bulk-subtree-deletions--queue-batching-v2-architecture)
 8. [Module 8: Expanded MAANG Technical Q&A Bank (Levels 1 to 4)](#module-8-expanded-maang-technical-qa-bank-levels-1-to-4)
 9. [Module 9: STAR Method Engineering Stories (5 Spoken Scenarios)](#module-9-star-method-engineering-stories-5-spoken-scenarios)
 10. [Module 10: Final Master Summary Checklist](#module-10-final-master-summary-checklist)
@@ -44,7 +44,7 @@ VaultDrive is a secure cloud drive (like Google Drive or Dropbox) built with **R
   A user wants to store a 100 MB video. They send the 100 MB video to your Node.js server. Your Node.js server holds the 100 MB file inside its computer RAM memory, and then sends it over the internet to Cloudinary.  
   *Why this fails:* If 10 users upload at the same time, your server needs $10 \times 100\text{ MB} = 1\text{ GB}$ of RAM just to hold files! The server CPU freezes, memory crashes (OOM: Out Of Memory), and the website goes down.
 - **The VaultDrive Way (Senior/Enterprise approach):**  
-  Your Node.js server acts like a **Valet Ticket Booth**. When a user wants to upload, the server gives them a cryptographically signed one-time pass (HMAC-SHA256 signature). The user takes that pass and sends the 100 MB file **directly to Cloudinary's global cloud servers**. Your Node.js server consumes **0 bytes of RAM** for the file data! It only saves the file name, size, and URL in PostgreSQL once the upload succeeds.
+  Your Node.js server acts like a **Valet Ticket Booth**. When a user wants to upload, the server gives them a cryptographically signed one-time pass (HMAC signature). The user takes that pass and sends the 100 MB file **directly to Cloudinary's global cloud servers**. Your Node.js server consumes **0 bytes of RAM** for the file data! It only saves the file name, size, and URL in PostgreSQL once the upload succeeds.
 
 ---
 
@@ -72,12 +72,12 @@ VaultDrive is a secure cloud drive (like Google Drive or Dropbox) built with **R
 ```
 
 ### End-to-End File Upload Lifecycle in 4 Simple Steps:
-1. **Pre-Flight Signature (`POST /api/v1/files/upload/sign`):**  
+1. **Pre-Flight Signature (`POST /api/v1/files/sign-upload`):**  
    The client tells the backend: *"I want to upload a 25 MB PDF called report.pdf."*  
    The backend checks:
    - Is the file $\le 100\text{ MB}$?
    - Does the user have enough room left in their 1 GB quota?  
-   If yes, the backend returns a signed timestamp and HMAC-SHA256 signature.
+   If yes, the backend returns a signed timestamp and HMAC signature.
 2. **Direct Storage Upload:**  
    The browser sends the raw file binary directly to Cloudinary's upload API using the HMAC signature.
 3. **Zero-Trust Server Confirmation (`POST /api/v1/files/confirm-upload`):**  
@@ -103,23 +103,25 @@ The database schema is defined in [schema.prisma](file:///c:/Users/HP/Desktop/va
 ### 2. `Folder` Model (Self-Referential Tree)
 ```prisma
 model Folder {
-  id        String    @id @default(uuid())
+  id        String    @id @default(cuid())
   name      String
-  parentId  String?   // Points to another Folder.id (or null if in Root)
   userId    String
-  deletedAt DateTime? // Soft delete timestamp
-  
-  parent    Folder?   @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Folder[]  @relation("FolderHierarchy")
+  parentId  String?
+  parent    Folder?   @relation("FolderTree", fields: [parentId], references: [id])
+  children  Folder[]  @relation("FolderTree")
   files     File[]
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deletedAt DateTime? // null = active folder, timestamp = in Trash
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  @@index([userId, parentId])
+  @@index([userId])
+  @@index([parentId])
   @@index([userId, deletedAt])
 }
 ```
 - **Self-referential pointer (`parentId`):** Every folder knows who its direct parent is. If `parentId == null`, the folder sits in the user's top-level **Root** directory.
-- **Why this design?** This is called an **Adjacency List**. It allows users to create folders inside folders to an infinite depth without complex setup.
+- **Why this design?** This is called an **Adjacency List**. It allows users to create folders inside folders to an infinite depth without complex setup. Rename and move operations require only a single row update ($O(1)$).
 
 ### 3. `File` Model
 - Stores `name`, `size` (in bytes), `mimeType`, `resourceType` (`image`, `video`, `raw`), `url`, and `publicId`.
@@ -194,7 +196,7 @@ A naive developer does 5 separate database queries one after another:
 *Result:* 5 slow database round trips. If network latency is 40ms, the user waits 200ms just for breadcrumbs!
 
 #### How VaultDrive Solves It:
-We execute **exactly ONE query** to get all folder IDs and names for that user, put them in a JavaScript `Map`, and walk up the tree in computer memory in less than **1 millisecond**:
+We execute **exactly ONE query** to get all folder IDs and names for that user, put them in a JavaScript `Map`, and walk up the tree entirely in memory:
 
 ```javascript
 // 1. Single database query
@@ -218,7 +220,7 @@ breadcrumbs.push({ id: folder.id, name: folder.name });
 ```
 
 #### How to explain this in an interview:
-> *"Instead of doing sequential N+1 database queries to resolve ancestor paths, I batch-query the user's active folder metadata in a single indexed query. I load it into an in-memory hash map (`Map<string, Folder>`) and resolve the breadcrumb hierarchy in $O(H)$ time, where $H$ is the tree height. This dropped our breadcrumb generation latency from over 150ms to sub-millisecond speeds."*
+> *"Instead of doing sequential N+1 database queries to resolve ancestor paths, I batch-query the user's active folder metadata in a single indexed query. I load it into an in-memory hash map (`Map<string, Folder>`) and resolve the breadcrumb hierarchy in $O(H)$ time, where $H$ is the tree height. This guarantees exactly one database round-trip regardless of directory depth, completely eliminating N+1 latency."*
 
 ---
 
@@ -228,7 +230,7 @@ breadcrumbs.push({ id: folder.id, name: folder.name });
 
 #### How It Works Step-by-Step:
 1. The user picks a file on their computer.
-2. The browser sends file name, size, and type to `POST /api/v1/files/upload/sign`.
+2. The browser sends file name, size, and type to `POST /api/v1/files/sign-upload`.
 3. The server computes the user's total current storage:
    ```javascript
    const storageSum = await prisma.file.aggregate({
@@ -237,13 +239,19 @@ breadcrumbs.push({ id: folder.id, name: folder.name });
    });
    ```
 4. If `currentUsedBytes + newFileSize > 1 GB`, it throws an error immediately before any data is transferred!
-5. If valid, the server creates an HMAC-SHA256 signature using the secret Cloudinary API key:
-   $$\text{Signature} = \text{SHA256}(\text{"folder=..."} + \text{"&timestamp=..."} + \text{API\_SECRET})$$
+5. If valid, the server creates a cryptographic HMAC signature using the secret Cloudinary API key:
+   ```javascript
+   const signature = cloudinary.utils.api_sign_request(
+     paramsToSign,
+     process.env.CLOUDINARY_API_SECRET
+   );
+   ```
+   *(Note: Cloudinary's Node SDK `api_sign_request` defaults to HMAC-SHA1 for signature generation unless explicitly configured with `signature_algorithm: "sha256"`).*
 6. The browser takes this signature and uploads directly to Cloudinary.
 
 #### Why this is a Masterstroke:
-- **Zero Server RAM:** Even if a user uploads a 100 MB video, your backend uses **zero megabytes** of memory for the upload.
-- **Infinite Scalability:** 1,000 users can upload simultaneously without slowing down your Node.js API.
+- **Zero Server RAM:** Even if a user uploads a 100 MB video, your backend uses **zero bytes of RAM** for binary file buffering.
+- **High Concurrency:** Hundreds of users can stream uploads directly to Cloudinary's edge infrastructure simultaneously without blocking the Node.js single-threaded event loop.
 
 ---
 
@@ -396,20 +404,30 @@ When interviewers ask *"Why did you choose this architecture?"*, use these direc
 ## Module 6: Security, Auth & Tenant Isolation
 
 ### 1. Defense Against Insecure Direct Object References (IDOR)
-- **The Threat:** What if User A changes the URL from `/folder/123` to `/folder/456` to look at User B's private folders?
-- **The Defense:** Every query in VaultDrive enforces tenant ownership in the SQL `where` clause:
-  ```javascript
-  const folder = await prisma.folder.findUnique({ where: { id } });
-  if (!folder || folder.userId !== req.user.id || folder.deletedAt) {
-    throw new ApiError(404, "Folder not found");
-  }
-  ```
-  Notice that we return an **HTTP 404 Not Found** instead of a 403 Forbidden. Why? Because a 403 tells the hacker *"This folder exists, but you aren't allowed in"*. A 404 reveals zero information!
+- **The Threat:** What if User A changes the URL from `/folder/123` to `/folder/456` or modifies `/api/v1/files/789` to access User B's private data?
+- **The Reality in the Codebase (An Important Architectural Nuance):**
+  - **Folders (`folder.controller.js`):** Queries check ownership and return **HTTP 404 Not Found**:
+    ```javascript
+    const folder = await prisma.folder.findUnique({ where: { id } });
+    if (!folder || folder.userId !== req.user.id || folder.deletedAt) {
+      throw new ApiError(404, "Folder not found or in trash");
+    }
+    ```
+    *Why 404 is ideal:* A 403 Forbidden reveals that the resource exists, whereas a 404 conceals resource existence completely.
+  - **Files (`file.controller.js`):** Mutation endpoints (`updateFile`, `deleteFile`, `shareWithUser`) currently check existence first and return **HTTP 403 Forbidden** if `file.userId !== userId`:
+    ```javascript
+    const file = await prisma.file.findUnique({ where: { id } });
+    if (!file) throw new ApiError(404, "File not found");
+    if (file.userId !== userId) throw new ApiError(403, "Forbidden: Only file owner can modify file properties");
+    ```
+- **How to explain this in an interview:**
+  > *"Our folder controller implements the strict information-masking pattern by returning 404 on ownership mismatches to conceal folder existence. Our file controller currently distinguishes between non-existence (404) and unauthorized access (403). In an enterprise hardening pass, I would harmonize the file endpoints to return 404 across the board, eliminating the resource enumeration side-channel entirely."*
 
 ### 2. Rate Limiting Protection
-- Configured in [rateLimit.middleware.js](file:///c:/Users/HP/Desktop/vaultDrive/server/src/middlewares/rateLimit.middleware.js).
-- **General API:** 100 requests per 15 minutes.
-- **Auth Endpoints (`/login`, `/register`):** 10 requests per 15 minutes to eliminate brute-force password guessing attacks.
+- Configured in [rateLimit.middleware.js](file:///c:/Users/HP/Desktop/vaultDrive/server/src/middlewares/rateLimit.middleware.js):
+  - **General API (`generalLimiter`):** **500 requests per 15 minutes** per IP.
+  - **Auth Endpoints (`loginLimiter`, `registerLimiter`):** **10 attempts per 15 minutes** (with `skipSuccessfulRequests: true` on login to avoid penalizing legitimate users).
+  - **Avatar Uploads (`avatarLimiter`):** **4 updates per 1 hour** to prevent CDN abuse.
 
 ### 3. Helmet & Content Security Policy (CSP)
 - Configured in [app.js](file:///c:/Users/HP/Desktop/vaultDrive/server/src/app.js#L15-L53).
@@ -417,104 +435,112 @@ When interviewers ask *"Why did you choose this architecture?"*, use these direc
 
 ---
 
-## Module 7: The 4 Distributed Systems "Trap Questions" Deep-Dive
+## Module 7: Enterprise System Design Extensions & Scaling Roadmap
 
-Senior and Principal engineers love asking questions about what happens when things **break in the real world**. Here are the 4 biggest distributed traps and the exact engineering answers:
+> **Interviewer Pro-Tip:** A senior or staff interviewer will test whether you understand the operational boundaries of your current MVP and how you would scale it into a fault-tolerant enterprise system. When answering distributed systems questions, distinguish clearly between what VaultDrive **currently implements** versus the **V2 architectural hardening** you would deploy at scale.
 
 ---
 
-### 7.1 The Ghost / Orphan Asset Problem (Network Drops Before Confirm)
+### 7.1 Unconfirmed Uploads & Orphan Asset Reconciliation (V2 Architecture)
 
-#### The Trap Question:
-> *"What happens if a user's 50 MB upload to Cloudinary succeeds 100%, but their laptop battery dies or their Wi-Fi disconnects before their browser can call `POST /api/v1/files/upload/confirm`?"*
+#### The Scenario / Question:
+> *"What happens if a user's 50 MB upload to Cloudinary succeeds 100%, but their laptop battery dies or their Wi-Fi disconnects before their browser can call `POST /api/v1/files/confirm-upload`?"*
 
-#### The Problem:
-1. The 50 MB binary file now lives permanently in your Cloudinary cloud bucket.
-2. But your PostgreSQL database **never got the confirmation record**!
-3. *Consequence:* You pay Cloudinary for storing a 50 MB file that the user cannot see and that your database doesn't know exists. Over time, thousands of these "ghost" files accumulate, quietly costing thousands of dollars in storage fees.
+#### What VaultDrive Currently Implements:
+- The server validates the upload signature and enforces the 1 GB quota before generating HMAC credentials.
+- When `confirm-upload` is called, the server strictly validates that `publicId` matches `vaultDrive/${userId}/...` and queries Cloudinary's Admin API for genuine byte metrics before creating the database row.
+- If the verified size exceeds the quota upon confirmation, the server immediately triggers `deleteFromCloudinary` and rejects the request.
 
-#### The Senior Engineering Solution:
-1. **Cloud Tagging & Temporary Status:** When generating the presigned signature in `getSignUpload`, we attach an automated cloud tag: `status: pending_confirmation`.
-2. **Reconciliation Cron Job (Garbage Collector):** Every night at 3:00 AM, a background worker runs:
-   - Queries Cloudinary's Admin API for assets with `status: pending_confirmation` created more than 24 hours ago.
+#### The Real-World Edge Case:
+- If the client's network drops *before* `/confirm-upload` is fired, the binary file sits in Cloudinary unreferenced in PostgreSQL, resulting in "ghost storage" that costs money without being visible in the user's vault.
+
+#### Proposed V2 Enterprise Hardening (What I'd Build Next):
+1. **Upload Status Tagging:** When issuing upload signatures, attach a temporary tag (`status: pending_confirmation`).
+2. **Scheduled Reconciliation Worker:** Run an off-peak background job (e.g., via AWS Lambda or a scheduled cron) that:
+   - Queries Cloudinary for assets with `status: pending_confirmation` created $>24$ hours ago.
    - Cross-checks with PostgreSQL: `SELECT id FROM "File" WHERE "publicId" = :assetId`.
-   - If no database record exists, the worker calls Cloudinary's `destroy()` API to delete the abandoned asset!
-3. **Client-Side Recovery (Bonus):** The browser saves the uploaded asset's `publicId` and `url` to IndexedDB or localStorage. If the user reconnects within 1 hour, the client detects the pending confirmation and replays the `POST /confirm` call automatically.
+   - Safely calls Cloudinary's `destroy()` API on any unreferenced assets to eliminate ghost storage charges.
+3. **Client-Side Reconnect Buffer:** Store pending upload credentials in browser `localStorage` or `IndexedDB` so the client can automatically replay `confirm-upload` upon network reconnection.
 
 ---
 
-### 7.2 Content-Addressable Storage & File Deduplication
+### 7.2 Content-Addressable Storage & Deduplication (V2 Architecture)
 
-#### The Trap Question:
-> *"Suppose a company has 500 employees, and an executive shares a 100 MB company handbook PDF. If 100 employees save that exact same file into their personal VaultDrive folders, do you store 10 GB of data in Cloudinary?"*
+#### The Scenario / Question:
+> *"Suppose 100 enterprise users save the exact same 100 MB company handbook PDF into their individual VaultDrive accounts. How would you prevent storing 10 GB of redundant data?"*
 
-#### The Problem:
-Storing 100 identical copies of a 100 MB file wastes 9.9 GB of expensive cloud storage.
+#### What VaultDrive Currently Implements:
+- Files are isolated on a per-user basis. Each upload receives a unique UUID-based public ID (`vaultDrive/${userId}/${fileId}-${name}`). Each user's uploads are independent and isolated.
 
-#### The Senior Engineering Solution (Content-Addressable Storage):
-1. **Client-Side Crypto Hashing:** Before uploading, the browser reads the file as an `ArrayBuffer` and computes a cryptographic hash using the browser's native Web Crypto API:
+#### The Real-World Limitation:
+- Storing duplicate copies of identical files across multiple users wastes cloud storage and bandwidth.
+
+#### Proposed V2 Enterprise Hardening (What I'd Build Next):
+1. **Client-Side SHA-256 Hashing:** Before uploading, the browser computes a cryptographic hash of the file using the native Web Crypto API:
    ```javascript
    const buffer = await file.arrayBuffer();
    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
    const fileHash = Array.from(new Uint8Array(hashBuffer))
      .map(b => b.toString(16).padStart(2, "0")).join("");
    ```
-2. **Hash Pre-Check:** The client sends `fileHash` to the backend during `POST /sign`.
-3. **Instant Zero-Second Upload:**
+2. **Hash Pre-Check Endpoint:** The client sends `fileHash` to the backend during `POST /sign-upload`.
+3. **Instant Zero-Second Deduplication:**
    - The backend checks: `SELECT * FROM "File" WHERE "contentHash" = :fileHash LIMIT 1`.
-   - If a file with that identical hash already exists in storage, the server skips the Cloudinary upload entirely!
-   - It simply creates a new `File` record in PostgreSQL pointing to the existing `url` and `publicId`, incrementing an internal reference counter (`refCount++`).
-   - The user gets an instantaneous 0-second upload, and storage costs drop by **99%**.
-4. **Safe Deletion via Reference Counting:** When a user deletes their file, Cloudinary's asset is only destroyed when `refCount === 0`.
+   - If a matching file already exists, skip Cloudinary upload entirely!
+   - Create a new `File` record pointing to the existing `url` and `publicId`, and increment an internal reference counter (`refCount++`).
+   - The user gets an instantaneous 0-second upload, and storage costs drop by 99%.
+4. **Reference-Counted Deletion:** When a file is purged, the physical asset is only destroyed on Cloudinary when `refCount === 0`.
 
 ---
 
-### 7.3 Automated 30-Day Trash Purging & Cloud Garbage Collection
+### 7.3 Automated 30-Day Trash Purging & Lifecycle Policies (V2 Architecture)
 
-#### The Trap Question:
-> *"In your database, Trash is handled via `deletedAt` (soft-delete). How do you physically purge expired trash after 30 days without slowing down the user's live database?"*
+#### The Scenario / Question:
+> *"Trash is currently soft-deleted via `deletedAt`. How would you implement automated 30-day data retention policies without locking active database tables?"*
 
-#### The Problem:
-If you run `DELETE FROM "File" WHERE deletedAt < NOW() - INTERVAL '30 days'` during the day on a large database, PostgreSQL locks rows, blocks other users from querying files, and leaves files stranded in Cloudinary.
+#### What VaultDrive Currently Implements:
+- When files or folders are moved to Trash, their `deletedAt` field is set. The `/trash` view displays top-level items, and users can selectively restore or permanently purge items via `DELETE /trash/empty`.
 
-#### The Senior Engineering Solution:
-1. **Decoupled Background Worker (e.g., BullMQ or node-cron):**
-   - The task runs off-peak (e.g., 2:00 AM UTC).
+#### The Real-World Limitation:
+- Without automated retention policies, abandoned trashed files accumulate indefinitely unless the user manually clicks "Empty Trash".
+
+#### Proposed V2 Enterprise Hardening (What I'd Build Next):
+1. **Decoupled Background Cleanup Worker:** Schedule a nightly worker running during low-traffic windows (e.g., 2:00 AM UTC).
 2. **Chunked Two-Phase Batch Processing:**
-   - Rather than deleting 50,000 files in one giant transaction, the worker queries in small batches of 200:
-   ```javascript
-   const expiredFiles = await prisma.file.findMany({
-     where: { deletedAt: { lt: thirtyDaysAgo } },
-     take: 200,
-     select: { id: true, publicId: true, resourceType: true }
-   });
-   ```
-3. **Cloud Deletion First, Database Record Second:**
-   - The worker batch-deletes the physical binary assets from Cloudinary using `cloudinary.api.delete_resources(publicIds)`.
-   - Once Cloudinary confirms deletion, the worker purges the database rows:
-     `await prisma.file.deleteMany({ where: { id: { in: expiredIds } } })`.
-   - This ensures you never have "orphaned" storage charges.
+   - Query expired items in small batches of 200 to avoid long-lived database locks:
+     ```javascript
+     const expiredFiles = await prisma.file.findMany({
+       where: { deletedAt: { lt: thirtyDaysAgo } },
+       take: 200,
+       select: { id: true, publicId: true, resourceType: true }
+     });
+     ```
+3. **Cloud Asset Destruction First, DB Second:**
+   - Batch-delete the physical assets on Cloudinary first via `cloudinary.api.delete_resources(publicIds)`.
+   - Upon confirmation, purge the database rows (`deleteMany`). This guarantees no orphaned storage costs if the worker crashes midway.
 
 ---
 
-### 7.4 The 10,000 File Bulk Deletion & Database Lock Contention
+### 7.4 Asynchronous Bulk Subtree Deletions & Queue Batching (V2 Architecture)
 
-#### The Trap Question:
-> *"If an enterprise user deletes a project folder that contains 50 subfolders and 10,000 files, what happens to your server and database?"*
+#### The Scenario / Question:
+> *"If an enterprise user deletes a project folder that contains 10,000 files across 50 nested subfolders, how do you prevent database lock contention?"*
 
-#### The Problem:
-If you execute a single recursive SQL transaction that locks 10,000 rows at once, PostgreSQL table locks can block incoming read requests for that entire table, causing the entire website to freeze for several seconds.
+#### What VaultDrive Currently Implements:
+- Subtree deletion is executed synchronously inside an Express request handler using `prisma.$transaction`. For typical directory sizes, this is fast and atomic.
 
-#### The Senior Engineering Solution:
+#### The Real-World Limitation:
+- For enterprise folders containing 10,000+ files, locking thousands of rows in a single synchronous SQL transaction can cause table contention and block incoming read queries.
+
+#### Proposed V2 Enterprise Hardening (What I'd Build Next):
 1. **Immediate $O(1)$ Soft-Delete on the Root Folder:**
-   - Mark the top-level folder with `deletedAt: new Date()`.
-   - Return an instant HTTP 200 to the user! The folder disappears from the UI in 10 milliseconds.
-2. **Asynchronous Subtree Cascade:**
-   - Push a job to an event queue (e.g., BullMQ or a background worker):
+   - Set `deletedAt: new Date()` on the target folder and immediately return HTTP 200 to the user. The folder instantly disappears from the UI.
+2. **Asynchronous Background Cascade:**
+   - Push a task to a background job queue (e.g., BullMQ with Redis or AWS SQS):
      `queue.add("cascadeFolderTrash", { folderId, userId })`.
 3. **Batched Downstream Processing:**
-   - The background worker marks child files and folders in batches of 500 rows using `UPDATE "File" SET "deletedAt" = ... WHERE "folderId" IN (...)`.
-   - The user experiences instantaneous responsiveness, and the database avoids table lock contention.
+   - The worker marks child files and folders in batches of 500 rows using `UPDATE "File" SET "deletedAt" = ... WHERE "folderId" IN (...)`.
+   - Keeps the UI instantly responsive while completely eliminating database lock contention.
 
 ---
 
@@ -533,7 +559,7 @@ Here are the 10 most common interview questions with high-confidence, conversati
 ### Q2 (Level 2 - Engineering): "How did you prevent Node.js from crashing when multiple users upload 100 MB files at the same time?"
 **Model Answer:**  
 > *"In traditional Node.js apps using libraries like Multer, file bytes are buffered in memory or written to local disk. Under concurrent heavy uploads, this easily causes Node.js single-thread event loop lag and Out-Of-Memory (OOM) crashes.  
-> In VaultDrive, I solved this by implementing presigned HMAC direct uploads. When a user selects a file, the client requests an upload signature from our API. The server validates storage quotas and returns a cryptographically signed HMAC-SHA256 token. The client then streams the binary payload directly to Cloudinary's edge infrastructure. The Node.js server buffers zero file bytes, keeping RAM usage flat regardless of how many users are uploading."*
+> In VaultDrive, I solved this by implementing presigned HMAC direct uploads. When a user selects a file, the client requests an upload signature from our API. The server validates storage quotas and returns a cryptographically signed HMAC token. The client then streams the binary payload directly to Cloudinary's edge infrastructure. The Node.js server buffers zero file bytes, keeping RAM usage flat regardless of how many users are uploading."*
 
 ---
 
@@ -604,10 +630,10 @@ Use these stories when an interviewer asks: *"Tell me about a challenging proble
 ---
 
 ### Story 1: The Zero-Buffer Direct Upload Architecture
-- **Situation:** Early testing showed that when multiple users uploaded 50MB–100MB videos simultaneously, our Node.js server memory spiked dramatically, causing the event loop to lag and crashing API response times.
-- **Task:** Eliminate all binary file buffering on the Node.js server so upload file sizes have zero impact on server RAM.
-- **Action:** I replaced traditional server-side file buffering with presigned HMAC-SHA256 direct uploads. The server validates storage quotas and issues a signed cryptographic signature. The client streams the binary payload directly to Cloudinary's storage network.
-- **Result:** Server memory consumption during uploads dropped to zero bytes. API response times remained flat under 25ms regardless of file size or upload concurrency.
+- **Situation:** In traditional multipart upload pipelines, large binary files (50MB–100MB) are buffered through the application server, spiking Node.js memory usage and risking Out-Of-Memory (OOM) crashes under concurrent traffic.
+- **Task:** Decouple binary file transport from our Express API so that file sizes have zero impact on Node.js server RAM.
+- **Action:** I implemented a presigned HMAC direct upload pipeline. The server computes a cryptographic signature after validating user quotas, allowing the browser to stream binary payloads directly to Cloudinary's edge storage network.
+- **Result:** Node.js memory allocation for file buffers remained at 0 bytes, completely eliminating event loop choking and upload-induced OOM crashes under concurrent multi-user traffic.
 
 ---
 
@@ -619,11 +645,11 @@ Use these stories when an interviewer asks: *"Tell me about a challenging proble
 
 ---
 
-### Story 3: The Ghost Asset / Cloud Storage Leak Defense
-- **Situation:** If a user uploaded a large file to Cloudinary but closed their laptop before our backend could confirm the upload, the binary asset remained stranded on Cloudinary, silently inflating cloud storage bills without being visible to the user.
-- **Task:** Ensure every uploaded asset either has a verified database record or is automatically cleaned up from cloud storage.
-- **Action:** I added upload tagging (`status: pending_confirmation`) during presigning and designed a nightly reconciliation worker. The worker queries Cloudinary for pending assets older than 24 hours, checks PostgreSQL for matching records, and safely destroys any abandoned assets.
-- **Result:** Eliminated 100% of orphaned storage leaks and protected our cloud infrastructure costs.
+### Story 3: Hardening the Zero-Trust Upload Confirmation Boundary
+- **Situation:** In direct-to-cloud upload pipelines, a security gap existed where the server initially trusted client-reported file sizes and public IDs on confirmation, enabling rogue clients to bypass the 1 GB quota or claim unowned directory namespaces.
+- **Task:** Establish a strict, server-verified trust boundary on `confirm-upload` without passing large binary files through the Node.js memory buffer.
+- **Action:** In `confirmUpload`, I enforced strict namespace validation (`vaultDrive/${userId}/...`) and integrated direct Cloudinary Admin API verification to query authentic byte size before committing the record. If the verified size exceeds the user's 1 GB quota, the handler deletes the asset from Cloudinary immediately and rejects the request. For edge cases where network drops before confirmation, I designed the architectural blueprint for a nightly reconciliation worker.
+- **Result:** Closed the quota evasion loophole, prevented namespace spoofing, and established a bulletproof zero-trust confirmation pipeline.
 
 ---
 
@@ -652,5 +678,4 @@ Before walking into your interview, make sure you can confidently speak to these
 - [x] **The Cycle Guard:** Explain how walking up ancestor pointers prevents circular graph loops (DAG invariant).
 - [x] **The Gatekeeper Proxy:** Explain why public links use 1-hour time-decay JWTs, live DB checks, and HTTP 206 byte ranges instead of raw CDN URLs.
 - [x] **The Axios Mutex Queue:** Explain how you solved concurrent 401 race conditions with an in-memory Promise queue.
-- [x] **The Ghost File Defense:** Explain how presigned status tags and reconciliation workers prevent orphaned cloud storage costs.
-
+- [x] **The Zero-Trust Confirmation Boundary:** Explain how namespace validation and Cloudinary Admin API queries prevent quota evasion, and how a reconciliation worker resolves disconnected uploads at scale.
