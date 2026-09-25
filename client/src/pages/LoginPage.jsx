@@ -178,7 +178,7 @@ export default function LoginPage() {
             <VaultMechanism />
 
             <h2 className="text-xl xl:text-2xl font-bold tracking-tight text-white leading-snug mt-6 mb-1.5">
-              Welcome back to <span className="text-gold-gradient">VaultDrive.</span>
+              Welcome back to VaultDrive.
             </h2>
             <p className="text-xs text-vault-muted leading-relaxed max-w-xs font-normal">
               Sign in to access your private cloud storage workspace.
@@ -186,12 +186,8 @@ export default function LoginPage() {
           </div>
 
           {/* Status Footer */}
-          <div className="text-xs text-vault-muted flex items-center justify-between">
-            <span>Encrypted storage</span>
-            <span className="flex items-center gap-1.5 text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-              Online
-            </span>
+          <div className="text-xs text-vault-muted text-center">
+            Encrypted storage
           </div>
         </div>
 
@@ -207,10 +203,6 @@ export default function LoginPage() {
                 </div>
                 <span className="font-bold text-base tracking-tight text-white">VaultDrive</span>
               </Link>
-              <span className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-xs text-emerald-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-                Online
-              </span>
             </div>
 
             {/* Card Frame */}

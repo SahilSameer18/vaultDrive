@@ -28,14 +28,6 @@ function LockPasscodeIcon({ className = "w-5 h-5" }) {
   );
 }
 
-function LightningIcon({ className = "w-4 h-4" }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none">
-      <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
 export default function CoreBenefits() {
   return (
     <section className="relative border-t border-white/[0.06] bg-vault-section-alt/80 z-10">
@@ -44,7 +36,7 @@ export default function CoreBenefits() {
         {/* Section Headline */}
         <div className="max-w-2xl mb-10 sm:mb-16">
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-            What's actually different <span className="text-silver-gradient">under the hood</span>
+            What's actually different under the hood
           </h2>
           <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[54ch]">
             Uploads go straight to storage, folders nest as deep as you want, and shared links can be locked behind a passcode.
@@ -59,13 +51,8 @@ export default function CoreBenefits() {
             <div className="absolute top-0 right-0 w-80 h-80 bg-white/[0.03] rounded-full blur-[70px] pointer-events-none" />
 
             <div>
-              <div className="flex items-center justify-between mb-6">
-                <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-white/70 shadow-sm">
-                  <ShieldCheckIcon className="w-5 h-5" />
-                </div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-[11px] text-emerald-400">
-                  <LightningIcon className="w-3.5 h-3.5" /> Direct upload pipeline
-                </span>
+              <div className="w-10 h-10 rounded-xl bg-vault-surface border border-white/[0.08] flex items-center justify-center text-white/70 shadow-sm mb-6">
+                <ShieldCheckIcon className="w-5 h-5" />
               </div>
 
               <h3 className="text-xl sm:text-2xl font-bold tracking-tight text-white">

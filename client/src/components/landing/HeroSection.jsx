@@ -101,12 +101,6 @@ export default function HeroSection() {
         {/* ── Left Column (5 Cols): Typographic Hierarchy ──────────────── */}
         <div className="lg:col-span-5 flex flex-col items-start text-left">
 
-          {/* Cryptographic Telemetry Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/[0.1] bg-white/[0.04] text-xs text-white/80 mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-vault-accent animate-pulse-dot" />
-            <span>Encrypted Vault Architecture</span>
-          </div>
-
           {/* Display Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-[-0.035em] leading-[1.1] text-white">
             Digital vault storage. <br />
@@ -266,7 +260,7 @@ export default function HeroSection() {
                 <div className="flex items-center gap-2 min-w-0">
                   <ShieldCheckIcon className="w-4 h-4 text-vault-accent shrink-0" />
                   <span className="text-vault-text truncate">
-                    Payload: <strong className="text-white">{selectedFile.name}</strong>
+                    Selected: <strong className="text-white">{selectedFile.name}</strong>
                   </span>
                 </div>
                 <span className="text-vault-success text-xs shrink-0 font-medium ml-2">

@@ -201,7 +201,7 @@ export default function RegisterPage() {
             <VaultMechanism />
 
             <h2 className="text-xl xl:text-2xl font-bold tracking-tight text-white leading-snug mt-6 mb-1.5">
-              Create your <span className="text-gold-gradient">personal vault.</span>
+              Create your personal vault.
             </h2>
             <p className="text-xs text-vault-muted leading-relaxed max-w-xs font-normal">
               Secure cloud storage with 1GB free space to get started.
@@ -209,12 +209,8 @@ export default function RegisterPage() {
           </div>
 
           {/* Status Footer */}
-          <div className="text-xs text-vault-muted flex items-center justify-between">
-            <span>Encrypted storage</span>
-            <span className="flex items-center gap-1.5 text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-              Online
-            </span>
+          <div className="text-xs text-vault-muted text-center">
+            Encrypted storage
           </div>
         </div>
 
@@ -230,10 +226,6 @@ export default function RegisterPage() {
                 </div>
                 <span className="font-bold text-base tracking-tight text-white">VaultDrive</span>
               </Link>
-              <span className="px-2.5 py-0.5 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] text-xs text-emerald-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-                Online
-              </span>
             </div>
 
             {/* Card Frame */}

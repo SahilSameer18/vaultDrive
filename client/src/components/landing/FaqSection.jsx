@@ -47,7 +47,7 @@ export default function FaqSection() {
           {/* Left Column (5 Cols): Editorial Title (Sticky) */}
           <div className="lg:col-span-5 lg:sticky lg:top-28 text-left">
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
-              <span className="text-silver-gradient">Frequently asked</span>
+              Frequently asked
             </h2>
             <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[44ch]">
               Straight answers about storage, sharing, and how your files are handled.
