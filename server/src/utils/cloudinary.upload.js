@@ -98,3 +98,30 @@ export const deleteFromCloudinary = async (publicId, resourceType = "image") => 
   }
 };
 
+// Fetch and verify resource metadata directly from Cloudinary
+export const getCloudinaryResource = async (publicId, resourceType = "image") => {
+  try {
+    return await cloudinary.api.resource(publicId, {
+      resource_type: resourceType,
+    });
+  } catch (err) {
+    // If not found under specified resourceType, try alternate resource types (raw / video)
+    const alternates = ["image", "video", "raw"].filter((t) => t !== resourceType);
+    for (const altType of alternates) {
+      try {
+        return await cloudinary.api.resource(publicId, {
+          resource_type: altType,
+        });
+      } catch {
+        // Continue fallback attempts
+      }
+    }
+    // If resource is genuinely 404/not found, rethrow clean error
+    if (err.http_code === 404 || err.message?.toLowerCase().includes("not found")) {
+      throw new ApiError(404, "Asset was not found on Cloudinary storage provider");
+    }
+    // Return null on unexpected non-fatal errors (e.g. temporary API throttling)
+    return null;
+  }
+};
+

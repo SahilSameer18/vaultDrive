@@ -8,9 +8,11 @@ export const generateAccessToken = (userId) => {
   );
 };
 
-export const generateRefreshToken = (userId) => {
+export const generateRefreshToken = (userId, tokenId = null) => {
+  const payload = { id: userId };
+  if (tokenId) payload.tokenId = tokenId;
   return jwt.sign(
-    { id: userId },
+    payload,
     process.env.REFRESH_TOKEN_SECRET,
     { expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "7d" }
   );

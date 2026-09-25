@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "../lib/prisma.js";
 import ApiError from "../utils/ApiError.js";
@@ -17,7 +18,7 @@ const getCookieOptions = () => ({
   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
 });
 
-// Generate JWT tokens and save hashed refresh token in database
+// Generate JWT tokens and save hashed refresh token in database (O(1) indexed lookup via tokenId)
 const generateAndStoreTokens = async (userId) => {
   // Prune any stale/expired tokens belonging to this user
   await prisma.refreshToken.deleteMany({
@@ -27,14 +28,16 @@ const generateAndStoreTokens = async (userId) => {
     },
   });
 
+  const tokenId = crypto.randomUUID();
   const accessToken = generateAccessToken(userId);
-  const refreshToken = generateRefreshToken(userId);
+  const refreshToken = generateRefreshToken(userId, tokenId);
 
   const tokenHash = await bcrypt.hash(refreshToken, 10);
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
   await prisma.refreshToken.create({
     data: {
+      id: tokenId,
       tokenHash,
       userId,
       expiresAt,
@@ -187,19 +190,38 @@ export const refresh = async (req, res, next) => {
       throw new ApiError(401, "Invalid or expired refresh token");
     }
 
-    const userTokens = await prisma.refreshToken.findMany({
-      where: { userId: decoded.id },
-    });
-
     let matchedToken = null;
-    for (const tokenRecord of userTokens) {
-      const isMatch = await bcrypt.compare(
-        incomingRefreshToken,
-        tokenRecord.tokenHash
-      );
-      if (isMatch) {
-        matchedToken = tokenRecord;
-        break;
+
+    // Fast O(1) indexed lookup if tokenId is present in JWT payload
+    if (decoded.tokenId) {
+      const tokenRecord = await prisma.refreshToken.findUnique({
+        where: { id: decoded.tokenId },
+      });
+
+      if (tokenRecord && tokenRecord.userId === decoded.id) {
+        const isMatch = await bcrypt.compare(
+          incomingRefreshToken,
+          tokenRecord.tokenHash
+        );
+        if (isMatch) {
+          matchedToken = tokenRecord;
+        }
+      }
+    } else {
+      // Legacy fallback: O(N) loop for tokens issued prior to tokenId support
+      const userTokens = await prisma.refreshToken.findMany({
+        where: { userId: decoded.id },
+      });
+
+      for (const tokenRecord of userTokens) {
+        const isMatch = await bcrypt.compare(
+          incomingRefreshToken,
+          tokenRecord.tokenHash
+        );
+        if (isMatch) {
+          matchedToken = tokenRecord;
+          break;
+        }
       }
     }
 
@@ -250,18 +272,35 @@ export const logout = async (req, res, next) => {
     if (incomingRefreshToken) {
       try {
         const decoded = verifyRefreshToken(incomingRefreshToken);
-        const userTokens = await prisma.refreshToken.findMany({
-          where: { userId: decoded.id },
-        });
+        
+        if (decoded.tokenId) {
+          const tokenRecord = await prisma.refreshToken.findUnique({
+            where: { id: decoded.tokenId },
+          });
 
-        for (const tokenRecord of userTokens) {
-          const isMatch = await bcrypt.compare(
-            incomingRefreshToken,
-            tokenRecord.tokenHash
-          );
-          if (isMatch) {
-            await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
-            break;
+          if (tokenRecord && tokenRecord.userId === decoded.id) {
+            const isMatch = await bcrypt.compare(
+              incomingRefreshToken,
+              tokenRecord.tokenHash
+            );
+            if (isMatch) {
+              await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+            }
+          }
+        } else {
+          const userTokens = await prisma.refreshToken.findMany({
+            where: { userId: decoded.id },
+          });
+
+          for (const tokenRecord of userTokens) {
+            const isMatch = await bcrypt.compare(
+              incomingRefreshToken,
+              tokenRecord.tokenHash
+            );
+            if (isMatch) {
+              await prisma.refreshToken.delete({ where: { id: tokenRecord.id } });
+              break;
+            }
           }
         }
       } catch (err) {

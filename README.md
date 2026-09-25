@@ -96,9 +96,10 @@ flowchart TD
 - **UI Controls**: Items-per-page selector (`10`, `20`, `50`, `100`), page navigation buttons, and auto-hiding when content fits on a single page.
 
 ### 🔐 Authentication & Session Management
-- **Dual-Token System**: 15-minute access tokens and 7-day refresh tokens stored as bcrypt hashes in PostgreSQL, delivered via `httpOnly` secure cookies.
+- **Dual-Token System with $O(1)$ Lookup**: 15-minute access tokens and 7-day refresh tokens stored as bcrypt hashes in PostgreSQL, delivered via `httpOnly` secure cookies.
+- **$O(1)$ Indexed Token Resolution**: JWT payload embeds a unique `tokenId`, enabling direct primary-key database lookups on `/auth/refresh` and `/auth/logout` to eliminate $O(N)$ CPU-expensive bcrypt loops across multi-device sessions.
 - **Google OAuth 2.0**: ID token verification via `google-auth-library` with relational `OAuthAccount` schema.
-- **Token Rotation**: Axios interceptor handles `401 Unauthorized` responses and queues concurrent requests during token refresh.
+- **Token Rotation**: Axios interceptor handles `401 Unauthorized` responses and queues concurrent requests during token refresh using a mutex queue.
 - **Rate Limiting**: Auth endpoints limited to 10 requests per 15 minutes; global API limited to 500 requests per 15 minutes.
 
 ### 📁 Folder & Workspace Navigation
@@ -111,6 +112,7 @@ flowchart TD
 
 ### ⚡ Upload Pipeline & Multi-File Batching
 - **Direct Presigned HMAC Uploads**: Direct browser-to-Cloudinary uploads using HMAC SHA-256 signatures (`sign-upload` → Cloudinary → `confirm-upload`). Server does not buffer file bytes in memory.
+- **Zero-Trust Server Confirmation**: Backend strictly enforces directory namespace isolation (`vaultDrive/${userId}/...`), queries Cloudinary's Admin API for real byte metrics, calculates storage quota using verified numbers (preventing client-side size manipulation), and auto-purges unconfirmed quota overflows.
 - **Multi-File Batch Queue**: Select up to 10 files at once with controlled 2-stream concurrency worker queue, individual `AbortController` cancellation, and drag-and-drop queue reordering.
 - **Multi-Item Selection & Floating Batch Action Bar**: Checkbox selection on both files and folders across Grid and List views with active gold ring indicators, dynamic total byte count calculations, and keyboard shortcuts (`Ctrl+A` / `Cmd+A` to Select All, `Esc` to Deselect).
 - **1-Click Batch Operations**:
@@ -204,11 +206,12 @@ flowchart TD
 | :--- | :--- | :--- |
 | **Trash Handling** | Soft delete via `deletedAt` timestamp | Prevents accidental data loss and keeps trashed items grouped |
 | **Restore Fallback** | Re-parent to root if parent folder is missing | Prevents orphaned references to deleted directories |
-| **Refresh Tokens** | Bcrypt hash in database | Database breach does not expose usable refresh tokens |
-| **401 Handling** | Queue-based Axios interceptor | Prevents multiple concurrent refresh calls |
-| **Uploads** | Direct presigned HMAC to Cloudinary | Bypasses server memory; supports chunked large uploads |
+| **Refresh Tokens** | Bcrypt hash in database with embedded `tokenId` | Database breach does not expose usable refresh tokens; $O(1)$ indexed lookup eliminates CPU-heavy iteration |
+| **401 Handling** | Queue-based Axios interceptor | Prevents multiple concurrent refresh calls via a mutex queue |
+| **Upload Pipeline** | Direct presigned HMAC to Cloudinary | Bypasses server memory; supports chunked large uploads with 0 server RAM |
+| **Upload Verification** | Zero-trust Cloudinary Admin API query | Prevents client-side file size tampering and quota evasion |
 | **Search & Sort** | PostgreSQL indexes and query parameters | Offloads sorting and filtering from browser runtime |
-| **Breadcrumbs** | Single query with in-memory map | Eliminates sequential N+1 queries per folder level |
+| **Breadcrumbs** | Single query with in-memory map | Eliminates sequential N+1 queries per folder level ($O(H)$ resolution) |
 
 ---
 

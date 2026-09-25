@@ -12,7 +12,7 @@ function LogoMark({ className = "w-5 h-5" }) {
 
 export default function LandingNavbar() {
   return (
-    <header className="fixed top-0 inset-x-0 z-50 glass-vault border-b border-white/[0.06] transition-all duration-300">
+    <header className="fixed top-0 inset-x-0 z-50 bg-[var(--theme-landing-bg)]/90 backdrop-blur-xl border-b border-white/[0.08] shadow-[0_4px_24px_-4px_rgba(0,0,0,0.5)] transition-all duration-300">
       <div className="max-w-7xl mx-auto px-3.5 sm:px-8 h-16 sm:h-18 flex items-center justify-between gap-2">
         {/* Brand Lockup */}
         <Link to="/" className="group flex items-center gap-2 sm:gap-3.5 focus-visible:outline-none shrink-0">

@@ -7,6 +7,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import {
   generateUploadSignature,
   deleteFromCloudinary,
+  getCloudinaryResource,
 } from "../utils/cloudinary.upload.js";
 import { getAllDescendantFolderIds } from "./folder.controller.js";
 
@@ -95,14 +96,35 @@ export const confirmUpload = async (req, res, next) => {
     const { name, size, mimeType, resourceType, url, publicId, folderId } = req.body;
     const userId = req.user.id;
 
-    // Enforce 1 GB storage quota check on confirm (counting active non-trashed files)
+    // 1. Strict Trust Boundary: Ensure publicId strictly belongs to the user's vault namespace
+    const expectedPrefix = `vaultDrive/${userId}/`;
+    if (!publicId || !publicId.startsWith(expectedPrefix)) {
+      throw new ApiError(403, "Invalid public ID: asset namespace does not belong to your vault directory");
+    }
+
+    // 2. Strict Trust Boundary: Verify asset directly against Cloudinary storage provider
+    const verifiedAsset = await getCloudinaryResource(publicId, resourceType || "image");
+    
+    // Extract server-verified metrics (fallback gracefully to req.body only if Cloudinary returned null on non-404)
+    const finalSize = (verifiedAsset && typeof verifiedAsset.bytes === "number") ? verifiedAsset.bytes : size;
+    const finalUrl = (verifiedAsset && verifiedAsset.secure_url) ? verifiedAsset.secure_url : url;
+    const finalResourceType = (verifiedAsset && verifiedAsset.resource_type) ? verifiedAsset.resource_type : (resourceType || "image");
+
+    // 3. Strict Origin Check: Ensure asset URL originates from Cloudinary
+    if (!finalUrl || !finalUrl.startsWith("https://res.cloudinary.com/")) {
+      throw new ApiError(400, "Invalid asset URL: asset must originate from Cloudinary storage");
+    }
+
+    // 4. Enforce 1 GB storage quota check using VERIFIED file size
     const storageSum = await prisma.file.aggregate({
       where: { userId, deletedAt: null },
       _sum: { size: true },
     });
     const currentUsedBytes = storageSum._sum.size || 0;
 
-    if (currentUsedBytes + (size || 0) > TOTAL_STORAGE_QUOTA_BYTES) {
+    if (currentUsedBytes + (finalSize || 0) > TOTAL_STORAGE_QUOTA_BYTES) {
+      // Clean up orphaned asset from Cloudinary so unconfirmed quota overflow does not linger
+      await deleteFromCloudinary(publicId, finalResourceType).catch(() => {});
       const usedMB = (currentUsedBytes / (1024 * 1024)).toFixed(1);
       throw new ApiError(
         400,
@@ -123,10 +145,10 @@ export const confirmUpload = async (req, res, next) => {
     const file = await prisma.file.create({
       data: {
         name,
-        size,
+        size: finalSize,
         mimeType,
-        resourceType: resourceType || "image",
-        url,
+        resourceType: finalResourceType,
+        url: finalUrl,
         publicId,
         userId,
         folderId: folderId || null,
@@ -135,7 +157,7 @@ export const confirmUpload = async (req, res, next) => {
 
     // Check if total user storage has crossed 800 MB (80% of 1 GB quota)
     const WARNING_THRESHOLD_BYTES = 800 * 1024 * 1024; // 800 MB
-    const newTotalBytes = currentUsedBytes + (size || 0);
+    const newTotalBytes = currentUsedBytes + (finalSize || 0);
 
     if (newTotalBytes >= WARNING_THRESHOLD_BYTES) {
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
