@@ -121,9 +121,9 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 select-none">
-      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm cursor-pointer animate-fade-in" onClick={onClose} />
 
-      <div className="relative w-full max-w-md rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] p-6 shadow-2xl z-10 animate-scale-up">
+      <div className="relative w-full max-w-md rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] p-6 shadow-2xl z-10 animate-scale-up origin-center">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--theme-border)] pb-4 mb-4">
           <div className="flex items-center gap-2.5 min-w-0">
@@ -136,15 +136,16 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
               </svg>
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-base text-[var(--theme-text)] truncate">{file.name}</h3>
-              <p className="text-xs text-[var(--theme-text-muted)]">Share this file</p>
+              <h3 className="font-bold text-base text-[var(--theme-text)] truncate apple-headline">{file.name}</h3>
+              <p className="text-xs text-[var(--theme-text-muted)] apple-caption">Share this file</p>
             </div>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer"
+            className="w-7 h-7 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer touch-target-44"
+            title="Close"
           >
             <span className="text-xs font-bold">✕</span>
           </button>
@@ -152,12 +153,12 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
 
         {/* Feedback Alerts */}
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono">
+          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-mono apple-mono">
             {error}
           </div>
         )}
         {success && (
-          <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono flex items-center gap-2">
+          <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono flex items-center gap-2 apple-mono">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span>{success}</span>
           </div>
@@ -168,7 +169,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
           <button
             type="button"
             onClick={() => setActiveTab("link")}
-            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer apple-caption ${
               activeTab === "link"
                 ? "bg-[var(--theme-panel)] text-[var(--theme-text)] font-semibold shadow-sm border border-[var(--theme-border)]"
                 : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"
@@ -179,7 +180,7 @@ export default function ShareModal({ isOpen, onClose, file, onShareUpdate }) {
           <button
             type="button"
             onClick={() => setActiveTab("user")}
-            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
+            className={`flex-1 py-1.5 rounded-lg text-xs transition-all cursor-pointer apple-caption ${
               activeTab === "user"
                 ? "bg-[var(--theme-panel)] text-[var(--theme-text)] font-semibold shadow-sm border border-[var(--theme-border)]"
                 : "text-[var(--theme-text-muted)] hover:text-[var(--theme-text)]"

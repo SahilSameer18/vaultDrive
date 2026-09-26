@@ -9,7 +9,7 @@ export default function VaultToggle({ isPublic, onToggle, disabled = false }) {
       onClick={onToggle}
       disabled={disabled}
       title={isPublic ? "Public link active — click to lock private" : "Private — click to enable public share link"}
-      className={`group relative inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border text-[9px] sm:text-[10px] font-mono tracking-widest uppercase transition-all duration-200 select-none ${
+      className={`group relative inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border text-[9px] sm:text-[10px] font-mono tracking-widest uppercase transition-all duration-200 select-none apple-mono touch-target-44 ${
         isPublic
           ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 shadow-[0_0_12px_rgba(52,211,153,0.12)]"
           : "border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)] hover:border-[var(--theme-accent)]/40 hover:text-[var(--theme-text)]"

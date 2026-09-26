@@ -102,7 +102,7 @@ export default function HeroSection() {
         <div className="lg:col-span-5 flex flex-col items-start text-left">
 
           {/* Display Headline */}
-          <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-[-0.035em] leading-[1.1] text-white">
+          <h1 className="text-3xl sm:text-5xl lg:text-[3.5rem] font-bold text-white apple-display">
             Digital vault storage. <br />
             <span className="text-gold-gradient">
               Built for absolute privacy.
@@ -110,7 +110,7 @@ export default function HeroSection() {
           </h1>
 
           {/* Subtitle */}
-          <p className="mt-4 sm:mt-5 text-sm sm:text-base leading-relaxed text-vault-muted font-normal max-w-[46ch]">
+          <p className="mt-4 sm:mt-5 text-sm sm:text-base text-vault-muted font-normal max-w-[46ch] apple-body">
             Nest folders as deep as you need, upload straight to secure cloud storage, and share files behind a passcode — all encrypted in transit.
           </p>
 
@@ -118,21 +118,21 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-7 sm:mt-8 w-full sm:w-auto">
             <Link
               to="/register"
-              className="tactile-btn inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-vault-accent hover:bg-vault-accent-hover text-vault-landing-bg text-sm font-semibold tracking-tight shadow-[0_2px_16px_rgba(197,160,89,0.25)] hover:shadow-[0_4px_24px_rgba(197,160,89,0.35)] transition-all cursor-pointer text-center"
+              className="tactile-btn inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-vault-accent hover:bg-vault-accent-hover text-vault-landing-bg text-sm font-semibold shadow-[0_2px_16px_rgba(197,160,89,0.25)] hover:shadow-[0_4px_24px_rgba(197,160,89,0.35)] transition-all cursor-pointer text-center apple-caption touch-target-44"
             >
               <span>Create Free Vault</span>
             </Link>
 
             <Link
               to="/login"
-              className="tactile-btn inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.18] text-sm font-medium tracking-tight text-white transition-all duration-200 text-center"
+              className="tactile-btn inline-flex items-center justify-center px-6 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.18] text-sm font-medium text-white transition-all duration-200 text-center apple-caption touch-target-44"
             >
               <span>Sign In</span>
             </Link>
           </div>
 
           {/* Trust Specs Strip */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-6 text-xs text-vault-muted">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 mt-6 text-xs text-vault-muted apple-caption font-mono">
             <span className="inline-flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-white/30" /> 1GB High-Speed Storage
             </span>

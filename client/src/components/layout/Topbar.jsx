@@ -148,8 +148,8 @@ export default function Topbar({ onToggleMobileMenu }) {
                     </svg>
                   </div>
                   <div className="hidden lg:flex flex-col">
-                    <span className="font-bold text-sm tracking-tight text-[var(--color-vault-text)]">VaultDrive</span>
-                    <span className="text-xs text-[var(--color-vault-muted)]">Cloud Storage</span>
+                    <span className="font-bold text-sm text-[var(--color-vault-text)] apple-headline">VaultDrive</span>
+                    <span className="text-xs text-[var(--color-vault-muted)] apple-caption">Cloud Storage</span>
                   </div>
                 </Link>
               </div>
@@ -169,18 +169,18 @@ export default function Topbar({ onToggleMobileMenu }) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search repository files and folders..."
-                  className="w-full pl-10 pr-12 py-2 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--color-vault-text)] text-xs placeholder:text-[var(--color-vault-muted)]/50 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all shadow-inner"
+                  className="w-full pl-10 pr-12 py-2 rounded-xl bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--color-vault-text)] text-xs placeholder:text-[var(--color-vault-muted)]/50 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/10 transition-all shadow-inner apple-body"
                 />
                 {searchQuery ? (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] text-xs cursor-pointer p-0.5"
+                    className="absolute right-3 text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] text-xs cursor-pointer p-1 touch-target-44"
                   >
                     ✕
                   </button>
                 ) : (
-                  <kbd className="absolute right-2.5 px-1.5 py-0.5 rounded border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[9px] font-mono text-[var(--color-vault-muted)] pointer-events-none shadow-sm">
+                  <kbd className="absolute right-2.5 px-1.5 py-0.5 rounded border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[9px] font-mono text-[var(--color-vault-muted)] pointer-events-none shadow-sm apple-caption font-semibold">
                     ⌘K
                   </kbd>
                 )}
@@ -196,7 +196,7 @@ export default function Topbar({ onToggleMobileMenu }) {
                     setMobileSearchOpen(true);
                     setTimeout(() => mobileSearchRef.current?.focus(), 60);
                   }}
-                  className="md:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-colors cursor-pointer"
+                  className="md:hidden p-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--color-vault-muted)] hover:text-[var(--color-vault-text)] hover:border-white/20 transition-colors cursor-pointer touch-target-44"
                   aria-label="Search files"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -233,7 +233,7 @@ export default function Topbar({ onToggleMobileMenu }) {
 
                   {/* Profile Dropdown Menu */}
                   {profileOpen && (
-                    <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-2xl depth-vault-chassis border border-[var(--theme-border)] bg-[var(--theme-surface)]/95 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-scale-up">
+                    <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] rounded-2xl depth-vault-chassis border border-[var(--theme-border)] bg-[var(--theme-surface)]/95 backdrop-blur-2xl shadow-2xl p-2 z-50 animate-scale-up origin-top-right">
                       {/* User Info Header Card */}
                       <div className="p-3 rounded-xl depth-vault-card border border-[var(--theme-border)] bg-[var(--theme-panel)] mb-2 flex items-center gap-3">
                         <UserAvatar user={user} size="md" />

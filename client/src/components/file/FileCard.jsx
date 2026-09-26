@@ -106,14 +106,14 @@ export default function FileCard({
 
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <p className="text-xs font-semibold text-[var(--theme-text)] truncate">
+                <p className="text-xs font-semibold text-[var(--theme-text)] truncate apple-headline">
                   {file.name}
                 </p>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)]">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] apple-mono">
                   {fileExt}
                 </span>
               </div>
-              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-0.5">
+              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] mt-0.5 apple-caption">
                 {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.createdAt)}
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function FileCard({
           <button
             type="button"
             onClick={() => onPreview && onPreview(file)}
-            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer touch-target-44"
             title="Preview"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -144,7 +144,7 @@ export default function FileCard({
           <button
             type="button"
             onClick={onDownloadClick}
-            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer touch-target-44"
             title="Download"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -157,7 +157,7 @@ export default function FileCard({
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer touch-target-44"
               title="File Options"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -168,7 +168,7 @@ export default function FileCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
+              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up origin-top-right">
                 {onToggleSelect && (
                   <button
                     type="button"
@@ -325,7 +325,7 @@ export default function FileCard({
           <button
             type="button"
             onClick={() => onPreview && onPreview(file)}
-            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer opacity-70 group-hover:opacity-100"
+            className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer opacity-70 group-hover:opacity-100 touch-target-44"
             title="Preview"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -338,7 +338,7 @@ export default function FileCard({
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer touch-target-44"
               title="Options"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
@@ -349,7 +349,7 @@ export default function FileCard({
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up">
+              <div className="absolute right-0 mt-1 w-44 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl p-1.5 shadow-2xl z-50 font-mono text-xs animate-scale-up origin-top-right">
                 {onToggleSelect && (
                   <button
                     type="button"
@@ -449,14 +449,14 @@ export default function FileCard({
       {/* Middle: File Name + Extension Badge + Size/Date */}
       <div className="mb-4">
         <div className="flex items-center justify-between gap-2 mb-1">
-          <h4 className="text-xs font-semibold text-[var(--theme-text)] truncate" title={file.name}>
+          <h4 className="text-xs font-semibold text-[var(--theme-text)] truncate apple-headline" title={file.name}>
             {file.name}
           </h4>
-          <span className="shrink-0 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)]">
+          <span className="shrink-0 px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-surface)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] apple-mono">
             {fileExt}
           </span>
         </div>
-        <p className="text-[10px] font-mono text-[var(--theme-text-muted)]">
+        <p className="text-[10px] font-mono text-[var(--theme-text-muted)] apple-caption">
           {formatBytes(file.size)} <span className="opacity-40">•</span> {formatDate(file.createdAt)}
         </p>
       </div>
@@ -471,7 +471,7 @@ export default function FileCard({
         <button
           type="button"
           onClick={onDownloadClick}
-          className="p-1 rounded-md text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer"
+          className="p-1 rounded-md text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:bg-[var(--theme-surface)] transition-colors cursor-pointer touch-target-44"
           title="Download"
         >
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">

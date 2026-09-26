@@ -210,10 +210,14 @@ body {
 
 /* ─── Tactile Button Physics ──────────────────────────────────────────────── */
 .tactile-btn {
-  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), filter 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), filter 0.16s ease, box-shadow 0.16s ease;
 }
 .tactile-btn:active {
-  transform: translateY(1px) scale(0.985);
+  transform: scale(0.97) translateY(1px);
+}
+button:active:not(:disabled) {
+  transform: scale(0.975);
+  transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ─── Shimmer Keyframe (skeleton loader) ────────────────────────────────────── */
@@ -234,7 +238,7 @@ body {
   border-radius: 6px;
 }
 
-/* ─── Motion & Micro-Animation Keyframes ────────────────────────────────────── */
+/* ─── Motion & Apple Spring Keyframes ──────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -245,9 +249,31 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
+/* Apple WWDC Critically Damped Spring Curve (damping 1.0, snappy settle) */
+@keyframes appleSpringUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(8px);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(1.006) translateY(-0.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes appleSheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulseDot {
@@ -257,8 +283,13 @@ body {
 
 .fade-in { animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-fade-in-up { animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-.animate-scale-up { animation: scaleUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-scale-up { animation: appleSpringUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-sheet-up { animation: appleSheetUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-pulse-dot { animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+.apple-spring-fast {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
 /* ─── Vault Toggle Keyframes ────────────────────────────────────────────────── */
 @keyframes latchUnlock {
@@ -300,4 +331,119 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: var(--color-vault-text) !important;
   caret-color: var(--color-vault-text) !important;
   transition: background-color 50000s ease-in-out 0s !important;
+}
+
+/* ─── Apple Optical Typography & Vibrancy ─────────────────────────────────── */
+.apple-display {
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.apple-headline {
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.apple-body {
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.apple-caption {
+  letter-spacing: 0.025em;
+}
+
+.apple-mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+/* Vibrancy boost over translucent glass surfaces */
+.glass-vibrancy {
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.glass-vibrancy-muted {
+  color: #D1D5DB;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+/* Touch ergonomics: minimum 44px hit target for touch devices */
+.touch-target-44 {
+  position: relative;
+}
+.touch-target-44::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Apple Accessibility: Reduced Motion ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .skeleton {
+    animation: none !important;
+    opacity: 0.7;
+  }
+
+  .fade-in,
+  .animate-fade-in-up,
+  .animate-scale-up,
+  .vault-latch-unlock,
+  .vault-latch-lock {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .depth-vault-card:hover {
+    transform: none !important;
+  }
+
+  .tactile-btn:active,
+  button:active {
+    transform: none !important;
+  }
+}
+
+/* ─── Apple Accessibility: Reduced Transparency ───────────────────────────── */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-vault,
+  header,
+  aside,
+  [class*="backdrop-blur"] {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background-color: var(--color-vault-surface) !important;
+    border-color: var(--theme-border-prominent) !important;
+  }
+}
+
+/* ─── Apple Accessibility: High Contrast ──────────────────────────────────── */
+@media (prefers-contrast: more) {
+  :root {
+    --theme-border: rgba(255, 255, 255, 0.28);
+    --theme-border-subtle: rgba(255, 255, 255, 0.18);
+    --theme-border-prominent: rgba(255, 255, 255, 0.45);
+    --theme-text-muted: #D1D5DB;
+  }
+
+  .depth-vault-card,
+  .depth-vault-chassis,
+  .glass-vault {
+    border-width: 1.5px !important;
+  }
 }

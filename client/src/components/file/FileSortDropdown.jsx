@@ -57,7 +57,7 @@ export default function FileSortDropdown({ sortBy, sortOrder, onChangeSort }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-52 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl shadow-2xl p-1.5 z-40 animate-scale-up select-none">
+        <div className="absolute right-0 mt-2 w-52 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)]/95 backdrop-blur-xl shadow-2xl p-1.5 z-40 animate-scale-up select-none origin-top-right">
           <div className="px-2.5 py-1.5 border-b border-[var(--theme-border)]/60 mb-1 flex items-center justify-between">
             <p className="text-xs text-[var(--theme-text-muted)]">
               Sort by

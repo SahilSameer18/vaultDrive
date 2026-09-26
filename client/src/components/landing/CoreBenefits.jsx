@@ -35,10 +35,10 @@ export default function CoreBenefits() {
 
         {/* Section Headline */}
         <div className="max-w-2xl mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold tracking-[-0.03em] leading-[1.1] text-white">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white apple-display">
             What's actually different under the hood
           </h2>
-          <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[54ch]">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-base text-vault-muted leading-relaxed max-w-[54ch] apple-body">
             Uploads go straight to storage, folders nest as deep as you want, and shared links can be locked behind a passcode.
           </p>
         </div>

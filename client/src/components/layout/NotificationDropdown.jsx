@@ -153,7 +153,7 @@ export default function NotificationDropdown() {
 
       {/* Glassmorphic Notifications Dropdown */}
       {open && (
-        <div className="fixed top-16 left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl depth-vault-chassis border border-[var(--theme-border)] bg-[var(--theme-surface)]/95 backdrop-blur-2xl shadow-2xl p-4 z-50 animate-scale-up select-none">
+        <div className="fixed top-16 left-4 right-4 sm:absolute sm:top-full sm:left-auto sm:right-0 sm:mt-2 sm:w-96 rounded-2xl depth-vault-chassis border border-[var(--theme-border)] bg-[var(--theme-surface)]/95 backdrop-blur-2xl shadow-2xl p-4 z-50 animate-scale-up select-none origin-top sm:origin-top-right">
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-[var(--theme-border)] mb-3">
             <div className="flex items-center gap-2">

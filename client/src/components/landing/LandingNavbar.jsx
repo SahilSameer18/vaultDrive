@@ -19,7 +19,7 @@ export default function LandingNavbar() {
           <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-b from-vault-panel to-vault-surface border border-vault-accent/35 flex items-center justify-center shadow-[0_2px_12px_rgba(0,0,0,0.6)] group-hover:border-vault-accent/70 group-hover:shadow-[0_0_20px_rgba(197,160,89,0.25)] transition-all duration-300">
             <LogoMark className="w-4 h-4 text-vault-accent transition-transform duration-300 group-hover:scale-105" />
           </div>
-          <span className="font-bold text-base sm:text-lg tracking-[-0.02em] text-vault-text group-hover:text-white transition-colors">
+          <span className="font-bold text-base sm:text-lg text-vault-text group-hover:text-white transition-colors apple-headline">
             VaultDrive
           </span>
         </Link>
@@ -28,13 +28,13 @@ export default function LandingNavbar() {
         <nav className="flex items-center gap-1.5 sm:gap-4 shrink-0">
           <Link
             to="/login"
-            className="tactile-btn px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium tracking-wide text-vault-muted hover:text-vault-text hover:bg-white/[0.04] transition-all duration-200"
+            className="tactile-btn px-2.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-vault-muted hover:text-vault-text hover:bg-white/[0.04] transition-all duration-200 apple-caption touch-target-44 flex items-center justify-center"
           >
             Sign In
           </Link>
           <Link
             to="/register"
-            className="tactile-btn inline-flex items-center justify-center px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-vault-accent hover:bg-vault-accent-hover text-vault-landing-bg text-xs sm:text-sm font-semibold tracking-tight shadow-[0_2px_14px_rgba(197,160,89,0.25)] hover:shadow-[0_4px_20px_rgba(197,160,89,0.35)] transition-all cursor-pointer whitespace-nowrap"
+            className="tactile-btn inline-flex items-center justify-center px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-vault-accent hover:bg-vault-accent-hover text-vault-landing-bg text-xs sm:text-sm font-semibold shadow-[0_2px_14px_rgba(197,160,89,0.25)] hover:shadow-[0_4px_20px_rgba(197,160,89,0.35)] transition-all cursor-pointer whitespace-nowrap apple-caption touch-target-44"
           >
             <span>Create Vault</span>
           </Link>

@@ -27,11 +27,11 @@ export function ToastProvider({ children }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-3.5 rounded-xl border shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3 text-xs font-mono animate-scale-up ${
+            className={`pointer-events-auto p-3.5 rounded-xl border shadow-2xl backdrop-blur-xl flex items-center justify-between gap-3 text-xs font-mono animate-scale-up apple-mono glass-vibrancy ${
               toast.type === "error"
-                ? "bg-[var(--theme-panel)]/95 border-rose-500/40 text-rose-400 shadow-[0_8px_30px_rgba(244,63,94,0.15)]"
+                ? "bg-[var(--theme-panel)]/95 border-rose-500/40 text-rose-300 shadow-[0_8px_30px_rgba(244,63,94,0.15)]"
                 : toast.type === "success"
-                ? "bg-[var(--theme-panel)]/95 border-emerald-500/40 text-emerald-400 shadow-[0_8px_30px_rgba(16,185,129,0.15)]"
+                ? "bg-[var(--theme-panel)]/95 border-emerald-500/40 text-emerald-300 shadow-[0_8px_30px_rgba(16,185,129,0.15)]"
                 : "bg-[var(--theme-panel)]/95 border-[var(--theme-accent)]/40 text-[var(--theme-text)] shadow-[0_8px_30px_rgba(197,160,89,0.15)]"
             }`}
           >
@@ -50,7 +50,8 @@ export function ToastProvider({ children }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] p-1 cursor-pointer transition-colors"
+              className="text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] p-1 cursor-pointer transition-colors touch-target-44"
+              title="Dismiss Notification"
             >
               ✕
             </button>

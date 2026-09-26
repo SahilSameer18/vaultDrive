@@ -108,12 +108,12 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 select-none font-sans">
       {/* ── Fullscreen Backdrop ─────────────────────────────────────── */}
       <div
-        className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer transition-opacity"
+        className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer transition-opacity animate-fade-in"
         onClick={onClose}
       />
 
       {/* ── Modal Card Container (Centered in viewport) ───────────────────── */}
-      <div className="relative z-[100000] w-full max-w-5xl h-[88vh] rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] flex flex-col shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden animate-scale-up">
+      <div className="relative z-[100000] w-full max-w-5xl h-[88vh] rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-panel)] flex flex-col shadow-[0_24px_80px_rgba(0,0,0,0.85)] overflow-hidden animate-scale-up origin-center">
         
         {/* ── Luxury Header Bar ────────────────────────────────────────────── */}
         <div className="px-5 py-3.5 border-b border-[var(--theme-border)] flex items-center justify-between bg-[var(--theme-surface)] shrink-0">
@@ -126,12 +126,12 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h3 className="font-bold text-sm text-[var(--theme-text)] truncate">{file.name}</h3>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--theme-text-muted)]">
+                <h3 className="font-bold text-sm text-[var(--theme-text)] truncate apple-headline">{file.name}</h3>
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[8px] font-mono font-bold tracking-wider bg-[var(--theme-panel)] border border-[var(--theme-border)] text-[var(--theme-text-muted)] apple-mono">
                   {fileExt}
                 </span>
               </div>
-              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] flex items-center gap-1.5 mt-0.5">
+              <p className="text-[10px] font-mono text-[var(--theme-text-muted)] flex items-center gap-1.5 mt-0.5 apple-caption">
                 <span>{formatBytes(file.size)}</span>
                 <span className="opacity-40">•</span>
                 <span>{formatDate(file.createdAt)}</span>
@@ -144,7 +144,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
             <button
               type="button"
               onClick={() => handleFileDownload(file.url, file.name)}
-              className="px-3.5 py-1.5 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text)] text-xs font-semibold hover:border-white/30 transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+              className="px-3.5 py-1.5 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text)] text-xs font-semibold hover:border-white/30 transition-all flex items-center gap-2 cursor-pointer shadow-sm apple-caption touch-target-44"
               title="Download File"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none">
@@ -156,7 +156,7 @@ export default function FilePreviewModal({ isOpen, onClose, file, onRefreshUrl }
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-panel)] text-[var(--theme-text-muted)] hover:text-[var(--theme-text)] hover:border-white/30 flex items-center justify-center transition-colors cursor-pointer touch-target-44"
               title="Close Preview (Esc)"
             >
               <span className="text-sm font-bold">✕</span>
